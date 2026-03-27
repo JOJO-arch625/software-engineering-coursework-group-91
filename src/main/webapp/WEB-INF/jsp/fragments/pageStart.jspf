@@ -1,0 +1,70 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" import="com.group91.tars.model.FlashMessage" %>
+<%
+    String currentView = (String) request.getAttribute("currentView");
+    String viewTag = (String) request.getAttribute("viewTag");
+    String viewTitle = (String) request.getAttribute("viewTitle");
+    Integer openJobCount = (Integer) request.getAttribute("openJobCount");
+    Integer applicationCount = (Integer) request.getAttribute("applicationCount");
+    Integer acceptedCount = (Integer) request.getAttribute("acceptedCount");
+    FlashMessage flash = (FlashMessage) request.getAttribute("flash");
+    String contextPath = request.getContextPath();
+%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= viewTitle %> | TA Recruitment System</title>
+    <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css">
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar">
+        <div class="brand">
+            <p class="eyebrow">Sprint 2</p>
+            <p class="eyebrow">Working Build</p>
+        </div>
+        <nav class="nav-group">
+            <a class="nav-link <%= "gateway".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/">Role Gateway</a>
+            <a class="nav-link <%= "ta-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/dashboard">TA Dashboard</a>
+            <a class="nav-link <%= "ta-profile".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/profile">TA Profile</a>
+            <a class="nav-link <%= "job-list".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/jobs">Job List</a>
+            <a class="nav-link <%= "job-detail".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/job">Job Detail</a>
+            <a class="nav-link <%= "applications".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/applications">My Applications</a>
+            <a class="nav-link <%= "mo-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/dashboard">MO Dashboard</a>
+            <a class="nav-link <%= "job-editor".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/jobs/edit">Create Job</a>
+            <a class="nav-link <%= "review".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/review">Applicant Review</a>
+            <a class="nav-link <%= "admin-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/admin/workload">Admin Workload</a>
+            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist">AI Assist</a>
+        </nav>
+    </aside>
+
+    <main class="main-panel">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow" id="view-tag"><%= viewTag %></p>
+                <h2 id="view-title"><%= viewTitle %></h2>
+            </div>
+            <div class="status-strip">
+                <article class="status-card">
+                    <span class="status-label">Open Jobs</span>
+                    <strong><%= openJobCount == null ? 0 : openJobCount %></strong>
+                </article>
+                <article class="status-card">
+                    <span class="status-label">Applications</span>
+                    <strong><%= applicationCount == null ? 0 : applicationCount %></strong>
+                </article>
+                <article class="status-card">
+                    <span class="status-label">Accepted</span>
+                    <strong><%= acceptedCount == null ? 0 : acceptedCount %></strong>
+                </article>
+            </div>
+        </header>
+
+        <% if (flash != null) { %>
+        <div class="view active" style="padding-bottom: 0;">
+            <div class="alert <%= "success".equals(flash.getLevel()) ? "success" : ("info".equals(flash.getLevel()) ? "info" : "danger") %>">
+                <%= flash.getText() %>
+            </div>
+        </div>
+        <% } %>
