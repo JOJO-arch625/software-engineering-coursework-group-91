@@ -25,6 +25,7 @@
 - Homepage: Highlight USP | Minimal layout | Video/slideshow | Motivational slogan
 - Learning Page: Colour theories | Multiple colour models | Visual + audio cues | Basic / advanced subpages
 - Game Page: Conversion challenges | Hue/saturation matching | Colour puzzles | Visual impact + sound effects
+- Game Page refinement for `Chencc7002`: Hero intro | Score strip | Game selector | Model Match | Hue Lab | Safety panel | Learning/Test/Community links
 - Test Page: 3 difficulty levels | Instant answer feedback | Aligned with EBU5303 objectives | No database
 - Community Page: Personal profiles | Rankings & scoreboard | Peer learning | No real database
 
@@ -36,3 +37,16 @@
 - User Experience: Error tolerance | Clear warnings | Transparent no-data policy
 - Cultural Design: Neutral imagery | Global colour symbolism
 - Version Milestones: v1-v4 aligned with EBU6305 deadlines
+
+## 6. Chencc7002 Personal Contribution Focus
+- Page owner: `Game`
+- Core Game 1: `Model Match`
+- Goal of Game 1: match `RGB`, `CMYK`, `HSV`, and `YCbCr` to real design or media scenarios
+- Input of Game 1: choose one option button
+- Feedback of Game 1: instant correct/incorrect response + explanation
+- Core Game 2: `Hue Lab`
+- Goal of Game 2: use hue, saturation, and lightness sliders to recreate a target colour
+- Input of Game 2: move sliders + press check button
+- Feedback of Game 2: match percentage + praise / close / try again message
+- Accessibility contribution: bilingual content | font-size control | keyboard-friendly interaction
+- Safety contribution: reset actions | no personal data collection | clear recovery guidance
