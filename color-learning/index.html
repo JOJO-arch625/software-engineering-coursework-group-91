@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage - Color Learning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">🎨</div>
+        <ul>
+            <li><a href="index.html" class="active">Homepage</a></li>
+            <li><a href="learning.html">Learning</a></li>
+            <li><a href="game.html">Game</a></li>
+            <li><a href="test.html">Test</a></li>
+            <li><a href="community.html">Community</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="lang-btn">EN</button>
+            <button class="font-btn">A-</button>
+            <button class="font-btn">A+</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="hero">
+            <div class="hero-text">
+                <h1>Learn Color Encoding</h1>
+                <p>Master RGB/CMYK/HSV/YCbCr</p>
+            </div>
+            <div class="hero-colors">
+                <div class="color-block red"></div>
+                <div class="color-block green"></div>
+                <div class="color-block blue"></div>
+            </div>
+        </div>
+
+        <div class="carousel">
+            <div class="carousel-main">
+                <button class="carousel-btn" onclick="prevSlide()">Prev</button>
+                <div class="carousel-content">
+                    <div class="carousel-color" style="background-color: #FF0000;"></div>
+                    <h3>RGB</h3>
+                    <p>Red Green Blue - Additive color model</p>
+                </div>
+                <button class="carousel-btn" onclick="nextSlide()">Next</button>
+            </div>
+            <div class="carousel-dots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <p class="carousel-desc">Explore different color models and understand their applications</p>
+        </div>
+    </div>
+
+    <div class="ad-banner">
+        <p>Advanced Color Course</p>
+    </div>
+
+    <footer>
+        <p>© 2026 Color Learning Website. All rights reserved.
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Use</a>
+        </p>
+    </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = [
+            { color: '#FF0000', title: 'RGB', desc: 'Red Green Blue - Additive color model' },
+            { color: '#0000FF', title: 'CMYK', desc: 'Cyan Magenta Yellow Key - Subtractive color model' },
+            { color: '#FFFF00', title: 'HSV', desc: 'Hue Saturation Value - Intuitive color adjustment' }
+        ];
+        const dots = document.querySelectorAll('.dot');
+
+        function updateSlide() {
+            const carouselColor = document.querySelector('.carousel-color');
+            const carouselTitle = document.querySelector('.carousel-content h3');
+            const carouselDesc = document.querySelector('.carousel-content p');
+            
+            carouselColor.style.backgroundColor = slides[currentSlide].color;
+            carouselTitle.textContent = slides[currentSlide].title;
+            carouselDesc.textContent = slides[currentSlide].desc;
+            
+            dots.forEach((dot, index) => {
+                dot.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlide();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlide();
+        }
+
+        updateSlide();
+    </script>
+</body>
+</html>
