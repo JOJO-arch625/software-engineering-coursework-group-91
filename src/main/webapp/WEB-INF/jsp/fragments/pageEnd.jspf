@@ -1,0 +1,50 @@
+        <button class="scroll-fab" type="button" data-scroll-fab aria-label="Scroll down">
+            <span class="scroll-fab-icon" data-scroll-icon>&#8595;</span>
+        </button>
+    </main>
+</div>
+<script>
+    (function () {
+        var key = "tars.sidebar.collapsed";
+        var toggle = document.querySelector("[data-sidebar-toggle]");
+        var scrollFab = document.querySelector("[data-scroll-fab]");
+        var scrollIcon = document.querySelector("[data-scroll-icon]");
+        if (window.localStorage && localStorage.getItem(key) === "true") {
+            document.body.classList.add("nav-collapsed");
+        }
+        if (toggle) {
+            toggle.addEventListener("click", function () {
+                document.body.classList.toggle("nav-collapsed");
+                if (window.localStorage) {
+                    localStorage.setItem(key, document.body.classList.contains("nav-collapsed"));
+                }
+            });
+        }
+
+        function refreshScrollFab() {
+            if (!scrollFab) {
+                return;
+            }
+            var atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 24;
+            scrollFab.setAttribute("aria-label", atBottom ? "Scroll to top" : "Scroll down");
+            if (scrollIcon) {
+                scrollIcon.innerHTML = atBottom ? "&#8593;" : "&#8595;";
+            }
+        }
+
+        if (scrollFab) {
+            refreshScrollFab();
+            scrollFab.addEventListener("click", function () {
+                var atBottom = window.innerHeight + window.scrollY >= document.body.scrollHeight - 24;
+                window.scrollTo({
+                    top: atBottom ? 0 : Math.min(window.scrollY + window.innerHeight * 0.82, document.body.scrollHeight),
+                    behavior: "smooth"
+                });
+            });
+            window.addEventListener("scroll", refreshScrollFab);
+            window.addEventListener("resize", refreshScrollFab);
+        }
+    })();
+</script>
+</body>
+</html>
