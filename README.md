@@ -16,3 +16,4 @@
 ## 中文实现文档
 - 本地运行说明：`docs/implementation/LOCAL-RUNNING-GUIDE.zh-CN.md`
 - 已实现功能与 TODO 说明：`docs/implementation/FEATURE-STATUS.zh-CN.md`
+- 阶段性中文总结报告：`docs/implementation/WORKSPACE-SUMMARY.zh-CN.md`

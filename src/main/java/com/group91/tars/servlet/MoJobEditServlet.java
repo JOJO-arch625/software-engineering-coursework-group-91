@@ -2,6 +2,7 @@ package com.group91.tars.servlet;
 
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.OperationResult;
+import com.group91.tars.service.TarsService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +15,9 @@ public class MoJobEditServlet extends BasePageServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+        if (!requireRole(request, response, TarsService.ROLE_MO)) {
+            return;
+        }
         preparePage(request, "job-editor", "MO Flow", "Create Or Edit Job Posting");
         request.setAttribute("job", resolveDraft(request));
         forward(request, response, "/WEB-INF/jsp/mo/job-editor.jsp");
@@ -22,6 +26,9 @@ public class MoJobEditServlet extends BasePageServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+        if (!requireRole(request, response, TarsService.ROLE_MO)) {
+            return;
+        }
         String action = request.getParameter("action");
         OperationResult result;
         if ("close".equals(action)) {
@@ -37,7 +44,7 @@ public class MoJobEditServlet extends BasePageServlet {
             draft.setDeadline(request.getParameter("deadline"));
             draft.setDescription(request.getParameter("description"));
             draft.setStatus(request.getParameter("status"));
-            result = service.saveJobPosting(draft);
+            result = service.saveJobPosting(getCurrentUser(request).getLinkedId(), draft);
         }
         flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
         redirect(request, response, "/mo/jobs/edit" + buildQuerySuffix(request.getParameter("id")));

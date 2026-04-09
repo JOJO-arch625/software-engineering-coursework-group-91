@@ -3,6 +3,7 @@ package com.group91.tars.servlet;
 import com.group91.tars.model.ApplicationRecord;
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.OperationResult;
+import com.group91.tars.service.TarsService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,6 +18,9 @@ public class MoReviewServlet extends BasePageServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+        if (!requireRole(request, response, TarsService.ROLE_MO)) {
+            return;
+        }
         preparePage(request, "review", "MO Flow", "Applicant Review");
         JobPosting selectedJob = resolveJob(request);
         List<ApplicationRecord> applications = selectedJob == null
@@ -34,6 +38,9 @@ public class MoReviewServlet extends BasePageServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+        if (!requireRole(request, response, TarsService.ROLE_MO)) {
+            return;
+        }
         OperationResult result = service.updateApplicationStatus(
             request.getParameter("applicationId"),
             request.getParameter("status"),
@@ -52,8 +59,8 @@ public class MoReviewServlet extends BasePageServlet {
                 return explicit;
             }
         }
-        if (!service.getJobsForCurrentMo().isEmpty()) {
-            return service.getJobsForCurrentMo().get(0);
+        if (!service.getJobsForMo(getCurrentUser(request).getLinkedId()).isEmpty()) {
+            return service.getJobsForMo(getCurrentUser(request).getLinkedId()).get(0);
         }
         return null;
     }

@@ -69,17 +69,19 @@
                     <button class="ghost-button" type="submit" name="status" value="Rejected">Reject applicant</button>
                 </div>
             </form>
-            <div class="ai-card" style="margin-top: 18px;">
-                <div class="panel-header">
-                    <h4>Optional AI Review Support</h4>
-                    <p>Reserved for teammate enhancement work. Final decision remains with the MO.</p>
+            <details class="accordion-card" style="margin-top: 18px;">
+                <summary>Optional AI Review Support</summary>
+                <div class="accordion-body">
+                    <article class="ai-card">
+                        <p class="muted">Reserved for teammate enhancement work. Final decision remains with the MO.</p>
+                        <ul class="feature-list">
+                            <% for (String item : aiTodos) { %>
+                            <li><%= item %></li>
+                            <% } %>
+                        </ul>
+                    </article>
                 </div>
-                <ul class="feature-list">
-                    <% for (String item : aiTodos) { %>
-                    <li><%= item %></li>
-                    <% } %>
-                </ul>
-            </div>
+            </details>
             <% } %>
         </article>
     </div>

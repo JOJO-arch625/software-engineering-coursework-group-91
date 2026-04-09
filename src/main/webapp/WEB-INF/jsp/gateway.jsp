@@ -62,7 +62,7 @@
         </article>
         <article class="panel">
             <div class="panel-header">
-                <h4>Latest TA Notifications</h4>
+                <h4>Build Highlights</h4>
             </div>
             <ul class="feature-list">
                 <% for (String item : notifications) { %>

@@ -66,17 +66,19 @@
     </div>
 
     <div class="grid one-col">
-        <article class="ai-card">
-            <div class="panel-header">
-                <h4>Optional AI Fit Summary</h4>
-                <p>Future enhancement only. Core recruitment flow does not depend on AI.</p>
+        <details class="accordion-card">
+            <summary>Optional AI Fit Summary</summary>
+            <div class="accordion-body">
+                <article class="ai-card">
+                    <p class="muted">Future enhancement only. Core recruitment flow does not depend on AI.</p>
+                    <ul class="feature-list">
+                        <% for (String item : aiTodos) { %>
+                        <li><%= item %></li>
+                        <% } %>
+                    </ul>
+                </article>
             </div>
-            <ul class="feature-list">
-                <% for (String item : aiTodos) { %>
-                <li><%= item %></li>
-                <% } %>
-            </ul>
-        </article>
+        </details>
     </div>
     <% } %>
 </section>

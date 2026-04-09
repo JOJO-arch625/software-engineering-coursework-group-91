@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.group91.tars.model.ApplicationRecord;
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.TAProfile;
+import com.group91.tars.model.UserAccount;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,6 +27,7 @@ public class JsonDataStore {
     private static final Type PROFILE_LIST_TYPE = new TypeToken<List<TAProfile>>() { }.getType();
     private static final Type JOB_LIST_TYPE = new TypeToken<List<JobPosting>>() { }.getType();
     private static final Type APPLICATION_LIST_TYPE = new TypeToken<List<ApplicationRecord>>() { }.getType();
+    private static final Type ACCOUNT_LIST_TYPE = new TypeToken<List<UserAccount>>() { }.getType();
 
     private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final Path rootDirectory = Paths.get(System.getProperty("user.dir"));
@@ -34,6 +36,7 @@ public class JsonDataStore {
     private final Path profilesFile = dataDirectory.resolve("ta-profiles.json");
     private final Path jobsFile = dataDirectory.resolve("job-postings.json");
     private final Path applicationsFile = dataDirectory.resolve("applications.json");
+    private final Path accountsFile = dataDirectory.resolve("accounts.json");
 
     private JsonDataStore() {
     }
@@ -49,6 +52,7 @@ public class JsonDataStore {
             ensureSeedProfiles();
             ensureSeedJobs();
             ensureSeedApplications();
+            ensureSeedAccounts();
             ensureSampleCv();
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to initialise local JSON storage.", exception);
@@ -77,6 +81,14 @@ public class JsonDataStore {
 
     public void saveApplications(List<ApplicationRecord> applications) {
         writeList(applicationsFile, applications);
+    }
+
+    public List<UserAccount> loadAccounts() {
+        return readList(accountsFile, ACCOUNT_LIST_TYPE);
+    }
+
+    public void saveAccounts(List<UserAccount> accounts) {
+        writeList(accountsFile, accounts);
     }
 
     public String saveCvFile(InputStream inputStream, String fileName) throws IOException {
@@ -175,6 +187,18 @@ public class JsonDataStore {
         writeList(applicationsFile, applications);
     }
 
+    private void ensureSeedAccounts() throws IOException {
+        if (Files.exists(accountsFile) && Files.size(accountsFile) > 0) {
+            return;
+        }
+
+        List<UserAccount> accounts = new ArrayList<UserAccount>();
+        accounts.add(createAccount("acc-ta-1", "ta.demo", "TaDemo123", "Yuyanchen Long", "TA", "ta-1"));
+        accounts.add(createAccount("acc-mo-1", "mo.demo", "MoDemo123", "Ling Ma", "MO", "mo-1"));
+        accounts.add(createAccount("acc-admin-1", "admin.demo", "AdminDemo123", "Programme Admin", "ADMIN", "admin-1"));
+        writeList(accountsFile, accounts);
+    }
+
     private void ensureSampleCv() throws IOException {
         createPlaceholderCv("YuyanchenLong_CV.pdf");
         createPlaceholderCv("MingLi_CV.pdf");
@@ -230,5 +254,17 @@ public class JsonDataStore {
         application.setNotes(notes);
         application.setSubmittedAt(submittedAt);
         return application;
+    }
+
+    private UserAccount createAccount(String id, String username, String password,
+                                      String displayName, String role, String linkedId) {
+        UserAccount account = new UserAccount();
+        account.setId(id);
+        account.setUsername(username);
+        account.setPassword(password);
+        account.setDisplayName(displayName);
+        account.setRole(role);
+        account.setLinkedId(linkedId);
+        return account;
     }
 }

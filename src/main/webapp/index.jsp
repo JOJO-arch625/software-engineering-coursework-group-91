@@ -1,3 +1,3 @@
 <%
-    response.sendRedirect(request.getContextPath() + "/gateway");
+    response.sendRedirect(request.getContextPath() + "/login");
 %>

@@ -4,6 +4,7 @@ import com.group91.tars.model.ApplicationRecord;
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.OperationResult;
 import com.group91.tars.model.TAProfile;
+import com.group91.tars.model.UserAccount;
 import com.group91.tars.model.WorkloadSummary;
 import com.group91.tars.storage.JsonDataStore;
 
@@ -24,6 +25,9 @@ import java.util.UUID;
 public class TarsService {
     public static final String CURRENT_TA_ID = "ta-1";
     public static final String CURRENT_MO_ID = "mo-1";
+    public static final String ROLE_TA = "TA";
+    public static final String ROLE_MO = "MO";
+    public static final String ROLE_ADMIN = "ADMIN";
     public static final int MAX_APPLICATIONS = 3;
     public static final int MAX_ACCEPTED_JOBS = 3;
 
@@ -42,8 +46,36 @@ public class TarsService {
         store.initialize();
     }
 
+    public UserAccount authenticate(String username, String password) {
+        if (isBlank(username) || isBlank(password)) {
+            return null;
+        }
+
+        for (UserAccount account : store.loadAccounts()) {
+            if (username.trim().equalsIgnoreCase(account.getUsername())
+                && password.equals(account.getPassword())) {
+                return account;
+            }
+        }
+        return null;
+    }
+
+    public String getHomePathForRole(String role) {
+        if (ROLE_MO.equals(role)) {
+            return "/mo/dashboard";
+        }
+        if (ROLE_ADMIN.equals(role)) {
+            return "/admin/workload";
+        }
+        return "/ta/dashboard";
+    }
+
     public TAProfile getCurrentTaProfile() {
         return getProfileById(CURRENT_TA_ID);
+    }
+
+    public TAProfile getTaProfile(String taId) {
+        return getProfileById(taId);
     }
 
     public TAProfile getProfileById(String taId) {
@@ -76,9 +108,13 @@ public class TarsService {
     }
 
     public List<JobPosting> getJobsForCurrentMo() {
+        return getJobsForMo(CURRENT_MO_ID);
+    }
+
+    public List<JobPosting> getJobsForMo(String moId) {
         List<JobPosting> moJobs = new ArrayList<JobPosting>();
         for (JobPosting job : getAllJobs()) {
-            if (CURRENT_MO_ID.equals(job.getMoId())) {
+            if (moId.equals(job.getMoId())) {
                 moJobs.add(job);
             }
         }
@@ -95,9 +131,13 @@ public class TarsService {
     }
 
     public List<ApplicationRecord> getApplicationsForCurrentTa() {
+        return getApplicationsForTa(CURRENT_TA_ID);
+    }
+
+    public List<ApplicationRecord> getApplicationsForTa(String taId) {
         List<ApplicationRecord> applications = new ArrayList<ApplicationRecord>();
         for (ApplicationRecord application : store.loadApplications()) {
-            if (CURRENT_TA_ID.equals(application.getTaId())) {
+            if (taId.equals(application.getTaId())) {
                 applications.add(application);
             }
         }
@@ -129,7 +169,11 @@ public class TarsService {
     }
 
     public int countCurrentTaApplications() {
-        return getApplicationsForCurrentTa().size();
+        return countApplicationsForTa(CURRENT_TA_ID);
+    }
+
+    public int countApplicationsForTa(String taId) {
+        return getApplicationsForTa(taId).size();
     }
 
     public int countCurrentTaAcceptedJobs() {
@@ -159,18 +203,26 @@ public class TarsService {
     }
 
     public List<String> getCurrentTaNotifications() {
+        return getNotificationsForTa(CURRENT_TA_ID);
+    }
+
+    public List<String> getNotificationsForTa(String taId) {
         List<String> notifications = new ArrayList<String>();
-        for (ApplicationRecord application : getApplicationsForCurrentTa()) {
+        for (ApplicationRecord application : getApplicationsForTa(taId)) {
             JobPosting job = getJobById(application.getJobId());
             String title = job == null ? "job" : job.getTitle();
             notifications.add(title + " status is " + application.getStatus() + ".");
         }
-        int remaining = MAX_APPLICATIONS - countCurrentTaApplications();
+        int remaining = MAX_APPLICATIONS - countApplicationsForTa(taId);
         notifications.add("You can still apply for " + Math.max(remaining, 0) + " more job(s).");
         return notifications;
     }
 
     public OperationResult saveCurrentTaProfile(TAProfile updatedProfile) {
+        return saveTaProfile(CURRENT_TA_ID, updatedProfile);
+    }
+
+    public OperationResult saveTaProfile(String taId, TAProfile updatedProfile) {
         if (isBlank(updatedProfile.getFullName())
             || isBlank(updatedProfile.getStudentNumber())
             || isBlank(updatedProfile.getEmail())
@@ -181,8 +233,8 @@ public class TarsService {
 
         List<TAProfile> profiles = store.loadProfiles();
         for (int index = 0; index < profiles.size(); index++) {
-            if (CURRENT_TA_ID.equals(profiles.get(index).getId())) {
-                updatedProfile.setId(CURRENT_TA_ID);
+            if (taId.equals(profiles.get(index).getId())) {
+                updatedProfile.setId(taId);
                 if (isBlank(updatedProfile.getCvPath())) {
                     updatedProfile.setCvPath(profiles.get(index).getCvPath());
                 }
@@ -192,13 +244,17 @@ public class TarsService {
             }
         }
 
-        updatedProfile.setId(CURRENT_TA_ID);
+        updatedProfile.setId(taId);
         profiles.add(updatedProfile);
         store.saveProfiles(profiles);
         return OperationResult.success("Profile created successfully.");
     }
 
     public OperationResult uploadCurrentTaCv(Part part) {
+        return uploadTaCv(CURRENT_TA_ID, part);
+    }
+
+    public OperationResult uploadTaCv(String taId, Part part) {
         if (part == null || part.getSize() == 0) {
             return OperationResult.failure("Please choose a CV file before uploading.");
         }
@@ -209,7 +265,7 @@ public class TarsService {
             return OperationResult.failure("Invalid file type. Please upload a PDF, DOC, or DOCX file.");
         }
 
-        TAProfile profile = getCurrentTaProfile();
+        TAProfile profile = getTaProfile(taId);
         if (profile == null) {
             return OperationResult.failure("TA profile was not found.");
         }
@@ -219,7 +275,7 @@ public class TarsService {
         try (InputStream inputStream = part.getInputStream()) {
             String path = store.saveCvFile(inputStream, finalName);
             profile.setCvPath(path);
-            saveCurrentTaProfile(profile);
+            saveTaProfile(taId, profile);
             return OperationResult.success("CV uploaded successfully. Stored locally and linked through JSON metadata.");
         } catch (IOException exception) {
             return OperationResult.failure("Unable to store the uploaded file locally.");
@@ -227,6 +283,10 @@ public class TarsService {
     }
 
     public OperationResult submitCurrentTaApplication(String jobId, String priority, String notes) {
+        return submitTaApplication(CURRENT_TA_ID, jobId, priority, notes);
+    }
+
+    public OperationResult submitTaApplication(String taId, String jobId, String priority, String notes) {
         JobPosting job = getJobById(jobId);
         if (job == null) {
             return OperationResult.failure("The selected job posting does not exist.");
@@ -234,10 +294,10 @@ public class TarsService {
         if (!"Open".equals(job.getStatus())) {
             return OperationResult.failure("This posting is closed and cannot accept new applications.");
         }
-        if (countCurrentTaApplications() >= MAX_APPLICATIONS) {
+        if (countApplicationsForTa(taId) >= MAX_APPLICATIONS) {
             return OperationResult.failure("Application blocked. A TA can apply for at most three jobs.");
         }
-        for (ApplicationRecord application : getApplicationsForCurrentTa()) {
+        for (ApplicationRecord application : getApplicationsForTa(taId)) {
             if (jobId.equals(application.getJobId())) {
                 return OperationResult.failure("You have already applied for this job.");
             }
@@ -246,7 +306,7 @@ public class TarsService {
         ApplicationRecord application = new ApplicationRecord();
         application.setId("app-" + UUID.randomUUID().toString().substring(0, 8));
         application.setJobId(jobId);
-        application.setTaId(CURRENT_TA_ID);
+        application.setTaId(taId);
         application.setPriority(isBlank(priority) ? "Priority 3" : priority);
         application.setStatus("Submitted");
         application.setNotes(isBlank(notes) ? "TA application submitted." : notes.trim());
@@ -259,6 +319,10 @@ public class TarsService {
     }
 
     public OperationResult saveJobPosting(JobPosting draft) {
+        return saveJobPosting(CURRENT_MO_ID, draft);
+    }
+
+    public OperationResult saveJobPosting(String moId, JobPosting draft) {
         if (isBlank(draft.getModuleCode()) || isBlank(draft.getTitle()) || isBlank(draft.getSkills())
             || isBlank(draft.getRequirements()) || isBlank(draft.getWorkload()) || isBlank(draft.getDeadline())) {
             return OperationResult.failure("Please complete all required job posting fields.");
@@ -268,7 +332,7 @@ public class TarsService {
         boolean updated = false;
         for (int index = 0; index < jobs.size(); index++) {
             if (draft.getId() != null && draft.getId().equals(jobs.get(index).getId())) {
-                draft.setMoId(CURRENT_MO_ID);
+                draft.setMoId(moId);
                 if (isBlank(draft.getStatus())) {
                     draft.setStatus("Open");
                 }
@@ -280,7 +344,7 @@ public class TarsService {
 
         if (!updated) {
             draft.setId("job-" + UUID.randomUUID().toString().substring(0, 8));
-            draft.setMoId(CURRENT_MO_ID);
+            draft.setMoId(moId);
             if (isBlank(draft.getStatus())) {
                 draft.setStatus("Open");
             }
@@ -394,8 +458,33 @@ public class TarsService {
     }
 
     private String extractFileName(Part part) {
-        String submittedName = part.getSubmittedFileName();
+        String submittedName;
+        try {
+            submittedName = part.getSubmittedFileName();
+        } catch (NoSuchMethodError error) {
+            submittedName = extractFileNameFromHeaders(part);
+        }
+        if (isBlank(submittedName)) {
+            submittedName = extractFileNameFromHeaders(part);
+        }
         return isBlank(submittedName) ? "uploaded_cv.pdf" : submittedName;
+    }
+
+    private String extractFileNameFromHeaders(Part part) {
+        String contentDisposition = part.getHeader("content-disposition");
+        if (isBlank(contentDisposition)) {
+            return null;
+        }
+        String[] segments = contentDisposition.split(";");
+        for (String segment : segments) {
+            String trimmed = segment.trim();
+            if (trimmed.startsWith("filename=")) {
+                String fileName = trimmed.substring("filename=".length()).trim().replace("\"", "");
+                int separatorIndex = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+                return separatorIndex >= 0 ? fileName.substring(separatorIndex + 1) : fileName;
+            }
+        }
+        return null;
     }
 
     private String buildDefaultStatusNote(String status) {

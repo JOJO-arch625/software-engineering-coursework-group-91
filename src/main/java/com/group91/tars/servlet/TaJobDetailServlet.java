@@ -2,6 +2,7 @@ package com.group91.tars.servlet;
 
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.OperationResult;
+import com.group91.tars.service.TarsService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -14,6 +15,9 @@ public class TaJobDetailServlet extends BasePageServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
+        if (!requireRole(request, response, TarsService.ROLE_TA)) {
+            return;
+        }
         preparePage(request, "job-detail", "TA Flow", "Job Detail And Application");
         JobPosting job = resolveSelectedJob(request);
         request.setAttribute("job", job);
@@ -24,8 +28,12 @@ public class TaJobDetailServlet extends BasePageServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
+        if (!requireRole(request, response, TarsService.ROLE_TA)) {
+            return;
+        }
         String jobId = request.getParameter("jobId");
-        OperationResult result = service.submitCurrentTaApplication(
+        OperationResult result = service.submitTaApplication(
+            getCurrentUser(request).getLinkedId(),
             jobId,
             request.getParameter("priority"),
             request.getParameter("notes")

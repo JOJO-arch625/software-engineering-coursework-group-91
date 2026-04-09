@@ -7,7 +7,7 @@
     <article class="panel">
         <div class="panel-header">
             <h4>Available Jobs</h4>
-            <p>Only open postings can be applied for, but closed roles remain visible for transparency.</p>
+            <p>Only open postings are shown to TA users so the application flow stays focused and clear.</p>
         </div>
         <div class="legend">
             <span class="pill pill-neutral">Max applications: 3</span>
