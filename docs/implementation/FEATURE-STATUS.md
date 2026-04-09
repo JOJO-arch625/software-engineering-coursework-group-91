@@ -1,24 +1,33 @@
 # Implemented Features And TODO Scope
 
 ## Current Implementation Scope
-This branch delivers the `core MVP workflow` for the intermediate assessment.  
-It is designed to be demo-ready, coursework-compliant, and easy for teammates to extend.
+This branch now delivers the `core intermediate-assessment MVP + role-based workspace version`.  
+It is designed to be demo-ready, coursework-compliant, and still easy for teammates to extend.
 
 ## Implemented Features
 
-### TA Flow
+### 1. Login And Role Access
+- local login page
+- local account seed data in `data/accounts.json`
+- `HttpSession`-based login state
+- role-based routing after login
+- redirect to `/login` for unauthenticated access
+- role-based route restriction
+- logout
+
+### 2. TA Flow
 - TA dashboard with summary cards
 - TA profile create and update
 - local CV upload
 - CV file type validation
-- job list with open and closed status visibility
+- job list showing open jobs
 - job detail page
 - application submission
 - application priority selection
 - application status page
 - visible rejection status for transparency
 
-### MO Flow
+### 3. MO Flow
 - MO dashboard
 - create job posting
 - edit job posting
@@ -29,11 +38,20 @@ It is designed to be demo-ready, coursework-compliant, and easy for teammates to
 - mark applicant as `Accepted`
 - mark applicant as `Rejected`
 
-### Admin Flow
+### 4. Admin Flow
 - workload dashboard
 - accepted job count summary
 - per-TA accepted module view
 - overload risk highlighting at the threshold
+- Admin positioned as a monitoring and balancing role rather than a direct hiring role
+
+### 5. Current UI And Interaction
+- unified blue and pink visual direction
+- left-side role navigation
+- top bar with user info
+- page-level floating scroll button
+- AI panels collapsed by default
+- `Search` and `Inbox` preserved as TODO entry points instead of MVP features
 
 ## Core Rules Already Implemented
 - no database is used
@@ -44,8 +62,10 @@ It is designed to be demo-ready, coursework-compliant, and easy for teammates to
 - a closed job blocks new applications
 - rejected applications remain visible to the TA
 - workload summary is derived from accepted applications
+- AI, Search, and Inbox are outside the current MVP acceptance scope
 
 ## Data Model In Use
+- `UserAccount`
 - `TAProfile`
 - `JobPosting`
 - `ApplicationRecord`
@@ -54,6 +74,11 @@ It is designed to be demo-ready, coursework-compliant, and easy for teammates to
 - `FlashMessage`
 
 ## Current Pages
+### Entry routes
+- `/`
+- `/login`
+
+### Main routes
 - `/gateway`
 - `/ta/dashboard`
 - `/ta/profile`
@@ -75,8 +100,18 @@ These areas are intentionally left as extension space and do not block the base 
 - AI shortlist support for MO
 - workload balancing advice for Admin
 
+### Search And Inbox
+These are already visible in the UI structure but not yet fully implemented:
+- Search module
+- Inbox / notification module
+- cross-page search
+- review reminders and system alerts
+
 ### Quality And UX Work
 These are good follow-up tasks for teammates:
+- stronger top-bar layout stability on different screen sizes
+- more polished collapsed sidebar behavior
+- AI page layout refinement
 - stronger form validation polish
 - better error text and edge-case handling
 - UI refinement and accessibility improvements
@@ -89,6 +124,7 @@ These are still worth adding:
 - service-layer unit tests
 - submission validation test cases
 - workload calculation test cases
+- login and role access test cases
 
 ## What Teammates Should Avoid Breaking
 - the max-3 application rule
@@ -96,15 +132,18 @@ These are still worth adding:
 - closed-job blocking behavior
 - local JSON storage design
 - route names already used in the current JSP/Servlet structure
+- login redirect and role-based access control
 
 ## Safe Extension Strategy
 If teammates continue from this branch, the safest order is:
 1. keep the current core flow stable
 2. add tests
 3. add UI polish
-4. add optional AI support
+4. complete Search / Inbox
+5. add optional AI support
 
 ## Suggested Ownership Split
+- one teammate: Search / Inbox
 - one teammate: AI fit scoring prototype
 - one teammate: validation and UX polish
 - one teammate: tests and demo scripts
