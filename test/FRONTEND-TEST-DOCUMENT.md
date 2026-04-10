@@ -1,87 +1,98 @@
-# Frontend Test Document
+# 前端测试说明
 
-## Scope
+## 目标
 
-This folder contains the first round of frontend-focused automated tests for the TA Recruitment System.  
-The project UI is server-rendered with JSP, so these tests validate the rendered HTML, redirects, flash messages, role-based navigation, and page-level user flows through HTTP responses.
+这套前端测试用于覆盖当前 TA Recruitment System 的核心页面验收流程。  
+由于项目采用的是 `JSP` 服务端渲染页面，所以前端测试主要验证：
 
-## Current test target
+- 页面是否正确渲染
+- 未登录和已登录时是否跳到正确页面
+- 不同角色是否进入各自工作区
+- 页面上的关键文案、按钮和状态是否可见
 
-- Login page rendering
-- Route protection and role-based redirects
-- TA dashboard, job list, job detail, and applications pages
-- MO dashboard and applicant review page
-- Admin workload dashboard
+## 当前覆盖范围
 
-## Test strategy
+- 登录页
+- 登录后的角色跳转
+- 未登录访问时的重定向保护
+- TA 页面：仪表盘、岗位列表、申请列表、岗位详情
+- MO 页面：仪表盘、申请审核页
+- Admin 页面：工作量监控页
 
-The current suite uses a lightweight in-repo Node runner instead of browser automation or `node --test`.  
-This choice keeps the test code lightweight and also avoids the sandbox child-process issue that can appear in restricted environments.
+## 测试策略
 
-Main ideas:
+前端测试当前使用仓库内置的轻量 Node runner，不依赖浏览器自动化框架。  
+这样做的原因是：
 
-- Treat JSP output as the frontend contract
-- Assert visible user-facing text instead of fragile CSS selectors
-- Keep most checks read-only so the seeded demo data is not mutated
-- Cover the most important acceptance paths before adding deeper UI automation
+- 当前环境已经具备 Node.js
+- 不需要额外下载依赖
+- 可以先把最核心的页面验收逻辑稳定下来
+- 能规避受限环境里 `node --test` 和浏览器依赖安装的问题
 
-## Files
+核心思路：
 
-- `frontend/login-and-routing.test.mjs`: login, session, redirect, and permission checks
-- `frontend/ta-pages.test.mjs`: TA-facing page coverage
-- `frontend/mo-admin-pages.test.mjs`: MO and Admin page coverage
-- `run-frontend-tests.mjs`: lightweight entry point for executing the suite
-- `helpers/miniTestRunner.mjs`: internal test runner used by this folder
-- `helpers/sessionClient.mjs`: session-aware HTTP helper with cookie handling
-- `helpers/htmlAssertions.mjs`: shared text and title assertions
-- `helpers/testConfig.mjs`: base URL and demo account configuration
+- 把 JSP 返回的 HTML 当作前端契约
+- 优先断言用户能看到的关键文本
+- 尽量避免依赖脆弱的 CSS 选择器
+- 以只读测试为主，避免污染本地演示数据
 
-## Covered scenarios
+## 主要文件
 
-### 1. Login and route protection
+- `frontend/login-and-routing.test.mjs`：登录、会话、重定向、越权访问测试
+- `frontend/ta-pages.test.mjs`：TA 页面测试
+- `frontend/mo-admin-pages.test.mjs`：MO 与 Admin 页面测试
+- `run-frontend-tests.mjs`：前端测试入口
+- `helpers/miniTestRunner.mjs`：轻量测试执行器
+- `helpers/sessionClient.mjs`：带 Cookie 的请求客户端
+- `helpers/htmlAssertions.mjs`：HTML 文本断言工具
+- `helpers/testConfig.mjs`：前端测试配置和演示账号
 
-- Login page renders correctly
-- Demo account hints are visible
-- Unauthenticated users are redirected to `/login`
-- TA login redirects to `/ta/dashboard`
-- Invalid login shows an error message
-- TA users are blocked from visiting Admin-only pages
+## 已覆盖场景
 
-### 2. TA frontend flow
+### 1. 登录与权限保护
 
-- TA job list only shows open postings
-- Closed postings are hidden from the TA list
-- Application history keeps rejected records visible
-- Job detail page exposes the application form
-- Optional AI section is still visible as a non-core enhancement block
+- 登录页能正常打开
+- 页面能显示演示账号信息
+- 未登录访问业务页会跳回 `/login`
+- TA 登录后会跳转到 `/ta/dashboard`
+- 错误账号密码会显示提示信息
+- TA 访问 Admin 页面会被拦回自己的工作区
 
-### 3. MO and Admin flow
+### 2. TA 页面
 
-- MO dashboard shows posting management context
-- MO review page displays applicant details and decision controls
-- Admin workload dashboard shows threshold and overload status
+- TA 岗位列表只显示开放岗位
+- 关闭岗位不会出现在 TA 列表里
+- 申请记录页面会保留被拒绝的申请
+- 岗位详情页会显示申请表单
+- 可选 AI 区域仍然可见
 
-## Why this counts as frontend testing
+### 3. MO 与 Admin 页面
 
-Although these tests do not open a browser yet, they still validate frontend behavior because the UI here is rendered on the server side.  
-The important frontend contract for this project is:
+- MO 仪表盘展示岗位管理和审核上下文
+- MO 审核页展示申请人详情和审核按钮
+- Admin 页面展示 workload 阈值和 overload 风险
 
-- which page a user reaches
-- what text and actions they see
-- whether the correct role-specific page is rendered
-- whether important workflow messages are visible
+## 为什么这属于前端测试
 
-## Limitations in this first version
+虽然这套测试现在还没有真正打开浏览器，但它验证的是页面层行为，而不是单纯的数据层逻辑。  
+对这个项目来说，当前前端最重要的契约就是：
 
-- No visual regression coverage
-- No CSS/layout assertions
-- No JavaScript interaction coverage beyond server-rendered flows
-- No mutation-heavy scenario checks such as repeated application submission or MO decision updates
-- Tests require the web app to be started manually before execution
+- 用户进入了哪个页面
+- 页面上显示了哪些信息
+- 页面是否根据角色正确变化
+- 核心提示和状态是否真的能被用户看到
 
-## Recommended next steps
+## 当前限制
 
-1. Keep this suite as a stable smoke/acceptance layer.
-2. Add backend/service tests for business rules such as application caps and workload calculation.
-3. Add browser-level automation later with Playwright or Selenium if the team wants UI interaction coverage.
-4. Add test fixtures or data reset scripts before introducing write-heavy end-to-end tests.
+- 还没有做视觉回归测试
+- 还没有做 CSS 布局断言
+- 还没有覆盖真正的点击动画或浏览器级交互
+- 还没有做大范围的写操作测试
+- 运行前需要先启动 Web 服务
+
+## 建议下一步
+
+1. 把这套前端测试保留为稳定的页面验收层。
+2. 在后端继续补 service 层和存储层测试。
+3. 如果后续要覆盖真实点击和表单交互，再升级到 Playwright 或 Selenium。
+4. 在加入写操作场景前，先补数据重置机制。
