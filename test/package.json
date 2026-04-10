@@ -1,0 +1,14 @@
+{
+  "name": "ta-recruitment-system-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:frontend": "node run-frontend-tests.mjs",
+    "test:frontend:verbose": "node run-frontend-tests.mjs --verbose",
+    "test:backend:contracts": "node run-backend-contract-tests.mjs",
+    "test:backend:contracts:verbose": "node run-backend-contract-tests.mjs --verbose",
+    "test:backend:java": "powershell -NoProfile -ExecutionPolicy Bypass -File backend\\java\\run-java-tests.ps1",
+    "test:backend": "npm run test:backend:java && npm run test:backend:contracts",
+    "test:all": "npm run test:frontend && npm run test:backend"
+  }
+}
