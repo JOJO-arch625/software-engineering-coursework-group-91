@@ -1,0 +1,9 @@
+{
+  "name": "ta-recruitment-system-tests",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test:frontend": "node run-frontend-tests.mjs",
+    "test:frontend:verbose": "node run-frontend-tests.mjs --verbose"
+  }
+}
