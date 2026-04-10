@@ -3,12 +3,216 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Learning - Color Learning</title>
+    <title>Learning - Color Encoding</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial,sans-serif;
+            transition: all 0.3s ease;
+        }
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #2ecc71;
+            --light: #ecf0f1;
+            --dark: #34495e;
+            --gray: #7f8c8d;
+        }
+        .high-contrast {
+            --primary: #000000;
+            --secondary: #FFFF00;
+            --accent: #00FF00;
+            --light: #FFFFFF;
+            --dark: #000000;
+            --gray: #333333;
+        }
+        nav{
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            padding:1rem 2rem;
+            background:var(--primary);
+            color:white;
+            position:sticky;
+            top:0;
+            z-index:100;
+        }
+        .logo{
+            font-size:1.8rem;
+            font-weight:bold;
+        }
+        nav ul{
+            display:flex;
+            list-style:none;
+            gap:2rem;
+        }
+        nav a{
+            color:white;
+            text-decoration:none;
+            font-size:1.1rem;
+        }
+        nav a.active{
+            color:var(--accent);
+            font-weight:bold;
+        }
+        .nav-right{
+            display:flex;
+            gap:0.5rem;
+        }
+        .lang-btn,.font-btn,.contrast-btn{
+            padding:0.4rem 0.8rem;
+            border:none;
+            border-radius:4px;
+            cursor:pointer;
+            background:var(--light);
+            color:var(--primary);
+        }
+        .container{
+            max-width:1200px;
+            margin:2rem auto;
+            padding:0 1rem;
+        }
+        .page-title{
+            text-align:center;
+            font-size:2.2rem;
+            color:var(--primary);
+            margin-bottom:0.5rem;
+        }
+        .page-subtitle{
+            text-align:center;
+            color:var(--gray);
+            margin-bottom:2rem;
+            font-size:1.1rem;
+        }
+        .main-tabs{
+            display:flex;
+            gap:1rem;
+            margin-bottom:2rem;
+            justify-content:center;
+            flex-wrap:wrap;
+        }
+        .main-tab{
+            padding:1rem 2rem;
+            background:var(--light);
+            border:none;
+            border-radius:6px;
+            font-size:1.1rem;
+            cursor:pointer;
+        }
+        .main-tab.active{
+            background:var(--secondary);
+            color:white;
+        }
+        .sub-tabs{
+            display:flex;
+            gap:1rem;
+            margin-bottom:2rem;
+            justify-content:center;
+            flex-wrap:wrap;
+        }
+        .sub-tab{
+            padding:0.8rem 1.5rem;
+            background:var(--light);
+            border:none;
+            border-radius:6px;
+            cursor:pointer;
+        }
+        .sub-tab.active{
+            background:var(--accent);
+            color:white;
+        }
+        .content-section{
+            background:white;
+            padding:2rem;
+            border-radius:8px;
+            box-shadow:0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom:2rem;
+        }
+        .content-section h2{
+            color:var(--primary);
+            margin-bottom:1rem;
+            border-left:4px solid var(--secondary);
+            padding-left:1rem;
+        }
+        .content-section h3{
+            color:var(--dark);
+            margin:1.5rem 0 1rem 0;
+        }
+        .content-section p{
+            line-height:1.8;
+            color:var(--dark);
+            margin-bottom:1rem;
+        }
+        .content-section ul{
+            margin-left:2rem;
+            margin-bottom:1rem;
+        }
+        .content-section li{
+            line-height:1.8;
+            color:var(--dark);
+            margin-bottom:0.5rem;
+        }
+        .img-box{
+            text-align:center;
+            margin:1.5rem 0;
+        }
+        .img-box img{
+            max-width:100%;
+            height:auto;
+            border-radius:6px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+        .img-box p{
+            font-size:0.9rem;
+            color:var(--gray);
+            margin-top:0.5rem;
+        }
+        .info-box{
+            background:#f8f9fa;
+            border-left:4px solid var(--accent);
+            padding:1rem;
+            margin:1rem 0;
+            border-radius:0 6px 6px 0;
+        }
+        .cards-grid{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+            gap:1.5rem;
+            margin-top:2rem;
+        }
+        .card{
+            background:white;
+            padding:1.5rem;
+            border-radius:8px;
+            box-shadow:0 2px 8px rgba(0,0,0,0.1);
+        }
+        .card h3{
+            color:var(--primary);
+            margin-bottom:1rem;
+        }
+        footer{
+            text-align:center;
+            padding:2rem;
+            background:var(--primary);
+            color:white;
+            margin-top:3rem;
+        }
+        footer a{
+            color:var(--accent);
+            text-decoration:none;
+            margin-left:1rem;
+        }
+        .audio-control{
+            margin:1rem 0;
+        }
+    </style>
 </head>
 <body>
     <nav>
-        <div class="logo">🎨</div>
+        <div class="logo">🎨 Color Learning</div>
         <ul>
             <li><a href="index.html">Homepage</a></li>
             <li><a href="learning.html" class="active">Learning</a></li>
@@ -17,37 +221,196 @@
             <li><a href="community.html">Community</a></li>
         </ul>
         <div class="nav-right">
-            <button class="lang-btn">EN</button>
-            <button class="font-btn">A-</button>
-            <button class="font-btn">A+</button>
+            <button class="lang-btn" id="langBtn">EN</button>
+            <button class="font-btn" id="fontSmaller">A-</button>
+            <button class="font-btn" id="fontBigger">A+</button>
+            <button class="contrast-btn" id="contrastBtn">Contrast</button>
         </div>
     </nav>
-
     <div class="container">
-        <h1 class="page-title">Extensive & Interesting Color Training</h1>
-        <p class="page-subtitle">Stretch Your Color Knowledge Without Boredom</p>
-
-        <div class="cards-grid">
-            <div class="card">
-                <h3>RGB/CMYK Basics</h3>
-                <p>Core color model training covering fundamental concepts of additive and subtractive color systems used in digital and print media.</p>
+        <h1 class="page-title">Color Encoding Learning</h1>
+        <p class="page-subtitle">From Basic Vision to Advanced Color Models</p>
+        <div class="main-tabs">
+            <button class="main-tab active" id="tab-basics">Colour basics & colour vision</button>
+            <button class="main-tab" id="tab-models">Colour models</button>
+        </div>
+        <div class="sub-tabs" id="sub-basics">
+            <button class="sub-tab active" id="sub-color-basics">Colour basics</button>
+            <button class="sub-tab" id="sub-color-vision">Colour vision</button>
+        </div>
+        <div class="sub-tabs" id="sub-models" style="display:none;">
+            <button class="sub-tab" id="sub-rgb">RGB</button>
+            <button class="sub-tab" id="sub-yuv">YUV/YCbCr</button>
+            <button class="sub-tab" id="sub-cmyk">CMYK</button>
+            <button class="sub-tab" id="sub-hsv">HSV</button>
+        </div>
+        <!-- ====================== Colour Basics ====================== -->
+        <div class="content-section" id="content-color-basics">
+            <h2>1. What is Color?</h2>
+            <p>Color is a <strong>perceptual property of light</strong>, not an inherent feature of objects. Objects do not have color themselves—they only reflect or absorb specific wavelengths of visible light.</p>
+            <div class="info-box">
+                <p>Key rule: Objects <strong>reflect</strong> the light we see; they <strong>absorb</strong> the light we don’t see.</p>
             </div>
-            <div class="card">
-                <h3>HSV/YCbCr Practical Use</h3>
-                <p>Real-world application training exploring color spaces used in image processing, video compression, and creative workflows.</p>
+            <h2>2. Visible Light Spectrum</h2>
+            <p>Visible light is a small part of the electromagnetic spectrum, ranging from <strong>400 nm (violet)</strong> to <strong>700 nm (red)</strong>. Different wavelengths correspond to different hues.</p>
+            <div class="img-box">
+                <img src="https://via.placeholder.com/800x200/2c3e50/ffffff?text=Visible+Light+Spectrum+400-700nm" alt="Visible Light Spectrum">
+                <p>Visible light spectrum and wavelength distribution</p>
             </div>
-            <div class="card">
-                <h3>Sub-pages</h3>
-                <p>Access detailed learning modules covering advanced topics, exercises, and interactive training materials.</p>
+            <h2>3. Three Core Properties of Color</h2>
+            <ul>
+                <li><strong>Hue</strong>: The dominant color name (red, green, blue), determined by the main wavelength of light.</li>
+                <li><strong>Saturation</strong>: Color purity. High saturation = no white light mixed; low saturation = grayish.</li>
+                <li><strong>Brightness</strong>: Subjective perceived light intensity from a surface.</li>
+            </ul>
+            <h2>4. Brightness vs Luminance</h2>
+            <p><strong>Brightness</strong>: Subjective human perception, no strict math definition.</p>
+            <p><strong>Luminance</strong>: Objective physical value, calculated based on wavelength and light power.</p>
+            <p>Human eyes are more sensitive to green light, so same-power lights have different perceived brightness.</p>
+        </div>
+        <!-- ====================== Colour Vision ====================== -->
+        <div class="content-section" id="content-color-vision" style="display:none;">
+            <h2>1. Human Eye Structure for Color Vision</h2>
+            <p>The retina contains two photoreceptor cell types: <strong>rods</strong> and <strong>cones</strong>.</p>
+            <div class="img-box">
+                <img src="https://via.placeholder.com/800x300/2c3e50/ffffff?text=Eye+Structure+Retina+Cones+Rods" alt="Eye Retina Structure">
+                <p>Retina structure showing rods and cones distribution</p>
+            </div>
+            <ul>
+                <li><strong>Rods</strong>: Work in low light, no color detection.</li>
+                <li><strong>Cones</strong>: Work in bright light, responsible for color vision.</li>
+            </ul>
+            <h2>2. Three Types of Cones</h2>
+            <ul>
+                <li><strong>L cones (Red)</strong>: Peak sensitivity ~610 nm</li>
+                <li><strong>M cones (Green)</strong>: Peak sensitivity ~560 nm</li>
+                <li><strong>S cones (Blue)</strong>: Peak sensitivity ~430 nm</li>
+            </ul>
+            <div class="info-box">
+                <p>Color blindness is usually caused by missing or defective cone types.</p>
+            </div>
+            <h2>3. Tristimulus Theory</h2>
+            <p>All perceived colors can be reproduced by mixing <strong>red, green, blue</strong> light in proper proportions. This is the foundation of all digital color systems.</p>
+            <h2>4. Metamers</h2>
+            <p>Metamers are <strong>different light spectra</strong> that produce <strong>identical color perception</strong> in human eyes. Different wavelength combinations can look like the same color.</p>
+        </div>
+        <!-- ====================== RGB ====================== -->
+        <div class="content-section" id="content-rgb" style="display:none;">
+            <h2>RGB Color Model</h2>
+            <p>RGB is an <strong>additive color model</strong> used for screens (monitors, phones, TVs). Colors are created by emitting red, green, blue light.</p>
+            <h3>Additive Principle</h3>
+            <p>More light = brighter color. <strong>(0,0,0) = black; (255,255,255) = white</strong></p>
+            <div class="img-box">
+                <img src="https://via.placeholder.com/800x250/2c3e50/ffffff?text=RGB+Additive+Color+Mixing" alt="RGB Additive Mixing">
+                <p>RGB additive color mixing diagram</p>
+            </div>
+            <h3>Common Values</h3>
+            <ul>
+                <li>Red: (255, 0, 0)</li>
+                <li>Green: (0, 255, 0)</li>
+                <li>Blue: (0, 0, 255)</li>
+                <li>Gray: (128, 128, 128)</li>
+            </ul>
+        </div>
+        <!-- ====================== YUV/YCbCr ====================== -->
+        <div class="content-section" id="content-yuv" style="display:none;">
+            <h2>YUV / YCbCr Color Model</h2>
+            <p>YUV separates <strong>luminance (Y)</strong> and <strong>chrominance (U/V)</strong>. YCbCr is the digital version for image/video compression (JPEG, MPEG).</p>
+            <h3>Why Separate Luma and Chroma?</h3>
+            <p>Human eyes are much more sensitive to brightness than color. We can reduce chroma data to save space without visible quality loss.</p>
+            <div class="info-box">
+                <p>Y = brightness; Cb = blue difference; Cr = red difference</p>
+            </div>
+        </div>
+        <!-- ====================== CMYK ====================== -->
+        <div class="content-section" id="content-cmyk" style="display:none;">
+            <h2>CMYK Color Model</h2>
+            <p>CMYK is a <strong>subtractive model</strong> for printing. Inks absorb light instead of emitting it.</p>
+            <h3>Subtractive Principle</h3>
+            <p>C(cyan), M(magenta), Y(yellow) are subtractive primaries. K = black (Key color).</p>
+            <div class="info-box">
+                <p>CMY cannot make pure black because real inks have impurities. So K (black ink) is added.</p>
+            </div>
+        </div>
+        <!-- ====================== HSV ====================== -->
+        <div class="content-section" id="content-hsv" style="display:none;">
+            <h2>HSV Color Model</h2>
+            <p>HSV is <strong>human-intuitive color space</strong> for designers: Hue, Saturation, Value.</p>
+            <ul>
+                <li><strong>Hue (0-360°)</strong>: Color angle (0°=red, 120°=green, 240°=blue)</li>
+                <li><strong>Saturation (0-100%)</strong>: Color purity</li>
+                <li><strong>Value (0-100%)</strong>: Brightness</li>
+            </ul>
+            <div class="img-box">
+                <img src="https://via.placeholder.com/800x250/2c3e50/ffffff?text=HSV+Cone+Model+Hue+Saturation+Value" alt="HSV Cone Structure">
+                <p>HSV color cone structure</p>
             </div>
         </div>
     </div>
-
     <footer>
         <p>© 2026 Color Learning Website. All rights reserved.
             <a href="#">Privacy Policy</a>
             <a href="#">Terms of Use</a>
         </p>
     </footer>
+    <script>
+        let currentFontSize = 100;
+        const root = document.documentElement;
+        // Main tabs
+        const mainTabs = document.querySelectorAll('.main-tab');
+        const subBasics = document.getElementById('sub-basics');
+        const subModels = document.getElementById('sub-models');
+        // Sub tabs
+        const subTabs = document.querySelectorAll('.sub-tab');
+        const contents = document.querySelectorAll('.content-section');
+        // Main tab switch
+        mainTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mainTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                if(tab.id === 'tab-basics'){
+                    subBasics.style.display = 'flex';
+                    subModels.style.display = 'none';
+                }else{
+                    subBasics.style.display = 'none';
+                    subModels.style.display = 'flex';
+                }
+            });
+        });
+        // Sub tab switch
+        subTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                subTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                contents.forEach(c => c.style.display = 'none');
+                
+                const targetId = 'content-' + tab.id.replace('sub-','');
+                const targetEl = document.getElementById(targetId);
+                if(targetEl) targetEl.style.display = 'block';
+            });
+        });
+        // Font size control
+        document.getElementById('fontBigger').addEventListener('click', () => {
+            if(currentFontSize < 150){
+                currentFontSize += 10;
+                document.body.style.fontSize = currentFontSize + '%';
+            }
+        });
+        document.getElementById('fontSmaller').addEventListener('click', () => {
+            if(currentFontSize > 70){
+                currentFontSize -= 10;
+                document.body.style.fontSize = currentFontSize + '%';
+            }
+        });
+        // Contrast mode
+        document.getElementById('contrastBtn').addEventListener('click', () => {
+            document.body.classList.toggle('high-contrast');
+        });
+        // Language switch (basic)
+        document.getElementById('langBtn').addEventListener('click', () => {
+            const btn = document.getElementById('langBtn');
+            btn.textContent = btn.textContent === 'EN' ? '中' : 'EN';
+        });
+    </script>
 </body>
 </html>
