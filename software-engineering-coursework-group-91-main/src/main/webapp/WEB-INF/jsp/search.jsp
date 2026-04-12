@@ -6,7 +6,7 @@
     List<ApplicationRecord> applicationResults = (List<ApplicationRecord>) request.getAttribute("applicationResults");
     List<TAProfile> profileResults = (List<TAProfile>) request.getAttribute("profileResults");
 %>
-<%@ include file="../fragments/pageStart.jspf" %>
+<%@ include file="fragments/pageStart.jspf" %>
 <section class="view active">
     <article class="panel">
         <div class="panel-header">
@@ -113,4 +113,4 @@
         <% } %>
     </article>
 </section>
-<%@ include file="../fragments/pageEnd.jspf" %>
+<%@ include file="fragments/pageEnd.jspf" %>

@@ -224,7 +224,7 @@ public class TarsService {
         String q = query.toLowerCase().trim();
         List<TAProfile> results = new ArrayList<TAProfile>();
         for (TAProfile profile : store.loadProfiles()) {
-            if (containsIgnoreCase(profile.getName(), q)
+            if (containsIgnoreCase(profile.getFullName(), q)
                 || containsIgnoreCase(profile.getStudentNumber(), q)
                 || containsIgnoreCase(profile.getEmail(), q)
                 || containsIgnoreCase(profile.getSkills(), q)) {
@@ -504,7 +504,7 @@ public class TarsService {
                 
                 // Add notification for TA
                 addNotification(application.getTaId(), ROLE_TA, "Application Status Updated", 
-                    "Your application for " + application.getModuleCode() + " has been updated to: " + status);
+                    "Your application for " + getJobModuleCode(application.getJobId()) + " has been updated to: " + status);
                 
                 // Check for overload and notify Admin
                 if ("Accepted".equals(status)) {
@@ -640,9 +640,5 @@ public class TarsService {
             return "MO is reviewing skills and workload.";
         }
         return "Status updated by MO.";
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.trim().isEmpty();
     }
 }

@@ -1048,6 +1048,13 @@ table,
   margin-top: 24px;
 }
 
+.login-field {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--blue-strong);
+}
+
 .login-submit {
   min-height: 54px;
   border-radius: 999px;
@@ -1126,6 +1133,8 @@ table,
   gap: 18px;
   width: min(100%, 430px);
   justify-self: end;
+  position: relative;
+  z-index: 10;
 }
 
 .login-card {
@@ -1161,6 +1170,19 @@ table,
   border-radius: 16px;
   padding: 14px 16px;
   background: rgba(25, 62, 130, 0.06);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.clickable-account {
+  cursor: pointer;
+}
+
+.clickable-account:hover {
+  background: rgba(25, 62, 130, 0.12);
+}
+
+.clickable-account:active {
+  transform: scale(0.98);
 }
 
 .account-chip strong {

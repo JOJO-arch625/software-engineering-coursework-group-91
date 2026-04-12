@@ -73,13 +73,13 @@
                 <% } %>
 
                 <form class="login-form" method="post" action="<%= contextPath %>/login">
-                    <label>
-                        Username
-                        <input type="text" name="username" placeholder="Enter demo username" required>
+                    <label class="login-field">
+                        <span>Username</span>
+                        <input type="text" name="username" id="username" placeholder="Enter demo username" required>
                     </label>
-                    <label>
-                        Password
-                        <input type="password" name="password" placeholder="Enter demo password" required>
+                    <label class="login-field">
+                        <span>Password</span>
+                        <input type="password" name="password" id="password" placeholder="Enter demo password" required>
                     </label>
                     <button class="primary-button login-submit" type="submit">Log in</button>
                 </form>
@@ -87,16 +87,17 @@
 
             <article class="demo-account-card">
                 <h3>Demo accounts</h3>
+                <p class="muted" style="margin-bottom: 12px; font-size: 13px;">Click an account to auto-fill</p>
                 <div class="account-grid">
-                    <div class="account-chip">
+                    <div class="account-chip clickable-account" data-user="ta.demo" data-pass="TaDemo123">
                         <strong>TA</strong>
                         <span>ta.demo / TaDemo123</span>
                     </div>
-                    <div class="account-chip">
+                    <div class="account-chip clickable-account" data-user="mo.demo" data-pass="MoDemo123">
                         <strong>MO</strong>
                         <span>mo.demo / MoDemo123</span>
                     </div>
-                    <div class="account-chip">
+                    <div class="account-chip clickable-account" data-user="admin.demo" data-pass="AdminDemo123">
                         <strong>Admin</strong>
                         <span>admin.demo / AdminDemo123</span>
                     </div>
@@ -105,5 +106,35 @@
         </aside>
     </section>
 </main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle demo account clicks
+        const chips = document.querySelectorAll('.clickable-account');
+        const userInp = document.getElementById('username');
+        const passInp = document.getElementById('password');
+
+        chips.forEach(chip => {
+            chip.addEventListener('click', function() {
+                userInp.value = this.getAttribute('data-user');
+                passInp.value = this.getAttribute('data-pass');
+                
+                // Optional: visual feedback
+                chip.style.transform = 'scale(0.98)';
+                setTimeout(() => chip.style.transform = '', 100);
+            });
+        });
+
+        // Form submission feedback
+        const form = document.querySelector('.login-form');
+        const submitBtn = document.querySelector('.login-submit');
+        
+        form.addEventListener('submit', function() {
+            submitBtn.textContent = 'Logging in...';
+            submitBtn.style.opacity = '0.8';
+            submitBtn.style.pointerEvents = 'none';
+        });
+    });
+</script>
 </body>
 </html>

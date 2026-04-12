@@ -6,7 +6,7 @@
     "title": "Welcome to TARS",
     "message": "Your account has been set up successfully. You can now start applying for jobs.",
     "timestamp": "2026-03-24 10:00",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "ntf-2",
@@ -15,7 +15,7 @@
     "title": "Application Under Review",
     "message": "Your application for Digital Systems TA (EIE2105) is now under review.",
     "timestamp": "2026-03-24 11:00",
-    "isRead": false
+    "isRead": true
   },
   {
     "id": "ntf-3",

@@ -2,7 +2,7 @@
 <%
     List<Notification> notifications = (List<Notification>) request.getAttribute("notifications");
 %>
-<%@ include file="../fragments/pageStart.jspf" %>
+<%@ include file="fragments/pageStart.jspf" %>
 <section class="view active">
     <article class="panel">
         <div class="panel-header">
@@ -41,4 +41,4 @@
         </div>
     </article>
 </section>
-<%@ include file="../fragments/pageEnd.jspf" %>
+<%@ include file="fragments/pageEnd.jspf" %>
