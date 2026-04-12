@@ -541,7 +541,9 @@
               <div class="panel-header">
                 <div>
                   <h4>Applicant Review</h4>
-                  <p class="muted">MO reviews profile, CV reference, and workload before a decision.</p>
+                  <p class="muted" id="review-job-context">
+                    MO reviews profile, CV reference, and workload before a decision.
+                  </p>
                 </div>
                 <span class="pill pill-neutral">Transparent decisions</span>
               </div>
@@ -575,7 +577,7 @@
                 <button class="primary-button" id="accept-button">Accept applicant</button>
                 <button class="ghost-button" id="reject-button">Reject applicant</button>
               </div>
-              <div class="alert success hidden" id="review-success">
+              <div class="alert success hidden" id="review-feedback">
                 Applicant status updated. TA dashboard and applications view now reflect the decision.
               </div>
             </article>

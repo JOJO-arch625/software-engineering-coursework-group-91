@@ -114,6 +114,53 @@ function getAcceptedApplications() {
   return state.applications.filter((app) => app.status === "Accepted");
 }
 
+function getSelectedJobApplications() {
+  return state.applications.filter((app) => app.jobId === state.selectedJobId);
+}
+
+function getApplicantName(app) {
+  return app?.applicantName || "Yuyanchen Long";
+}
+
+function getAdminRecordByApplicant(applicantName) {
+  return state.adminRecords.find((item) => item.ta === applicantName);
+}
+
+function ensureAdminRecord(applicantName) {
+  const existingRecord = getAdminRecordByApplicant(applicantName);
+  if (existingRecord) return existingRecord;
+
+  const record = {
+    ta: applicantName,
+    modules: [],
+    count: 0,
+  };
+  state.adminRecords.push(record);
+  return record;
+}
+
+function getAcceptedJobCountForApplicant(app) {
+  const record = getAdminRecordByApplicant(getApplicantName(app));
+  return record ? record.count : app.acceptedJobs;
+}
+
+function syncAcceptedJobCountForApplicant(applicantName, acceptedCount) {
+  state.applications.forEach((item) => {
+    if (getApplicantName(item) === applicantName) {
+      item.acceptedJobs = acceptedCount;
+    }
+  });
+}
+
+function removeAcceptedModuleFromRecord(app) {
+  const record = getAdminRecordByApplicant(getApplicantName(app));
+  if (!record) return;
+
+  record.modules = record.modules.filter((moduleCode) => moduleCode !== app.moduleCode);
+  record.count = record.modules.length;
+  syncAcceptedJobCountForApplicant(record.ta, record.count);
+}
+
 function setView(viewId) {
   state.currentView = viewId;
   document.querySelectorAll(".view").forEach((view) => {
@@ -137,6 +184,36 @@ function statusClass(status) {
 
 function createStatusChip(status) {
   return `<span class="status-chip ${statusClass(status)}">${status}</span>`;
+}
+
+function setReviewActionsDisabled(disabled) {
+  ["mark-review-button", "accept-button", "reject-button"].forEach((id) => {
+    document.getElementById(id).disabled = disabled;
+  });
+}
+
+function showReviewFeedback(type, message) {
+  const feedback = document.getElementById("review-feedback");
+  feedback.textContent = message;
+  feedback.className = `alert ${type}`;
+}
+
+function renderEmptyReviewState(selectedJob) {
+  document.getElementById("candidate-name").textContent = selectedJob
+    ? `No applicants for ${selectedJob.moduleCode}`
+    : "No applicant selected";
+  document.getElementById("candidate-skills").textContent =
+    "Applicants for this posting will appear here after a TA submits an application.";
+  document.getElementById("candidate-cv").textContent = "CV path: Not available yet";
+  document.getElementById("candidate-workload").textContent = "Current accepted jobs: - / 3";
+  document.getElementById("review-ai-score").textContent = "--";
+  document.getElementById("review-ai-fit").textContent =
+    "No applicant is currently selected for AI review support.";
+  document.getElementById("review-ai-workload").textContent =
+    "Workload analysis will appear once an applicant is available.";
+  document.getElementById("review-ai-action").textContent =
+    "Open a posting with applicants to review recommendation details.";
+  setReviewActionsDisabled(true);
 }
 
 function renderTopMetrics() {
@@ -239,7 +316,7 @@ function renderMODashboard() {
           <p>${job.applicants} applicants</p>
           <div class="button-row">
             <button class="secondary-button" data-select-job="${job.id}">Open detail</button>
-            <button class="ghost-button" data-jump="review">Review applicants</button>
+            <button class="ghost-button" data-review-job="${job.id}">Review applicants</button>
           </div>
         </article>
       `
@@ -248,28 +325,56 @@ function renderMODashboard() {
 }
 
 function renderReviewTable() {
-  document.getElementById("review-table").innerHTML = state.applications
+  const selectedJob = state.jobs.find((item) => item.id === state.selectedJobId);
+  const filteredApplications = getSelectedJobApplications();
+
+  document.getElementById("review-job-context").textContent = selectedJob
+    ? `Showing applicants for ${selectedJob.moduleCode} ${selectedJob.title}.`
+    : "Showing applicants for the selected job posting.";
+
+  if (filteredApplications.length === 0) {
+    document.getElementById("review-table").innerHTML = `
+      <tr>
+        <td colspan="4" class="muted">No applicants have applied for this job yet.</td>
+      </tr>
+    `;
+    hide("review-feedback");
+    renderEmptyReviewState(selectedJob);
+    return;
+  }
+
+  if (!filteredApplications.some((item) => item.id === state.selectedApplicantId)) {
+    state.selectedApplicantId = filteredApplications[0].id;
+  }
+
+  document.getElementById("review-table").innerHTML = filteredApplications
     .map(
       (app) => `
         <tr>
-          <td><button class="table-link" data-select-app="${app.id}">Yuyanchen Long</button></td>
+          <td><button class="table-link" data-select-app="${app.id}">${getApplicantName(app)}</button></td>
           <td>${app.skills}</td>
-          <td>${app.acceptedJobs} / 3</td>
+          <td>${getAcceptedJobCountForApplicant(app)} / 3</td>
           <td>${createStatusChip(app.status)}</td>
         </tr>
       `
     )
     .join("");
 
-  const selectedApp = state.applications.find((item) => item.id === state.selectedApplicantId);
-  if (!selectedApp) return;
-  document.getElementById("candidate-name").textContent = "Yuyanchen Long";
+  const selectedApp = filteredApplications.find((item) => item.id === state.selectedApplicantId);
+  if (!selectedApp) {
+    renderEmptyReviewState(selectedJob);
+    return;
+  }
+
+  const acceptedJobs = getAcceptedJobCountForApplicant(selectedApp);
+  document.getElementById("candidate-name").textContent = getApplicantName(selectedApp);
   document.getElementById("candidate-skills").textContent = selectedApp.skills;
   document.getElementById("candidate-cv").textContent = `CV path: ${selectedApp.cvPath}`;
   document.getElementById(
     "candidate-workload"
-  ).textContent = `Current accepted jobs: ${selectedApp.acceptedJobs} / 3`;
-  renderReviewAI(selectedApp);
+  ).textContent = `Current accepted jobs: ${acceptedJobs} / 3`;
+  setReviewActionsDisabled(false);
+  renderReviewAI({ ...selectedApp, acceptedJobs });
 }
 
 function renderJobAI(job) {
@@ -383,13 +488,14 @@ function resetMessages() {
     "apply-case-note",
     "job-save-success",
     "job-close-info",
-    "review-success",
+    "review-feedback",
   ].forEach(hide);
 }
 
 function addApplication(jobId, priority) {
   const job = state.jobs.find((item) => item.id === jobId);
   if (!job) return;
+  const applicantName = "Yuyanchen Long";
   state.applications.push({
     id: `app-${Date.now()}`,
     jobId: job.id,
@@ -399,7 +505,7 @@ function addApplication(jobId, priority) {
     status: "Submitted",
     notes: "Application submitted successfully.",
     skills: job.skills,
-    acceptedJobs: getAcceptedApplications().length,
+    acceptedJobs: getAdminRecordByApplicant(applicantName)?.count ?? getAcceptedApplications().length,
     cvPath: `uploads/cv/${state.cvFileName}`,
   });
   state.notifications.unshift(`New application submitted for ${job.moduleCode}.`);
@@ -424,6 +530,16 @@ function bindEvents() {
   });
 
   document.addEventListener("click", (event) => {
+    const reviewTrigger = event.target.closest("[data-review-job]");
+    if (reviewTrigger) {
+      state.selectedJobId = reviewTrigger.dataset.reviewJob;
+      state.selectedApplicantId = getSelectedJobApplications()[0]?.id || "";
+      hide("review-feedback");
+      setView("review");
+      renderReviewTable();
+      return;
+    }
+
     const jumpTrigger = event.target.closest("[data-jump]");
     if (jumpTrigger) {
       setView(jumpTrigger.dataset.jump);
@@ -440,6 +556,7 @@ function bindEvents() {
     const appTrigger = event.target.closest("[data-select-app]");
     if (appTrigger) {
       state.selectedApplicantId = appTrigger.dataset.selectApp;
+      hide("review-feedback");
       renderReviewTable();
     }
   });
@@ -534,37 +651,64 @@ function bindEvents() {
   document.getElementById("mark-review-button").addEventListener("click", () => {
     const app = state.applications.find((item) => item.id === state.selectedApplicantId);
     if (!app) return;
+    const wasAccepted = app.status === "Accepted";
     app.status = "Under Review";
     app.notes = "MO is reviewing workload and module fit.";
-    show("review-success");
+    if (wasAccepted) {
+      removeAcceptedModuleFromRecord(app);
+    }
+    showReviewFeedback("success", `Applicant marked under review for ${app.moduleCode}.`);
     rerender();
   });
 
   document.getElementById("accept-button").addEventListener("click", () => {
     const app = state.applications.find((item) => item.id === state.selectedApplicantId);
     if (!app) return;
+
+    const applicantName = getApplicantName(app);
+    const acceptedJobCount = getAcceptedJobCountForApplicant(app);
+
+    if (app.status === "Accepted") {
+      showReviewFeedback("info", `${applicantName} has already been accepted for ${app.moduleCode}.`);
+      return;
+    }
+
+    if (acceptedJobCount >= 3) {
+      showReviewFeedback(
+        "danger",
+        `${applicantName} already has 3 accepted jobs. This application cannot be accepted.`
+      );
+      return;
+    }
+
     app.status = "Accepted";
     app.notes = "Offer sent to TA and visible in dashboard.";
-    app.acceptedJobs += 1;
-    const record = state.adminRecords.find((item) => item.ta === "Yuyanchen Long");
-    if (record && !record.modules.includes(app.moduleCode)) {
+
+    const record = ensureAdminRecord(applicantName);
+    if (!record.modules.includes(app.moduleCode)) {
       record.modules.push(app.moduleCode);
-      record.count = record.modules.length;
     }
+    record.count = record.modules.length;
+    syncAcceptedJobCountForApplicant(applicantName, record.count);
+
     state.notifications.unshift(`${app.moduleCode} status updated to Accepted.`);
     if (state.notifications.length > 4) state.notifications.pop();
-    show("review-success");
+    showReviewFeedback("success", `Applicant accepted for ${app.moduleCode}.`);
     rerender();
   });
 
   document.getElementById("reject-button").addEventListener("click", () => {
     const app = state.applications.find((item) => item.id === state.selectedApplicantId);
     if (!app) return;
+    const wasAccepted = app.status === "Accepted";
     app.status = "Rejected";
     app.notes = "MO rejected the application. TA can see the result clearly.";
+    if (wasAccepted) {
+      removeAcceptedModuleFromRecord(app);
+    }
     state.notifications.unshift(`${app.moduleCode} status updated to Rejected.`);
     if (state.notifications.length > 4) state.notifications.pop();
-    show("review-success");
+    showReviewFeedback("success", `Applicant rejected for ${app.moduleCode}.`);
     rerender();
   });
 }
