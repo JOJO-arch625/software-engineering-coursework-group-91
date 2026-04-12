@@ -1,5 +1,6 @@
 const state = {
   currentView: "gateway",
+  viewHistory: [],
   selectedJobId: "job-1",
   selectedApplicantId: "app-1",
   profileComplete: true,
@@ -106,6 +107,26 @@ const viewMeta = {
   "ai-assist": { tag: "Optional", title: "AI Assist Concept" },
 };
 
+const secondaryViews = new Set([
+  "ta-profile",
+  "job-list",
+  "job-detail",
+  "applications",
+  "job-editor",
+  "review",
+  "ai-assist",
+]);
+
+const fallbackBackView = {
+  "ta-profile": "ta-dashboard",
+  "job-list": "ta-dashboard",
+  "job-detail": "job-list",
+  applications: "ta-dashboard",
+  "job-editor": "mo-dashboard",
+  review: "mo-dashboard",
+  "ai-assist": "gateway",
+};
+
 function getOpenJobs() {
   return state.jobs.filter((job) => job.status === "Open");
 }
@@ -161,7 +182,22 @@ function removeAcceptedModuleFromRecord(app) {
   syncAcceptedJobCountForApplicant(record.ta, record.count);
 }
 
-function setView(viewId) {
+function updateBackButton() {
+  const backButton = document.getElementById("back-button");
+  const shouldShow =
+    secondaryViews.has(state.currentView) &&
+    (state.viewHistory.length > 0 || Boolean(fallbackBackView[state.currentView]));
+
+  backButton.classList.toggle("hidden", !shouldShow);
+}
+
+function setView(viewId, options = {}) {
+  if (!viewMeta[viewId]) return;
+
+  if (!options.skipHistory && state.currentView && state.currentView !== viewId) {
+    state.viewHistory.push(state.currentView);
+  }
+
   state.currentView = viewId;
   document.querySelectorAll(".view").forEach((view) => {
     view.classList.toggle("active", view.id === viewId);
@@ -173,6 +209,13 @@ function setView(viewId) {
   const meta = viewMeta[viewId];
   document.getElementById("view-tag").textContent = meta.tag;
   document.getElementById("view-title").textContent = meta.title;
+  updateBackButton();
+}
+
+function goBack() {
+  const previousView = state.viewHistory.pop() || fallbackBackView[state.currentView];
+  if (!previousView) return;
+  setView(previousView, { skipHistory: true });
 }
 
 function statusClass(status) {
@@ -528,6 +571,8 @@ function bindEvents() {
   document.querySelectorAll(".nav-link").forEach((button) => {
     button.addEventListener("click", () => setView(button.dataset.view));
   });
+
+  document.getElementById("back-button").addEventListener("click", goBack);
 
   document.addEventListener("click", (event) => {
     const reviewTrigger = event.target.closest("[data-review-job]");
