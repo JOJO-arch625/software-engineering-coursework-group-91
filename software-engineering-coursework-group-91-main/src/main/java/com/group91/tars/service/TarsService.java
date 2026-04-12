@@ -257,9 +257,11 @@ public class TarsService {
             }
 
             if (visible) {
-                if (containsIgnoreCase(application.getModuleCode(), q)
+                String moduleCode = getJobModuleCode(application.getJobId());
+                String taName = getTaName(application.getTaId());
+                if (containsIgnoreCase(moduleCode, q)
                     || containsIgnoreCase(application.getStatus(), q)
-                    || containsIgnoreCase(application.getTaName(), q)) {
+                    || containsIgnoreCase(taName, q)) {
                     results.add(application);
                 }
             }
@@ -433,7 +435,7 @@ public class TarsService {
         // Add notification for MO
         if (job.getMoId() != null) {
             addNotification(job.getMoId(), ROLE_MO, "New Application Received", 
-                "You have received a new application for " + job.getModuleCode() + " from " + application.getTaName() + ".");
+                "You have received a new application for " + job.getModuleCode() + " from " + getTaName(application.getTaId()) + ".");
         }
         
         return OperationResult.success("Application submitted. Status is now Submitted.");
@@ -509,7 +511,7 @@ public class TarsService {
                     int acceptedCount = countAcceptedJobsForTa(application.getTaId());
                     if (acceptedCount >= MAX_ACCEPTED_JOBS) {
                         addNotification("admin-1", ROLE_ADMIN, "TA Overload Warning", 
-                            "TA " + application.getTaName() + " has reached the workload limit (" + acceptedCount + " jobs).");
+                            "TA " + getTaName(application.getTaId()) + " has reached the workload limit (" + acceptedCount + " jobs).");
                     }
                 }
                 
@@ -576,6 +578,11 @@ public class TarsService {
     public String getJobModuleCode(String jobId) {
         JobPosting job = getJobById(jobId);
         return job == null ? "-" : job.getModuleCode();
+    }
+
+    public String getTaName(String taId) {
+        TAProfile profile = getTaProfile(taId);
+        return profile == null ? "Unknown TA" : profile.getFullName();
     }
 
     public int countApplicantsForJob(String jobId) {

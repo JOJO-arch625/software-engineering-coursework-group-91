@@ -1,5 +1,6 @@
-<%@ page import="java.util.List,com.group91.tars.model.JobPosting,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.TAProfile" %>
+<%@ page import="java.util.List,com.group91.tars.model.JobPosting,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.TAProfile,com.group91.tars.service.TarsService" %>
 <%
+    TarsService service = TarsService.getInstance();
     String query = (String) request.getAttribute("query");
     List<JobPosting> jobResults = (List<JobPosting>) request.getAttribute("jobResults");
     List<ApplicationRecord> applicationResults = (List<ApplicationRecord>) request.getAttribute("applicationResults");
@@ -58,8 +59,8 @@
                         <article class="job-card">
                             <header>
                                 <div>
-                                    <p class="eyebrow"><%= app.getModuleCode() %></p>
-                                    <h5><%= app.getTaName() %></h5>
+                                    <p class="eyebrow"><%= service.getJobModuleCode(app.getJobId()) %></p>
+                                    <h5><%= service.getTaName(app.getTaId()) %></h5>
                                 </div>
                                 <span class="status-chip <%= "Accepted".equals(app.getStatus()) ? "status-open" : ("Rejected".equals(app.getStatus()) ? "status-rejected" : "status-neutral") %>"><%= app.getStatus() %></span>
                             </header>
@@ -88,7 +89,7 @@
                             <header>
                                 <div>
                                     <p class="eyebrow"><%= profile.getStudentNumber() %></p>
-                                    <h5><%= profile.getName() %></h5>
+                                    <h5><%= profile.getFullName() %></h5>
                                 </div>
                             </header>
                             <p class="muted"><%= profile.getEmail() %></p>
