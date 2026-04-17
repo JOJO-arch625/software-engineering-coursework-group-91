@@ -10,4 +10,4 @@ Members:
 - Boxin-Lyu，BUPT2023213505，QM231224815，16601160811@163.com, Community
 - dra-ciop, BUPT2023213580, QM231224217, draciop@bupt.edu.cn, Test
 - ElanusCaeruleus9, BUPT2023213561, QM231224930, 2023213561@bupt.cn, Learning
-- Assigned TA: Dr. Zhang San
+- Assigned TA: Xingde Li 2556930696@qq.com
