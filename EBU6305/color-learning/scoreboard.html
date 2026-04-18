@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoreboard - Color Learning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">🎨</div>
+        <ul>
+            <li><a href="index.html" data-i18n="nav_home">Homepage</a></li>
+            <li><a href="learning.html" data-i18n="nav_learning">Learning</a></li>
+            <li><a href="game.html" data-i18n="nav_game">Game</a></li>
+            <li><a href="test.html" data-i18n="nav_test">Test</a></li>
+            <li><a href="community.html" class="active" data-i18n="nav_community">Community</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="lang-btn" onclick="toggleLang()">EN</button>
+            <button class="font-btn" onclick="changeFontSize(-1)">A-</button>
+            <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="community.html" class="back-link" data-i18n="disc_back">← Back to Community</a>
+        <h1 class="page-title" data-i18n="score_title">Community Scoreboard</h1>
+        <p class="page-subtitle" data-i18n="score_subtitle">Top performers and rankings updated daily</p>
+
+        <div class="scoreboard-container">
+            <div>
+                <h3 style="margin-bottom: 20px; font-size: 1.125rem;" data-i18n="score_title">Global Leaderboard</h3>
+                <table class="leaderboard-table">
+                    <tr class="rank-1">
+                        <td class="leaderboard-rank">1</td>
+                        <td><span class="star-badge"></span> Casey Morgan</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 3120</span> • Streak: 45 days</td>
+                    </tr>
+                    <tr class="rank-2">
+                        <td class="leaderboard-rank">2</td>
+                        <td><span class="star-badge"></span> Sam Rivera</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 2680</span> • Streak: 38 days</td>
+                    </tr>
+                    <tr class="rank-3">
+                        <td class="leaderboard-rank">3</td>
+                        <td><span class="star-badge"></span> Alex Chen</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 2450</span> • Streak: 32 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">4</td>
+                        <td>Jordan Lee</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 1820</span> • Streak: 28 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">5</td>
+                        <td>Riley Park</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 1650</span> • Streak: 24 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">6</td>
+                        <td>Morgan Davis</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 1420</span> • Streak: 20 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">7</td>
+                        <td>Quinn Taylor</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 1280</span> • Streak: 18 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">8</td>
+                        <td>Avery Wilson</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 1150</span> • Streak: 15 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">9</td>
+                        <td>Drew Martinez</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 980</span> • Streak: 12 days</td>
+                    </tr>
+                    <tr>
+                        <td class="leaderboard-rank">10</td>
+                        <td>Taylor Kim</td>
+                        <td style="text-align: right;"><span data-i18n="score_points">Points: 890</span> • Streak: 10 days</td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <h3 style="margin-bottom: 20px; font-size: 1.125rem;" data-i18n="score_star_title">Star Learners</h3>
+                <div class="star-card">
+                    <p><span class="star-badge"></span> Top 3 Performers</p>
+                    <p style="font-size: 0.75rem; color: #6B7280;">Awarded to the top 3 learners on the global leaderboard</p>
+                </div>
+                <div class="star-card">
+                    <p><span class="star-badge"></span> #1 Casey Morgan</p>
+                    <p style="font-size: 0.875rem; color: #6B7280;"><span data-i18n="score_points">3120 points</span> • 45 day streak</p>
+                </div>
+                <div class="star-card">
+                    <p><span class="star-badge"></span> #2 Sam Rivera</p>
+                    <p style="font-size: 0.875rem; color: #6B7280;"><span data-i18n="score_points">2680 points</span> • 38 day streak</p>
+                </div>
+                <div class="star-card">
+                    <p><span class="star-badge"></span> #3 Alex Chen</p>
+                    <p style="font-size: 0.875rem; color: #6B7280;"><span data-i18n="score_points">2450 points</span> • 32 day streak</p>
+                </div>
+
+                <div class="time-periods">
+                    <h3 data-i18n="score_periods">Time Periods</h3>
+                    <button class="time-btn" data-i18n="score_weekly">This Week</button>
+                    <button class="time-btn" data-i18n="score_monthly">This Month</button>
+                    <button class="time-btn" data-i18n="score_alltime">All Time</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Color Learning Website. <span data-i18n="footer_rights">All rights reserved.</span>
+            <a href="#" data-i18n="footer_privacy">Privacy Policy</a>
+            <a href="#" data-i18n="footer_terms">Terms of Use</a>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

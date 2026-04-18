@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profiles - Color Learning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="logo">🎨</div>
+        <ul>
+            <li><a href="index.html" data-i18n="nav_home">Homepage</a></li>
+            <li><a href="learning.html" data-i18n="nav_learning">Learning</a></li>
+            <li><a href="game.html" data-i18n="nav_game">Game</a></li>
+            <li><a href="test.html" data-i18n="nav_test">Test</a></li>
+            <li><a href="community.html" class="active" data-i18n="nav_community">Community</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="lang-btn" onclick="toggleLang()">EN</button>
+            <button class="font-btn" onclick="changeFontSize(-1)">A-</button>
+            <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <a href="community.html" class="back-link" data-i18n="disc_back">← Back to Community</a>
+        <h1 class="page-title" data-i18n="prof_title">Learner Profiles</h1>
+        <p class="page-subtitle" data-i18n="prof_subtitle">Explore member profiles and their learning journey</p>
+
+        <div class="filter-bar">
+            <button class="filter-btn active" onclick="filterProfiles('all')" data-i18n="disc_filter_all">All</button>
+            <button class="filter-btn" onclick="filterProfiles('beginner')" data-i18n="level_beginner">Beginner</button>
+            <button class="filter-btn" onclick="filterProfiles('intermediate')" data-i18n="level_intermediate">Intermediate</button>
+            <button class="filter-btn" onclick="filterProfiles('advanced')" data-i18n="level_advanced">Advanced</button>
+            <button class="filter-btn" onclick="filterProfiles('expert')" data-i18n="prof_filter_expert">Expert</button>
+        </div>
+
+        <div class="profiles-grid">
+            <div class="profile-card" data-level="advanced">
+                <span class="profile-level level-advanced" data-i18n="level_advanced">Advanced</span>
+                <h3>Alex Chen</h3>
+                <div class="profile-stats">
+                    <p>Points: 2450 • Lessons: 48 • Accuracy: 94% • Joined: Jan 2026</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+            <div class="profile-card" data-level="intermediate">
+                <span class="profile-level level-intermediate" data-i18n="level_intermediate">Intermediate</span>
+                <h3>Jordan Lee</h3>
+                <div class="profile-stats">
+                    <p>Points: 1820 • Lessons: 36 • Accuracy: 89% • Joined: Feb 2026</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+            <div class="profile-card" data-level="advanced">
+                <span class="profile-level level-advanced" data-i18n="level_advanced">Advanced</span>
+                <h3>Sam Rivera</h3>
+                <div class="profile-stats">
+                    <p>Points: 2680 • Lessons: 52 • Accuracy: 96% • Joined: Dec 2025</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+            <div class="profile-card" data-level="expert">
+                <span class="profile-level level-expert" data-i18n="prof_filter_expert">Expert</span>
+                <h3>Casey Morgan</h3>
+                <div class="profile-stats">
+                    <p>Points: 3120 • Lessons: 60 • Accuracy: 98% • Joined: Nov 2025</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+            <div class="profile-card" data-level="beginner">
+                <span class="profile-level level-beginner" data-i18n="level_beginner">Beginner</span>
+                <h3>Taylor Kim</h3>
+                <div class="profile-stats">
+                    <p>Points: 890 • Lessons: 18 • Accuracy: 82% • Joined: Mar 2026</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+            <div class="profile-card" data-level="intermediate">
+                <span class="profile-level level-intermediate" data-i18n="level_intermediate">Intermediate</span>
+                <h3>Riley Park</h3>
+                <div class="profile-stats">
+                    <p>Points: 1650 • Lessons: 32 • Accuracy: 88% • Joined: Feb 2026</p>
+                </div>
+                <a href="#" class="module-link" data-i18n="prof_view">View Full Profile →</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2026 Color Learning Website. <span data-i18n="footer_rights">All rights reserved.</span>
+            <a href="#" data-i18n="footer_privacy">Privacy Policy</a>
+            <a href="#" data-i18n="footer_terms">Terms of Use</a>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+        function filterProfiles(level) {
+            const profileCards = document.querySelectorAll('.profile-card');
+            const filterButtons = document.querySelectorAll('.filter-bar .filter-btn');
+            
+            filterButtons.forEach(btn => {
+                btn.classList.remove('active');
+                // Check if button's target tag matches
+                const btnTag = btn.getAttribute('onclick').match(/'([^']+)'/)[1];
+                if (btnTag === level) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            profileCards.forEach(card => {
+                if (level === 'all' || card.dataset.level === level) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game - Color Learning</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <div class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;">🎨</div>
+        <ul>
+            <li><a href="index.html" data-i18n="nav_home">Homepage</a></li>
+            <li><a href="learning.html" data-i18n="nav_learning">Learning</a></li>
+            <li><a href="game.html" class="active" data-i18n="nav_game">Game</a></li>
+            <li><a href="test.html" data-i18n="nav_test">Test</a></li>
+            <li><a href="community.html" data-i18n="nav_community">Community</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="icon-btn" onclick="toggleAccessibilityMenu()" title="Accessibility">♿</button>
+            <button class="lang-btn" onclick="toggleLang()">EN</button>
+            <button class="font-btn" onclick="changeFontSize(-1)">A-</button>
+            <button class="font-btn" onclick="changeFontSize(1)">A+</button>
+        </div>
+    </nav>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumb-container" id="breadcrumb">
+        <div class="container">
+            <nav class="breadcrumbs">
+                <a href="index.html" data-i18n="nav_home">Homepage</a>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Accessibility Menu Modal -->
+    <div id="accessibility-modal" class="modal">
+        <div class="modal-content">
+            <h3 data-i18n="acc_title">Accessibility Settings</h3>
+            <div class="setting-item">
+                <span data-i18n="acc_high_contrast">High Contrast</span>
+                <label class="switch">
+                    <input type="checkbox" id="contrast-toggle" onclick="toggleHighContrast()">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <span data-i18n="acc_data_policy">Ethical Data Use</span>
+                <button class="small-btn" onclick="showDataPolicy()" data-i18n="acc_view_policy">View Policy</button>
+            </div>
+            <button class="close-btn" onclick="toggleAccessibilityMenu()" data-i18n="btn_close">Close</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title" data-i18n="game_title">Highly Interactive Color Games</h1>
+        <p class="page-subtitle" data-i18n="game_subtitle">Demonstrate Concepts or Take Quizzes</p>
+
+        <!-- Interactive RGB Mixer Game -->
+        <div class="game-container">
+            <h2 data-i18n="game_concept_title">RGB Mixer Experiment</h2>
+            <div class="mixer-layout">
+                <div class="sliders-section">
+                    <div class="slider-group">
+                        <label>Red (R): <span id="r-val">128</span></label>
+                        <input type="range" min="0" max="255" value="128" class="rgb-slider r-slider" id="r-range" oninput="updateMixer()">
+                    </div>
+                    <div class="slider-group">
+                        <label>Green (G): <span id="g-val">128</span></label>
+                        <input type="range" min="0" max="255" value="128" class="rgb-slider g-slider" id="g-range" oninput="updateMixer()">
+                    </div>
+                    <div class="slider-group">
+                        <label>Blue (B): <span id="b-val">128</span></label>
+                        <input type="range" min="0" max="255" value="128" class="rgb-slider b-slider" id="b-range" oninput="updateMixer()">
+                    </div>
+                    <div class="game-controls">
+                        <button class="small-btn" onclick="resetMixer()" data-i18n="btn_reset">Reset</button>
+                        <button class="small-btn" onclick="undoMixer()" data-i18n="btn_undo">Undo</button>
+                    </div>
+                </div>
+                <div class="preview-section">
+                    <div id="mixer-preview" class="mixer-preview"></div>
+                    <p class="hex-code" id="hex-display">#808080</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="games-grid">
+            <div class="game-card">
+                <div class="game-color game-purple"></div>
+                <h3 data-i18n="game_concept_title">Concept Demo Game</h3>
+                <p data-i18n="game_concept_desc">Visualize color mixing rules interactively</p>
+            </div>
+            <div class="game-card">
+                <div class="game-color game-green"></div>
+                <h3 data-i18n="game_quiz_title">Color Quiz Game</h3>
+                <p data-i18n="game_quiz_desc">Test your knowledge with quick quizzes</p>
+            </div>
+        </div>
+
+        <a href="#" class="more-games" data-i18n="game_more">More Games →</a>
+    </div>
+
+    <footer>
+        <p>© 2026 Color Learning Website. <span data-i18n="footer_rights">All rights reserved.</span>
+            <a href="#" data-i18n="footer_privacy">Privacy Policy</a>
+            <a href="#" data-i18n="footer_terms">Terms of Use</a>
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
