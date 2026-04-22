@@ -1,0 +1,38 @@
+[
+  {
+    "id": "job-1",
+    "moId": "mo-1",
+    "moduleCode": "EIE3320",
+    "title": "Object-Oriented Programming TA",
+    "skills": "Java, OOP, debugging",
+    "requirements": "Strong Java syntax, classes, arrays, exception handling, and lab support communication.",
+    "workload": "6 hours / week",
+    "deadline": "2026-04-10",
+    "status": "Open",
+    "description": "Support weekly labs and guide students through Java exercises."
+  },
+  {
+    "id": "job-2",
+    "moId": "mo-1",
+    "moduleCode": "EIE2105",
+    "title": "Digital Systems TA",
+    "skills": "VHDL, Boolean logic, simulation",
+    "requirements": "Basic circuit design, VHDL syntax, waveform debugging, and hardware fundamentals.",
+    "workload": "5 hours / week",
+    "deadline": "2026-04-11",
+    "status": "Open",
+    "description": "Assist digital systems lab sessions and hardware simulation support."
+  },
+  {
+    "id": "job-3",
+    "moId": "mo-1",
+    "moduleCode": "ECS5001",
+    "title": "Data Analytics TA",
+    "skills": "Python, pandas, plotting",
+    "requirements": "Python basics, data processing, notebook workflows, and problem explanation skills.",
+    "workload": "4 hours / week",
+    "deadline": "2026-04-09",
+    "status": "Closed",
+    "description": "Help students with Python notebooks and analytics exercises."
+  }
+]
