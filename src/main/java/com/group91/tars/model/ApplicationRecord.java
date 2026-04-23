@@ -8,6 +8,8 @@ public class ApplicationRecord {
     private String status;
     private String notes;
     private String submittedAt;
+    private String applicantSkills;
+    private String applicantDescription;
 
     public String getId() {
         return id;
@@ -63,5 +65,21 @@ public class ApplicationRecord {
 
     public void setSubmittedAt(String submittedAt) {
         this.submittedAt = submittedAt;
+    }
+
+    public String getApplicantSkills() {
+        return applicantSkills;
+    }
+
+    public void setApplicantSkills(String applicantSkills) {
+        this.applicantSkills = applicantSkills;
+    }
+
+    public String getApplicantDescription() {
+        return applicantDescription;
+    }
+
+    public void setApplicantDescription(String applicantDescription) {
+        this.applicantDescription = applicantDescription;
     }
 }

@@ -29,7 +29,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= viewTitle %> | TA Recruitment System</title>
+    <title><%= viewTitle %> | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260409c">
 </head>
 <body>
@@ -39,7 +39,7 @@
             <a class="brand-link" href="<%= contextPath + sidebarHomePath %>">
                 <span class="brand-mark">TR</span>
                 <span class="brand-copy">
-                    <strong class="brand-title">TA Recruit</strong>
+                    <strong class="brand-title">ISTARS</strong>
                     <span class="brand-subtitle">Coursework portal</span>
                 </span>
             </a>
@@ -101,7 +101,7 @@
         <header class="topbar">
             <div class="topbar-left">
                 <button class="icon-button" type="button" data-sidebar-toggle aria-label="Toggle sidebar">&#9776;</button>
-                <a class="wordmark" href="<%= contextPath + sidebarHomePath %>">TA Recruit</a>
+                <a class="wordmark" href="<%= contextPath + sidebarHomePath %>">ISTARS</a>
                 <div class="topbar-links">
                     <span><%= workspaceLabel %></span>
                     <a href="<%= contextPath %>/ai/assist">AI panel</a>

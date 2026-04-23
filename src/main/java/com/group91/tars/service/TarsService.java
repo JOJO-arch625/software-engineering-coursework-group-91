@@ -283,11 +283,11 @@ public class TarsService {
         }
     }
 
-    public OperationResult submitCurrentTaApplication(String jobId, String priority, String notes) {
-        return submitTaApplication(CURRENT_TA_ID, jobId, priority, notes);
+    public OperationResult submitCurrentTaApplication(String jobId, String priority, String notes, String applicantSkills, String applicantDescription) {
+        return submitTaApplication(CURRENT_TA_ID, jobId, priority, notes, applicantSkills, applicantDescription);
     }
 
-    public OperationResult submitTaApplication(String taId, String jobId, String priority, String notes) {
+    public OperationResult submitTaApplication(String taId, String jobId, String priority, String notes, String applicantSkills, String applicantDescription) {
         JobPosting job = getJobById(jobId);
         if (job == null) {
             return OperationResult.failure("The selected job posting does not exist.");
@@ -311,6 +311,8 @@ public class TarsService {
         application.setPriority(isBlank(priority) ? "Priority 3" : priority);
         application.setStatus("Submitted");
         application.setNotes(isBlank(notes) ? "TA application submitted." : notes.trim());
+        application.setApplicantSkills(isBlank(applicantSkills) ? "" : applicantSkills.trim());
+        application.setApplicantDescription(isBlank(applicantDescription) ? "" : applicantDescription.trim());
         application.setSubmittedAt(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH).format(new Date()));
 
         List<ApplicationRecord> applications = store.loadApplications();

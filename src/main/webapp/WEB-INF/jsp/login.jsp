@@ -9,13 +9,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | TA Recruitment System</title>
+    <title>Login | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260409c">
 </head>
 <body class="login-page">
 <header class="login-topbar">
     <div class="topbar-left">
-        <span class="wordmark">TA Recruit</span>
+        <span class="wordmark">INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</span>
         <div class="topbar-links">
             <span>Coursework portal</span>
             <span>Role-based access</span>
@@ -29,7 +29,7 @@
 <main class="login-shell">
     <section class="login-hero">
         <section class="login-copy-panel">
-            <p class="eyebrow">Teaching Assistant Recruitment System</p>
+            <p class="eyebrow">INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</p>
             <h1>Track recruitment clearly, not through scattered spreadsheets.</h1>
             <p class="login-lead">
                 This portal brings TA applications, MO review, and Admin workload monitoring into one

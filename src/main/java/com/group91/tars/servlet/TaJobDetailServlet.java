@@ -36,7 +36,9 @@ public class TaJobDetailServlet extends BasePageServlet {
             getCurrentUser(request).getLinkedId(),
             jobId,
             request.getParameter("priority"),
-            request.getParameter("notes")
+            request.getParameter("notes"),
+            request.getParameter("applicantSkills"),
+            request.getParameter("applicantDescription")
         );
         flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
         response.sendRedirect(request.getContextPath() + "/ta/job?id=" + jobId);

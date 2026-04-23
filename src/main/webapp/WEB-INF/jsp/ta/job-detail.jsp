@@ -59,7 +59,7 @@
             <% if (!missingSkills.isEmpty()) { %>
             <div class="alert danger" style="margin-top: 0; margin-bottom: 16px;">
                 <strong>Missing skills:</strong> <%= String.join(", ", missingSkills) %><br>
-                Consider highlighting related experience in your motivation note.
+                Consider highlighting related experience in your description.
             </div>
             <% } else { %>
             <div class="alert success" style="margin-top: 0; margin-bottom: 16px;">
@@ -77,8 +77,16 @@
                     </select>
                 </label>
                 <label class="span-two">
+                    Your skills
+                    <input type="text" name="applicantSkills" placeholder="e.g. Java, Python, Git, Testing" required>
+                </label>
+                <label class="span-two">
+                    Description
+                    <textarea name="applicantDescription" rows="4" placeholder="Describe your relevant experience and why you are a good fit for this position." required></textarea>
+                </label>
+                <label class="span-two">
                     Motivation note
-                    <textarea name="notes"><%= missingSkills.isEmpty() ? "I have relevant skills and can support this module consistently." : "I have relevant skills and am eager to develop further in: " + String.join(", ", missingSkills) + "." %></textarea>
+                    <textarea name="notes" rows="3"><%= missingSkills.isEmpty() ? "I have relevant skills and can support this module consistently." : "I have relevant skills and am eager to develop further in: " + String.join(", ", missingSkills) + "." %></textarea>
                 </label>
                 <div class="button-row span-two">
                     <button class="primary-button" type="submit">Submit application</button>
@@ -98,7 +106,7 @@
                         <% if (missingSkills.isEmpty()) { %>
                         <p><strong>Missing skills:</strong> None. Your profile covers all required skills for this position.</p>
                         <% } else { %>
-                        <p><strong>Missing skills:</strong> <%= String.join(", ", missingSkills) %>. You may still apply, but consider addressing these in your motivation note.</p>
+                        <p><strong>Missing skills:</strong> <%= String.join(", ", missingSkills) %>. You may still apply, but consider addressing these in your description.</p>
                         <% } %>
                         <p><strong>Note:</strong> AI scoring is based on keyword matching and serves as guidance only. Final decisions are made by the MO.</p>
                     </div>
