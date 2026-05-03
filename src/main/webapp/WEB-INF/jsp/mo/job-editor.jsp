@@ -1,13 +1,53 @@
-<%@ page import="com.group91.tars.model.JobPosting" %>
+<%@ page import="java.util.List,com.group91.tars.model.JobPosting" %>
 <%
     JobPosting job = (JobPosting) request.getAttribute("job");
+    List<JobPosting> myJobs = (List<JobPosting>) request.getAttribute("myJobs");
+    boolean isEditing = job.getId() != null;
 %>
 <%@ include file="../fragments/pageStart.jspf" %>
 <section class="view active">
     <div class="grid two-col">
+        <%-- Left: existing postings list --%>
         <article class="panel">
             <div class="panel-header">
-                <h4><%= i18n.t("mo.job.editor.heading") %></h4>
+                <h4><%= i18n.t("mo.job.editor.your-postings") %></h4>
+            </div>
+            <% if (myJobs == null || myJobs.isEmpty()) { %>
+            <div class="alert info"><%= i18n.t("mo.dashboard.no-applications") %></div>
+            <% } else { %>
+            <div class="table-shell">
+                <table>
+                    <thead>
+                    <tr>
+                        <th><%= i18n.t("mo.job.editor.module-code") %></th>
+                        <th><%= i18n.t("mo.job.editor.job-title") %></th>
+                        <th><%= i18n.t("mo.dashboard.status") %></th>
+                        <th><%= i18n.t("search.applicants") %></th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% for (JobPosting j : myJobs) { %>
+                    <tr>
+                        <td><strong><%= j.getModuleCode() %></strong></td>
+                        <td><%= j.getTitle() %></td>
+                        <td><span class="status-chip <%= "Open".equals(j.getStatus()) ? "status-open" : "status-rejected" %>"><%= i18n.t("status." + j.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
+                        <td><%= com.group91.tars.service.TarsService.getInstance().countApplicantsForJob(j.getId()) %></td>
+                        <td>
+                            <a class="secondary-button" href="<%= request.getContextPath() %>/mo/jobs/edit?id=<%= j.getId() %>"><%= i18n.t("common.edit") %></a>
+                        </td>
+                    </tr>
+                    <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <% } %>
+        </article>
+
+        <%-- Right: editor form --%>
+        <article class="panel">
+            <div class="panel-header">
+                <h4><%= isEditing ? i18n.t("mo.job.editor.editing") : i18n.t("mo.job.editor.heading") %></h4>
                 <p><%= i18n.t("mo.job.editor.description") %></p>
             </div>
             <form method="post" action="<%= request.getContextPath() %>/mo/jobs/edit" class="form-grid">
@@ -43,29 +83,20 @@
                     <input type="date" name="deadline" value="<%= job.getDeadline() == null ? "" : job.getDeadline() %>" required>
                 </label>
                 <div class="button-row span-two">
-                    <button class="primary-button" type="submit"><%= i18n.t("mo.job.editor.save") %></button>
+                    <button class="primary-button" type="submit"><%= isEditing ? i18n.t("mo.job.editor.save") : i18n.t("mo.job.editor.create") %></button>
+                    <% if (isEditing) { %>
+                    <a class="ghost-button" href="<%= request.getContextPath() %>/mo/jobs/edit"><%= i18n.t("mo.job.editor.new-posting") %></a>
+                    <% } %>
                 </div>
             </form>
 
-            <% if (job.getId() != null) { %>
+            <% if (isEditing) { %>
             <form method="post" action="<%= request.getContextPath() %>/mo/jobs/edit" style="margin-top: 12px;">
                 <input type="hidden" name="action" value="close">
                 <input type="hidden" name="id" value="<%= job.getId() %>">
                 <button class="ghost-button" type="submit"><%= i18n.t("mo.job.editor.close") %></button>
             </form>
             <% } %>
-        </article>
-
-        <article class="panel">
-            <div class="panel-header">
-                <h4><%= i18n.t("mo.job.editor.checklist-heading") %></h4>
-            </div>
-            <ul class="feature-list">
-                <li><%= i18n.t("mo.job.editor.checklist-1") %></li>
-                <li><%= i18n.t("mo.job.editor.checklist-2") %></li>
-                <li><%= i18n.t("mo.job.editor.checklist-3") %></li>
-                <li><%= i18n.t("mo.job.editor.checklist-4") %></li>
-            </ul>
         </article>
     </div>
 </section>

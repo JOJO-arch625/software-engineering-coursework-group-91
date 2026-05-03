@@ -20,6 +20,7 @@ public class MoJobEditServlet extends BasePageServlet {
         }
         preparePage(request, "job-editor", "MO Flow", "Create Or Edit Job Posting");
         request.setAttribute("job", resolveDraft(request));
+        request.setAttribute("myJobs", service.getJobsForMo(getCurrentUser(request).getLinkedId()));
         forward(request, response, "/WEB-INF/jsp/mo/job-editor.jsp");
     }
 

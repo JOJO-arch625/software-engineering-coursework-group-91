@@ -6,9 +6,9 @@
     "priority": "Priority 1",
     "status": "Submitted",
     "notes": "I have experience in Java development and unit testing.",
+    "submittedAt": "2026-04-20 10:00",
     "applicantSkills": "Java, JUnit, Maven, Agile",
-    "applicantDescription": "I have completed multiple Java projects and I am familiar with software testing practices. I can support lab sessions effectively.",
-    "submittedAt": "2026-04-20 10:00"
+    "applicantDescription": "I have completed multiple Java projects and I am familiar with software testing practices. I can support lab sessions effectively."
   },
   {
     "id": "app-2",
@@ -17,9 +17,9 @@
     "priority": "Priority 2",
     "status": "Under Review",
     "notes": "I have experience with UML and design patterns.",
+    "submittedAt": "2026-04-21 14:30",
     "applicantSkills": "UML, Design Patterns, Documentation",
-    "applicantDescription": "I have worked on several software design projects using UML diagrams and design patterns. I can help students understand these concepts.",
-    "submittedAt": "2026-04-21 14:30"
+    "applicantDescription": "I have worked on several software design projects using UML diagrams and design patterns. I can help students understand these concepts."
   },
   {
     "id": "app-3",
@@ -28,9 +28,9 @@
     "priority": "Priority 1",
     "status": "Submitted",
     "notes": "Strong background in software engineering.",
+    "submittedAt": "2026-04-22 09:00",
     "applicantSkills": "Java, Python, Git, Testing",
-    "applicantDescription": "I have experience in full-stack development and software testing. I am passionate about helping students learn software engineering practices.",
-    "submittedAt": "2026-04-22 09:00"
+    "applicantDescription": "I have experience in full-stack development and software testing. I am passionate about helping students learn software engineering practices."
   },
   {
     "id": "app-4",
@@ -39,9 +39,9 @@
     "priority": "Priority 1",
     "status": "Submitted",
     "notes": "Experienced with Python and Git workflows.",
+    "submittedAt": "2026-04-22 11:00",
     "applicantSkills": "Python, Git, GitHub, Code Review",
-    "applicantDescription": "I have contributed to open-source projects and have experience with Git workflows. I can help students with version control and code review.",
-    "submittedAt": "2026-04-22 11:00"
+    "applicantDescription": "I have contributed to open-source projects and have experience with Git workflows. I can help students with version control and code review."
   },
   {
     "id": "app-5",
@@ -50,9 +50,9 @@
     "priority": "Priority 2",
     "status": "Submitted",
     "notes": "Good understanding of software design.",
+    "submittedAt": "2026-04-22 15:00",
     "applicantSkills": "UML, Software Architecture, Documentation",
-    "applicantDescription": "I have taken advanced software engineering courses and have practical experience with software design documentation.",
-    "submittedAt": "2026-04-22 15:00"
+    "applicantDescription": "I have taken advanced software engineering courses and have practical experience with software design documentation."
   },
   {
     "id": "app-6",
@@ -61,8 +61,8 @@
     "priority": "Priority 3",
     "status": "Submitted",
     "notes": "Available for coursework support.",
+    "submittedAt": "2026-04-23 10:00",
     "applicantSkills": "Python, Git, Debugging",
-    "applicantDescription": "I can help students debug their code and understand Python programming concepts. I am available during weekday afternoons.",
-    "submittedAt": "2026-04-23 10:00"
+    "applicantDescription": "I can help students debug their code and understand Python programming concepts. I am available during weekday afternoons."
   }
 ]

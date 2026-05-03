@@ -7,6 +7,16 @@
     if (loginLocale == null) { loginLocale = java.util.Locale.ENGLISH; }
     I18n i18n = new I18n(loginLocale);
     String lang = loginLocale.getLanguage();
+    String newLang = "zh".equals(lang) ? "en" : "zh";
+    String qs = request.getQueryString();
+    String langToggleUrl;
+    if (qs == null) {
+        langToggleUrl = "?lang=" + newLang;
+    } else if (qs.contains("lang=")) {
+        langToggleUrl = "?" + qs.replaceAll("lang=(en|zh)", "lang=" + newLang);
+    } else {
+        langToggleUrl = "?" + qs + "&lang=" + newLang;
+    }
 %>
 <!DOCTYPE html>
 <html lang="<%= lang %>">
@@ -22,7 +32,7 @@
         <span class="wordmark"><%= i18n.t("brand.title") %></span>
     </div>
     <div class="topbar-right">
-        <a class="lang-toggle" href="?lang=<%= "zh".equals(lang) ? "en" : "zh" %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
+        <a class="lang-toggle" href="<%= langToggleUrl %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
             <%= "zh".equals(lang) ? "EN" : "中文" %>
         </a>
     </div>

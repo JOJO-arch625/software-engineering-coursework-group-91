@@ -22,6 +22,17 @@
     boolean isMo = "MO".equals(currentRole);
     boolean isAdmin = "ADMIN".equals(currentRole);
     String workspaceLabel = isTa ? i18n.t("topbar.workspace.ta") : (isMo ? i18n.t("topbar.workspace.mo") : (isAdmin ? i18n.t("topbar.workspace.admin") : i18n.t("topbar.workspace.guest")));
+    // Build lang toggle URL preserving existing query params
+    String newLang = "zh".equals(lang) ? "en" : "zh";
+    String qs = request.getQueryString();
+    String langToggleUrl;
+    if (qs == null) {
+        langToggleUrl = "?lang=" + newLang;
+    } else if (qs.contains("lang=")) {
+        langToggleUrl = "?" + qs.replaceAll("lang=(en|zh)", "lang=" + newLang);
+    } else {
+        langToggleUrl = "?" + qs + "&lang=" + newLang;
+    }
     int inboxUnread = 0;
     if (currentUser != null) {
         inboxUnread = TarsService.getInstance().countUnreadNotifications(currentUser.getLinkedId());
@@ -120,7 +131,7 @@
                     <strong><%= currentUser == null ? i18n.t("topbar.guest") : currentUser.getDisplayName() %></strong>
                     <span><%= workspaceLabel %></span>
                 </div>
-                <a class="lang-toggle" href="?lang=<%= "zh".equals(lang) ? "en" : "zh" %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
+                <a class="lang-toggle" href="<%= langToggleUrl %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
                     <%= "zh".equals(lang) ? "EN" : "中文" %>
                 </a>
                 <a class="logout-link" href="<%= contextPath %>/logout"><%= i18n.t("topbar.logout") %></a>
