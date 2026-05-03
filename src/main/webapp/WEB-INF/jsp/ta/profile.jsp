@@ -7,59 +7,59 @@
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Applicant Profile</h4>
-                <p>Maintain TA details, declared skills, and availability before applying.</p>
+                <h4><%= i18n.t("ta.profile.heading") %></h4>
+                <p><%= i18n.t("ta.profile.description") %></p>
             </div>
             <form method="post" action="<%= request.getContextPath() %>/ta/profile" class="form-grid">
                 <input type="hidden" name="action" value="saveProfile">
                 <label>
-                    Full name
+                    <%= i18n.t("ta.profile.full-name") %>
                     <input type="text" name="fullName" value="<%= profile == null ? "" : profile.getFullName() %>" required>
                 </label>
                 <label>
-                    Student number
+                    <%= i18n.t("ta.profile.student-number") %>
                     <input type="text" name="studentNumber" value="<%= profile == null ? "" : profile.getStudentNumber() %>" required>
                 </label>
                 <label>
-                    Email
+                    <%= i18n.t("ta.profile.email") %>
                     <input type="email" name="email" value="<%= profile == null ? "" : profile.getEmail() %>" required>
                 </label>
                 <label>
-                    Phone
+                    <%= i18n.t("ta.profile.phone") %>
                     <input type="text" name="phone" value="<%= profile == null ? "" : profile.getPhone() %>">
                 </label>
                 <label class="span-two">
-                    Skills
+                    <%= i18n.t("ta.profile.skills") %>
                     <input type="text" name="skills" value="<%= profile == null ? "" : profile.getSkills() %>" required>
                 </label>
                 <label class="span-two">
-                    Availability
+                    <%= i18n.t("ta.profile.availability") %>
                     <textarea name="availability" required><%= profile == null ? "" : profile.getAvailability() %></textarea>
                 </label>
                 <div class="button-row span-two">
-                    <button class="primary-button" type="submit">Save profile</button>
+                    <button class="primary-button" type="submit"><%= i18n.t("ta.profile.save") %></button>
                 </div>
             </form>
         </article>
 
         <article class="panel upload-card">
             <div class="panel-header">
-                <h4>CV Upload</h4>
-                <p>Accepted types in final system: PDF, DOC, DOCX</p>
+                <h4><%= i18n.t("ta.profile.cv-heading") %></h4>
+                <p><%= i18n.t("ta.profile.cv-description") %></p>
             </div>
-            <p class="file-name"><%= profile != null && profile.getCvPath() != null ? profile.getCvPath() : "No CV uploaded yet" %></p>
+            <p class="file-name"><%= profile != null && profile.getCvPath() != null ? profile.getCvPath() : i18n.t("ta.profile.cv-no-file") %></p>
             <form method="post" action="<%= request.getContextPath() %>/ta/profile" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="uploadCv">
                 <label>
-                    Select CV file
+                    <%= i18n.t("ta.profile.cv-select") %>
                     <input type="file" name="cvFile" accept=".pdf,.doc,.docx" required>
                 </label>
                 <div class="button-row">
-                    <button class="secondary-button" type="submit">Upload CV</button>
+                    <button class="secondary-button" type="submit"><%= i18n.t("ta.profile.cv-upload") %></button>
                 </div>
             </form>
             <div class="alert info" style="margin-top: 18px;">
-                Data is stored locally in files for coursework compliance. No database is used in this build.
+                <%= i18n.t("ta.profile.alert") %>
             </div>
         </article>
     </div>

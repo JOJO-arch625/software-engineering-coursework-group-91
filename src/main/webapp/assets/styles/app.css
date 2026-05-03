@@ -1377,3 +1377,27 @@ body.nav-collapsed .sidebar .nav-icon {
   margin: 0 0 10px;
   line-height: 1.6;
 }
+
+/* ---- Language toggle ---- */
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  height: 36px;
+  border-radius: 999px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.14s ease;
+  margin-right: 6px;
+}
+
+.lang-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}

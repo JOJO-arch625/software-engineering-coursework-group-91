@@ -1,59 +1,65 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-    import="com.group91.tars.model.FlashMessage" %>
+    import="com.group91.tars.model.FlashMessage,com.group91.tars.i18n.I18n,java.util.Locale" %>
 <%
     FlashMessage flash = (FlashMessage) request.getAttribute("flash");
     String contextPath = request.getContextPath();
+    java.util.Locale loginLocale = (java.util.Locale) request.getSession(true).getAttribute("locale");
+    if (loginLocale == null) { loginLocale = java.util.Locale.ENGLISH; }
+    I18n i18n = new I18n(loginLocale);
+    String lang = loginLocale.getLanguage();
 %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</title>
+    <title>Login | <%= i18n.t("page.title.suffix") %></title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260409c">
 </head>
 <body class="login-page">
 <header class="login-topbar">
     <div class="topbar-left">
-        <span class="wordmark">INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</span>
+        <span class="wordmark"><%= i18n.t("login.wordmark") %></span>
         <div class="topbar-links">
-            <span>Coursework portal</span>
-            <span>Role-based access</span>
+            <span><%= i18n.t("login.coursework-portal") %></span>
+            <span><%= i18n.t("login.role-based-access") %></span>
         </div>
     </div>
     <div class="topbar-right">
-        <span class="icon-badge">Local demo</span>
+        <a class="lang-toggle" href="?lang=<%= "zh".equals(lang) ? "en" : "zh" %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
+            <%= "zh".equals(lang) ? "EN" : "中文" %>
+        </a>
+        <span class="icon-badge"><%= i18n.t("login.local-demo") %></span>
     </div>
 </header>
 
 <main class="login-shell">
     <section class="login-hero">
         <section class="login-copy-panel">
-            <p class="eyebrow">INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</p>
-            <h1>Track recruitment clearly, not through scattered spreadsheets.</h1>
+            <p class="eyebrow"><%= i18n.t("login.eyebrow") %></p>
+            <h1><%= i18n.t("login.hero-heading") %></h1>
             <p class="login-lead">
-                This portal brings TA applications, MO review, and Admin workload monitoring into one
-                cleaner workflow with role-based access and local file storage.
+                <%= i18n.t("login.hero-lead") %>
             </p>
 
             <div class="login-pill-row">
-                <span class="pill pill-warning">No database</span>
-                <span class="pill pill-neutral">JSON + local files</span>
-                <span class="pill pill-neutral">Core workflow first</span>
+                <span class="pill pill-warning"><%= i18n.t("login.pill-no-db") %></span>
+                <span class="pill pill-neutral"><%= i18n.t("login.pill-json") %></span>
+                <span class="pill pill-neutral"><%= i18n.t("login.pill-workflow") %></span>
             </div>
 
             <div class="login-feature-grid">
                 <article class="login-feature-card">
-                    <h3>For TAs</h3>
-                    <p>Maintain your profile, upload a CV, browse open roles, and track application status.</p>
+                    <h3><%= i18n.t("login.card-ta-heading") %></h3>
+                    <p><%= i18n.t("login.card-ta-body") %></p>
                 </article>
                 <article class="login-feature-card">
-                    <h3>For MOs</h3>
-                    <p>Publish postings, review applicants, and update decisions from one workspace.</p>
+                    <h3><%= i18n.t("login.card-mo-heading") %></h3>
+                    <p><%= i18n.t("login.card-mo-body") %></p>
                 </article>
                 <article class="login-feature-card">
-                    <h3>For Admin</h3>
-                    <p>Monitor accepted allocations and spot workload pressure before it becomes a problem.</p>
+                    <h3><%= i18n.t("login.card-admin-heading") %></h3>
+                    <p><%= i18n.t("login.card-admin-body") %></p>
                 </article>
             </div>
         </section>
@@ -61,9 +67,9 @@
         <aside class="login-card-shell">
             <article class="login-card">
                 <div class="login-card-header">
-                    <p class="eyebrow">Sign in</p>
-                    <h2>Open your role workspace</h2>
-                    <p class="muted">Use one of the local demo accounts below to access the TA, MO, or Admin flow.</p>
+                    <p class="eyebrow"><%= i18n.t("login.signin-eyebrow") %></p>
+                    <h2><%= i18n.t("login.signin-heading") %></h2>
+                    <p class="muted"><%= i18n.t("login.signin-description") %></p>
                 </div>
 
                 <% if (flash != null) { %>
@@ -74,19 +80,19 @@
 
                 <form class="login-form" method="post" action="<%= contextPath %>/login">
                     <label>
-                        Username
-                        <input type="text" name="username" placeholder="Enter demo username" required>
+                        <%= i18n.t("login.label-username") %>
+                        <input type="text" name="username" placeholder="<%= i18n.t("login.placeholder-username") %>" required>
                     </label>
                     <label>
-                        Password
-                        <input type="password" name="password" placeholder="Enter demo password" required>
+                        <%= i18n.t("login.label-password") %>
+                        <input type="password" name="password" placeholder="<%= i18n.t("login.placeholder-password") %>" required>
                     </label>
-                    <button class="primary-button login-submit" type="submit">Log in</button>
+                    <button class="primary-button login-submit" type="submit"><%= i18n.t("login.button-login") %></button>
                 </form>
             </article>
 
             <article class="demo-account-card">
-                <h3>Demo accounts</h3>
+                <h3><%= i18n.t("login.demo-heading") %></h3>
                 <div class="account-grid">
                     <div class="account-chip">
                         <strong>TA</strong>

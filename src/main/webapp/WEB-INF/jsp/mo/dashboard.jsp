@@ -10,41 +10,41 @@
 <section class="view active">
     <div class="grid three-col">
         <article class="metric-card">
-            <span>Open postings</span>
+            <span><%= i18n.t("mo.dashboard.open-postings") %></span>
             <strong><%= request.getAttribute("openJobCount") %></strong>
-            <small>EBU6304 Software Engineering</small>
+            <small><%= i18n.t("mo.dashboard.open-postings-subtitle") %></small>
         </article>
         <article class="metric-card">
-            <span>Total applicants</span>
+            <span><%= i18n.t("mo.dashboard.total-applicants") %></span>
             <strong><%= applicantCount == null ? 0 : applicantCount %></strong>
-            <small>Across all positions</small>
+            <small><%= i18n.t("mo.dashboard.total-applicants-subtitle") %></small>
         </article>
         <article class="metric-card">
-            <span>Pending review</span>
+            <span><%= i18n.t("mo.dashboard.pending-review") %></span>
             <strong><%= pendingCount == null ? 0 : pendingCount %></strong>
-            <small>Submitted or under review</small>
+            <small><%= i18n.t("mo.dashboard.pending-review-subtitle") %></small>
         </article>
     </div>
 
     <article class="panel" style="margin-top: 18px;">
         <div class="panel-header">
-            <h4>EBU6304 Software Engineering - Applications</h4>
-            <p>Click an applicant to view details and make a decision.</p>
+            <h4><%= i18n.t("mo.dashboard.panel-heading") %></h4>
+            <p><%= i18n.t("mo.dashboard.description") %></p>
         </div>
         <% if (allApplications == null || allApplications.isEmpty()) { %>
-        <div class="alert info">No applications have been submitted yet.</div>
+        <div class="alert info"><%= i18n.t("mo.dashboard.no-applications") %></div>
         <% } else { %>
         <div class="table-shell">
             <table>
                 <thead>
                 <tr>
-                    <th>Applicant</th>
-                    <th>Position</th>
-                    <th>Skills</th>
-                    <th>Priority</th>
-                    <th>AI Fit</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
+                    <th><%= i18n.t("mo.dashboard.applicant") %></th>
+                    <th><%= i18n.t("mo.dashboard.position") %></th>
+                    <th><%= i18n.t("mo.dashboard.skills") %></th>
+                    <th><%= i18n.t("mo.dashboard.priority") %></th>
+                    <th><%= i18n.t("mo.dashboard.ai-fit") %></th>
+                    <th><%= i18n.t("mo.dashboard.status") %></th>
+                    <th><%= i18n.t("mo.dashboard.submitted") %></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -67,7 +67,7 @@
                     <td><span class="muted"><%= skills %></span></td>
                     <td><%= app.getPriority() %></td>
                     <td><strong><%= fitScore %>%</strong></td>
-                    <td><span class="status-chip <%= statusClass %>"><%= app.getStatus() %></span></td>
+                    <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + app.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td><%= app.getSubmittedAt() == null ? "0" : app.getSubmittedAt() %></td>
                 </tr>
                 <% } %>

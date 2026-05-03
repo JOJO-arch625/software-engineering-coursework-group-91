@@ -7,42 +7,40 @@
 <section class="view active" id="gateway">
     <article class="hero-card">
         <div>
-            <p class="eyebrow">Workflow Entry</p>
-            <h3>Transparent TA recruitment without database complexity</h3>
-            <p class="muted">
-                This working build turns the approved prototype into a Java Servlet/JSP application with local JSON storage and local CV files.
-            </p>
+            <p class="eyebrow"><%= i18n.t("gateway.eyebrow") %></p>
+            <h3><%= i18n.t("gateway.heading") %></h3>
+            <p class="muted"><%= i18n.t("gateway.description") %></p>
         </div>
         <div class="hero-meta">
-            <span class="pill pill-neutral">Servlet / JSP runtime</span>
-            <span class="pill pill-neutral">JSON + local uploads</span>
-            <span class="pill pill-warning">AI reserved for teammates</span>
+            <span class="pill pill-neutral"><%= i18n.t("gateway.pill-servlet") %></span>
+            <span class="pill pill-neutral"><%= i18n.t("gateway.pill-json") %></span>
+            <span class="pill pill-warning"><%= i18n.t("gateway.pill-ai") %></span>
         </div>
     </article>
 
     <div class="role-grid">
         <article class="role-card accent-blue">
-            <p class="eyebrow">TA</p>
-            <h4>Apply with profile, CV, and ranked preferences</h4>
-            <p>Track application progress directly instead of waiting for hidden spreadsheet updates.</p>
+            <p class="eyebrow"><%= i18n.t("gateway.ta-eyebrow") %></p>
+            <h4><%= i18n.t("gateway.ta-heading") %></h4>
+            <p><%= i18n.t("gateway.ta-body") %></p>
             <div class="button-row">
-                <a class="primary-button" href="<%= request.getContextPath() %>/ta/dashboard">Open TA flow</a>
+                <a class="primary-button" href="<%= request.getContextPath() %>/ta/dashboard"><%= i18n.t("gateway.ta-button") %></a>
             </div>
         </article>
         <article class="role-card accent-amber">
-            <p class="eyebrow">MO</p>
-            <h4>Publish roles and review applicants in one place</h4>
-            <p>Check skills, CV references, and current TA workload before making a decision.</p>
+            <p class="eyebrow"><%= i18n.t("gateway.mo-eyebrow") %></p>
+            <h4><%= i18n.t("gateway.mo-heading") %></h4>
+            <p><%= i18n.t("gateway.mo-body") %></p>
             <div class="button-row">
-                <a class="primary-button" href="<%= request.getContextPath() %>/mo/dashboard">Open MO flow</a>
+                <a class="primary-button" href="<%= request.getContextPath() %>/mo/dashboard"><%= i18n.t("gateway.mo-button") %></a>
             </div>
         </article>
         <article class="role-card accent-green">
-            <p class="eyebrow">Admin</p>
-            <h4>Monitor accepted jobs and workload balance</h4>
-            <p>See all accepted allocations and identify overload risk before more offers are confirmed.</p>
+            <p class="eyebrow"><%= i18n.t("gateway.admin-eyebrow") %></p>
+            <h4><%= i18n.t("gateway.admin-heading") %></h4>
+            <p><%= i18n.t("gateway.admin-body") %></p>
             <div class="button-row">
-                <a class="primary-button" href="<%= request.getContextPath() %>/admin/workload">Open Admin flow</a>
+                <a class="primary-button" href="<%= request.getContextPath() %>/admin/workload"><%= i18n.t("gateway.admin-button") %></a>
             </div>
         </article>
     </div>
@@ -50,19 +48,19 @@
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Current Working Build Coverage</h4>
+                <h4><%= i18n.t("gateway.coverage-heading") %></h4>
             </div>
             <ul class="feature-list">
-                <li>TA profile maintenance and local CV upload</li>
-                <li>Job browsing, job detail, and capped application submission</li>
-                <li>MO posting creation, editing, and closure</li>
-                <li>MO applicant review with status updates</li>
-                <li>Admin workload summary based on accepted applications</li>
+                <li><%= i18n.t("gateway.coverage-1") %></li>
+                <li><%= i18n.t("gateway.coverage-2") %></li>
+                <li><%= i18n.t("gateway.coverage-3") %></li>
+                <li><%= i18n.t("gateway.coverage-4") %></li>
+                <li><%= i18n.t("gateway.coverage-5") %></li>
             </ul>
         </article>
         <article class="panel">
             <div class="panel-header">
-                <h4>Build Highlights</h4>
+                <h4><%= i18n.t("gateway.highlights-heading") %></h4>
             </div>
             <ul class="feature-list">
                 <% for (String item : notifications) { %>
@@ -75,18 +73,18 @@
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Core Rules Already Enforced</h4>
+                <h4><%= i18n.t("gateway.rules-heading") %></h4>
             </div>
             <ul class="feature-list">
-                <li>TA can apply to at most three jobs</li>
-                <li>Closed postings reject new applications</li>
-                <li>Rejected applications remain visible to the TA</li>
-                <li>Admin highlights workload risk at the threshold</li>
+                <li><%= i18n.t("gateway.rules-1") %></li>
+                <li><%= i18n.t("gateway.rules-2") %></li>
+                <li><%= i18n.t("gateway.rules-3") %></li>
+                <li><%= i18n.t("gateway.rules-4") %></li>
             </ul>
         </article>
         <article class="panel">
             <div class="panel-header">
-                <h4>Reserved TODO Space</h4>
+                <h4><%= i18n.t("gateway.todo-heading") %></h4>
             </div>
             <ul class="feature-list">
                 <% for (String item : aiTodos) { %>

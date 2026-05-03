@@ -10,25 +10,23 @@
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Profile readiness</h4>
+                <h4><%= i18n.t("ta.dashboard.profile-readiness") %></h4>
             </div>
             <p class="dashboard-lead">
-                <strong><%= profile != null && profile.getCvPath() != null ? "Complete profile" : "Profile still needs CV" %></strong>
+                <strong><%= profile != null && profile.getCvPath() != null ? i18n.t("ta.dashboard.complete-profile") : i18n.t("ta.dashboard.profile-needs-cv") %></strong>
             </p>
-            <p class="muted">
-                Keep your TA profile updated so module organisers can review your skills, availability, and uploaded CV in one place.
-            </p>
+            <p class="muted"><%= i18n.t("ta.dashboard.profile-description") %></p>
             <div class="legend">
-                <span class="pill pill-neutral">Applications: <%= applicationTotal == null ? 0 : applicationTotal %> / 3</span>
-                <span class="pill pill-neutral">Accepted: <%= acceptedTotal == null ? 0 : acceptedTotal %> / 3</span>
+                <span class="pill pill-neutral"><%= i18n.t("metric.applications") %>: <%= applicationTotal == null ? 0 : applicationTotal %> / 3</span>
+                <span class="pill pill-neutral"><%= i18n.t("metric.accepted") %>: <%= acceptedTotal == null ? 0 : acceptedTotal %> / 3</span>
                 <span class="pill <%= profile != null && profile.getCvPath() != null ? "pill-success" : "pill-warning" %>">
-                    <%= profile != null && profile.getCvPath() != null ? "CV linked" : "CV still required" %>
+                    <%= profile != null && profile.getCvPath() != null ? i18n.t("ta.dashboard.cv-linked") : i18n.t("ta.dashboard.cv-required") %>
                 </span>
             </div>
         </article>
         <article class="panel">
             <div class="panel-header">
-                <h4>Latest Notifications</h4>
+                <h4><%= i18n.t("ta.dashboard.latest-notifications") %></h4>
             </div>
             <ul class="feature-list">
                 <% for (String item : notifications) { %>
@@ -41,14 +39,14 @@
     <div class="grid one-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Quick Actions</h4>
+                <h4><%= i18n.t("ta.dashboard.quick-actions") %></h4>
             </div>
             <div class="button-row">
-                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/profile">Update profile</a>
-                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/jobs">Browse jobs</a>
-                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/applications">View applications</a>
+                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/profile"><%= i18n.t("ta.dashboard.update-profile") %></a>
+                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/jobs"><%= i18n.t("ta.dashboard.browse-jobs") %></a>
+                <a class="secondary-button" href="<%= request.getContextPath() %>/ta/applications"><%= i18n.t("ta.dashboard.view-applications") %></a>
             </div>
-            <p class="muted">This workspace now opens through role-based login, so TA tools stay separate from MO and Admin workflows.</p>
+            <p class="muted"><%= i18n.t("ta.dashboard.footnote") %></p>
         </article>
     </div>
 </section>
