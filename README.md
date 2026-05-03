@@ -8,6 +8,12 @@
 - Boson-Lyu: 231224815 (Member)
 - lswsb: 2024018006 (Support TA)
 
+## total directory structure
+- dtat: json数据库
+- src : 前后端源码
+- test: 测试代码
+- uploads: 上传简历等
+
 ## Current Implementation Docs
 - local run guide: `coursework/docs/implementation/LOCAL-RUNNING-GUIDE.md`
 - implemented features and TODO scope: `coursework/docs/implementation/FEATURE-STATUS.md`
@@ -17,3 +23,5 @@
 - 本地运行说明：`coursework/docs/implementation/LOCAL-RUNNING-GUIDE.zh-CN.md`
 - 已实现功能与 TODO 说明：`coursework/docs/implementation/FEATURE-STATUS.zh-CN.md`
 - 阶段性中文总结报告：`coursework/docs/implementation/WORKSPACE-SUMMARY.zh-CN.md`
+
+
