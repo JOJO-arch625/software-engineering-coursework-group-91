@@ -58,9 +58,9 @@
                     <button class="secondary-button" type="submit"><%= i18n.t("ta.profile.cv-upload") %></button>
                 </div>
             </form>
-            <div class="alert info" style="margin-top: 18px;">
+            <!-- <div class="alert info" style="margin-top: 18px;">
                 <%= i18n.t("ta.profile.alert") %>
-            </div>
+            </div> -->
         </article>
     </div>
 </section>

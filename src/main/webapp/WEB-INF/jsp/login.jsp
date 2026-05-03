@@ -14,39 +14,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | <%= i18n.t("page.title.suffix") %></title>
-    <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260409c">
+    <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260503a">
 </head>
 <body class="login-page">
 <header class="login-topbar">
     <div class="topbar-left">
-        <span class="wordmark"><%= i18n.t("login.wordmark") %></span>
-        <div class="topbar-links">
-            <span><%= i18n.t("login.coursework-portal") %></span>
-            <span><%= i18n.t("login.role-based-access") %></span>
-        </div>
+        <span class="wordmark"><%= i18n.t("brand.title") %></span>
     </div>
     <div class="topbar-right">
         <a class="lang-toggle" href="?lang=<%= "zh".equals(lang) ? "en" : "zh" %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
             <%= "zh".equals(lang) ? "EN" : "中文" %>
         </a>
-        <span class="icon-badge"><%= i18n.t("login.local-demo") %></span>
     </div>
 </header>
 
 <main class="login-shell">
     <section class="login-hero">
         <section class="login-copy-panel">
-            <p class="eyebrow"><%= i18n.t("login.eyebrow") %></p>
             <h1><%= i18n.t("login.hero-heading") %></h1>
-            <p class="login-lead">
-                <%= i18n.t("login.hero-lead") %>
-            </p>
-
-            <div class="login-pill-row">
-                <span class="pill pill-warning"><%= i18n.t("login.pill-no-db") %></span>
-                <span class="pill pill-neutral"><%= i18n.t("login.pill-json") %></span>
-                <span class="pill pill-neutral"><%= i18n.t("login.pill-workflow") %></span>
-            </div>
+            <p class="login-lead"><%= i18n.t("login.hero-lead") %></p>
 
             <div class="login-feature-grid">
                 <article class="login-feature-card">

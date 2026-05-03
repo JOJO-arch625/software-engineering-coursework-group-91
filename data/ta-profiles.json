@@ -1,32 +1,22 @@
 [
   {
     "id": "ta-1",
-    "fullName": "Yuyanchen Long",
-    "studentNumber": "231224653",
+    "fullName": "Yuyanchen",
+    "studentNumber": "123",
     "email": "yuyanchen.long@qmul.ac.uk",
     "phone": "+86 188 0000 0000",
     "skills": "Java, Python, VHDL, Object-Oriented Programming",
     "availability": "Available on Tuesday afternoon, Thursday evening, and Friday morning.",
-    "cvPath": "uploads/cv/YuyanchenLong_CV.pdf"
+    "cvPath": "uploads/cv/Yuyanchen_YuyanchenLong_CV.pdf"
   },
   {
     "id": "ta-2",
-    "fullName": "Ming Li",
+    "fullName": "lidarou",
     "studentNumber": "231224601",
-    "email": "ming.li@qmul.ac.uk",
+    "email": "darou.li@qmul.ac.uk",
     "phone": "+86 177 0000 0001",
     "skills": "Python, Lab support, Data structures",
     "availability": "Available on Wednesday afternoon and Friday afternoon.",
-    "cvPath": "uploads/cv/MingLi_CV.pdf"
-  },
-  {
-    "id": "ta-3",
-    "fullName": "Siyu Chen",
-    "studentNumber": "231224612",
-    "email": "siyu.chen@qmul.ac.uk",
-    "phone": "+86 177 0000 0002",
-    "skills": "Digital logic, Simulation, Student support",
-    "availability": "Available on Monday morning and Thursday afternoon.",
-    "cvPath": "uploads/cv/SiyuChen_CV.pdf"
+    "cvPath": "uploads/cv/lidarou_CV.pdf"
   }
 ]
