@@ -9,11 +9,11 @@
 - lswsb: 2024018006 (Support TA)
 
 ## Current Implementation Docs
-- local run guide: `docs/implementation/LOCAL-RUNNING-GUIDE.md`
-- implemented features and TODO scope: `docs/implementation/FEATURE-STATUS.md`
-- sprint handoff: `docs/implementation/SPRINT-2-HANDOFF.md`
+- local run guide: `coursework/docs/implementation/LOCAL-RUNNING-GUIDE.md`
+- implemented features and TODO scope: `coursework/docs/implementation/FEATURE-STATUS.md`
+- sprint handoff: `coursework/docs/implementation/SPRINT-2-HANDOFF.md`
 
 ## 中文实现文档
-- 本地运行说明：`docs/implementation/LOCAL-RUNNING-GUIDE.zh-CN.md`
-- 已实现功能与 TODO 说明：`docs/implementation/FEATURE-STATUS.zh-CN.md`
-- 阶段性中文总结报告：`docs/implementation/WORKSPACE-SUMMARY.zh-CN.md`
+- 本地运行说明：`coursework/docs/implementation/LOCAL-RUNNING-GUIDE.zh-CN.md`
+- 已实现功能与 TODO 说明：`coursework/docs/implementation/FEATURE-STATUS.zh-CN.md`
+- 阶段性中文总结报告：`coursework/docs/implementation/WORKSPACE-SUMMARY.zh-CN.md`
