@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"
-    import="com.group91.tars.model.FlashMessage,com.group91.tars.model.UserAccount,com.group91.tars.service.TarsService" %>
+    import="com.group91.tars.model.FlashMessage,com.group91.tars.model.UserAccount,com.group91.tars.service.TarsService,com.group91.tars.i18n.I18n" %>
 <%
     String currentView = (String) request.getAttribute("currentView");
     String viewTag = (String) request.getAttribute("viewTag");
@@ -15,21 +15,24 @@
     String currentRole = (String) request.getAttribute("currentRole");
     String sidebarHomePath = (String) request.getAttribute("sidebarHomePath");
     String contextPath = request.getContextPath();
+    I18n i18n = (I18n) request.getAttribute("i18n");
+    String lang = (String) request.getAttribute("lang");
+    if (i18n == null) { i18n = new I18n(java.util.Locale.ENGLISH); lang = "en"; }
     boolean isTa = "TA".equals(currentRole);
     boolean isMo = "MO".equals(currentRole);
     boolean isAdmin = "ADMIN".equals(currentRole);
-    String workspaceLabel = isTa ? "TA workspace" : (isMo ? "MO workspace" : (isAdmin ? "Admin workspace" : "Recruitment workspace"));
+    String workspaceLabel = isTa ? i18n.t("topbar.workspace.ta") : (isMo ? i18n.t("topbar.workspace.mo") : (isAdmin ? i18n.t("topbar.workspace.admin") : i18n.t("topbar.workspace.guest")));
     int inboxUnread = 0;
     if (currentUser != null) {
         inboxUnread = TarsService.getInstance().countUnreadNotifications(currentUser.getLinkedId());
     }
 %>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<%= lang %>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= viewTitle %> | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM</title>
+    <title><%= viewTitle %> | <%= i18n.t("page.title.suffix") %></title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260409c">
 </head>
 <body>
@@ -37,62 +40,62 @@
     <aside class="sidebar">
         <div class="brand">
             <a class="brand-link" href="<%= contextPath + sidebarHomePath %>">
-                <span class="brand-mark">TR</span>
+                <span class="brand-mark"><%= i18n.t("brand.mark") %></span>
                 <span class="brand-copy">
-                    <strong class="brand-title">ISTARS</strong>
-                    <span class="brand-subtitle">Coursework portal</span>
+                    <strong class="brand-title"><%= i18n.t("brand.title") %></strong>
+                    <span class="brand-subtitle"><%= i18n.t("brand.subtitle") %></span>
                 </span>
             </a>
         </div>
         <nav class="nav-group">
             <% if (isTa) { %>
-            <a class="nav-link <%= "ta-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/dashboard" title="Dashboard">
-                <span class="nav-icon">DB</span><span class="nav-label">Dashboard</span>
+            <a class="nav-link <%= "ta-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/dashboard" title="<%= i18n.t("nav.dashboard") %>">
+                <span class="nav-icon">DB</span><span class="nav-label"><%= i18n.t("nav.dashboard") %></span>
             </a>
-            <a class="nav-link <%= "ta-profile".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/profile" title="Profile">
-                <span class="nav-icon">PF</span><span class="nav-label">Profile</span>
+            <a class="nav-link <%= "ta-profile".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/profile" title="<%= i18n.t("nav.profile") %>">
+                <span class="nav-icon">PF</span><span class="nav-label"><%= i18n.t("nav.profile") %></span>
             </a>
-            <a class="nav-link <%= "job-list".equals(currentView) || "job-detail".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/jobs" title="Jobs">
-                <span class="nav-icon">JB</span><span class="nav-label">Jobs</span>
+            <a class="nav-link <%= "job-list".equals(currentView) || "job-detail".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/jobs" title="<%= i18n.t("nav.jobs") %>">
+                <span class="nav-icon">JB</span><span class="nav-label"><%= i18n.t("nav.jobs") %></span>
             </a>
-            <a class="nav-link <%= "applications".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/applications" title="Applications">
-                <span class="nav-icon">AP</span><span class="nav-label">Applications</span>
+            <a class="nav-link <%= "applications".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ta/applications" title="<%= i18n.t("nav.applications") %>">
+                <span class="nav-icon">AP</span><span class="nav-label"><%= i18n.t("nav.applications") %></span>
             </a>
-            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="AI panel">
-                <span class="nav-icon">AI</span><span class="nav-label">AI Assist</span>
+            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="<%= i18n.t("topbar.ai-panel") %>">
+                <span class="nav-icon">AI</span><span class="nav-label"><%= i18n.t("nav.ai-assist") %></span>
             </a>
             <% } %>
             <% if (isMo) { %>
-            <a class="nav-link <%= "mo-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/dashboard" title="Dashboard">
-                <span class="nav-icon">DB</span><span class="nav-label">Dashboard</span>
+            <a class="nav-link <%= "mo-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/dashboard" title="<%= i18n.t("nav.dashboard") %>">
+                <span class="nav-icon">DB</span><span class="nav-label"><%= i18n.t("nav.dashboard") %></span>
             </a>
-            <a class="nav-link <%= "job-editor".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/jobs/edit" title="Posts">
-                <span class="nav-icon">PS</span><span class="nav-label">Posts</span>
+            <a class="nav-link <%= "job-editor".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/jobs/edit" title="<%= i18n.t("nav.posts") %>">
+                <span class="nav-icon">PS</span><span class="nav-label"><%= i18n.t("nav.posts") %></span>
             </a>
-            <a class="nav-link <%= "review".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/review" title="Review">
-                <span class="nav-icon">RV</span><span class="nav-label">Review</span>
+            <a class="nav-link <%= "review".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/mo/review" title="<%= i18n.t("nav.review") %>">
+                <span class="nav-icon">RV</span><span class="nav-label"><%= i18n.t("nav.review") %></span>
             </a>
-            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="AI panel">
-                <span class="nav-icon">AI</span><span class="nav-label">AI Assist</span>
+            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="<%= i18n.t("topbar.ai-panel") %>">
+                <span class="nav-icon">AI</span><span class="nav-label"><%= i18n.t("nav.ai-assist") %></span>
             </a>
             <% } %>
             <% if (isAdmin) { %>
-            <a class="nav-link <%= "admin-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/admin/workload" title="Dashboard">
-                <span class="nav-icon">DB</span><span class="nav-label">Dashboard</span>
+            <a class="nav-link <%= "admin-dashboard".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/admin/workload" title="<%= i18n.t("nav.dashboard") %>">
+                <span class="nav-icon">DB</span><span class="nav-label"><%= i18n.t("nav.dashboard") %></span>
             </a>
-            <a class="nav-link <%= "gateway".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/gateway" title="Overview">
-                <span class="nav-icon">OV</span><span class="nav-label">Overview</span>
+            <a class="nav-link <%= "gateway".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/gateway" title="<%= i18n.t("nav.overview") %>">
+                <span class="nav-icon">OV</span><span class="nav-label"><%= i18n.t("nav.overview") %></span>
             </a>
-            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="AI panel">
-                <span class="nav-icon">AI</span><span class="nav-label">AI Assist</span>
+            <a class="nav-link <%= "ai-assist".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/ai/assist" title="<%= i18n.t("topbar.ai-panel") %>">
+                <span class="nav-icon">AI</span><span class="nav-label"><%= i18n.t("nav.ai-assist") %></span>
             </a>
             <% } %>
             <div style="border-top: 1px solid rgba(255,255,255,0.18); margin: 10px 14px;"></div>
-            <a class="nav-link <%= "search".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/search" title="Search">
-                <span class="nav-icon">SH</span><span class="nav-label">Search</span>
+            <a class="nav-link <%= "search".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/search" title="<%= i18n.t("nav.search") %>">
+                <span class="nav-icon">SH</span><span class="nav-label"><%= i18n.t("nav.search") %></span>
             </a>
-            <a class="nav-link <%= "inbox".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/inbox" title="Inbox">
-                <span class="nav-icon">IB</span><span class="nav-label">Inbox<%= inboxUnread > 0 ? " (" + inboxUnread + ")" : "" %></span>
+            <a class="nav-link <%= "inbox".equals(currentView) ? "active" : "" %>" href="<%= contextPath %>/inbox" title="<%= i18n.t("nav.inbox") %>">
+                <span class="nav-icon">IB</span><span class="nav-label"><%= i18n.t("nav.inbox") %><%= inboxUnread > 0 ? " (" + inboxUnread + ")" : "" %></span>
             </a>
         </nav>
     </aside>
@@ -100,24 +103,27 @@
     <main class="main-panel">
         <header class="topbar">
             <div class="topbar-left">
-                <button class="icon-button" type="button" data-sidebar-toggle aria-label="Toggle sidebar">&#9776;</button>
-                <a class="wordmark" href="<%= contextPath + sidebarHomePath %>">ISTARS</a>
+                <button class="icon-button" type="button" data-sidebar-toggle aria-label="<%= i18n.t("topbar.toggle-sidebar") %>">&#9776;</button>
+                <a class="wordmark" href="<%= contextPath + sidebarHomePath %>"><%= i18n.t("brand.title") %></a>
                 <div class="topbar-links">
                     <span><%= workspaceLabel %></span>
-                    <a href="<%= contextPath %>/ai/assist">AI panel</a>
+                    <a href="<%= contextPath %>/ai/assist"><%= i18n.t("topbar.ai-panel") %></a>
                 </div>
             </div>
             <div class="topbar-right">
                 <div class="top-icons">
-                    <a class="icon-badge icon-link" href="<%= contextPath %>/search" title="Global search">Search</a>
-                    <a class="icon-badge icon-link" href="<%= contextPath %>/inbox" title="Notifications inbox">Inbox<%= inboxUnread > 0 ? " (" + inboxUnread + ")" : "" %></a>
+                    <a class="icon-badge icon-link" href="<%= contextPath %>/search" title="<%= i18n.t("topbar.search") %>"><%= i18n.t("topbar.search") %></a>
+                    <a class="icon-badge icon-link" href="<%= contextPath %>/inbox" title="<%= i18n.t("topbar.inbox") %>"><%= i18n.t("topbar.inbox") %><%= inboxUnread > 0 ? " (" + inboxUnread + ")" : "" %></a>
                 </div>
-                <div class="user-badge"><%= currentUser == null ? "GU" : currentUser.getInitials() %></div>
+                <div class="user-badge"><%= currentUser == null ? i18n.t("brand.mark") : currentUser.getInitials() %></div>
                 <div class="user-meta">
-                    <strong><%= currentUser == null ? "Guest" : currentUser.getDisplayName() %></strong>
+                    <strong><%= currentUser == null ? i18n.t("topbar.guest") : currentUser.getDisplayName() %></strong>
                     <span><%= workspaceLabel %></span>
                 </div>
-                <a class="logout-link" href="<%= contextPath %>/logout">Logout</a>
+                <a class="lang-toggle" href="?lang=<%= "zh".equals(lang) ? "en" : "zh" %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
+                    <%= "zh".equals(lang) ? "EN" : "中文" %>
+                </a>
+                <a class="logout-link" href="<%= contextPath %>/logout"><%= i18n.t("topbar.logout") %></a>
             </div>
         </header>
 
@@ -128,15 +134,15 @@
             </div>
             <div class="status-strip">
                 <article class="status-card">
-                    <span class="status-label"><%= topMetricOneLabel %></span>
+                    <span class="status-label"><%= i18n.t(topMetricOneLabel) %></span>
                     <strong><%= topMetricOneValue == null ? 0 : topMetricOneValue %></strong>
                 </article>
                 <article class="status-card">
-                    <span class="status-label"><%= topMetricTwoLabel %></span>
+                    <span class="status-label"><%= i18n.t(topMetricTwoLabel) %></span>
                     <strong><%= topMetricTwoValue == null ? 0 : topMetricTwoValue %></strong>
                 </article>
                 <article class="status-card">
-                    <span class="status-label"><%= topMetricThreeLabel %></span>
+                    <span class="status-label"><%= i18n.t(topMetricThreeLabel) %></span>
                     <strong><%= topMetricThreeValue == null ? 0 : topMetricThreeValue %></strong>
                 </article>
             </div>

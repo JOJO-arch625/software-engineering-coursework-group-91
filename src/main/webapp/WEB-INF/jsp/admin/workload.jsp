@@ -9,12 +9,12 @@
 <section class="view active">
     <div class="grid three-col">
         <article class="metric-card">
-            <span>Total TAs tracked</span>
+            <span><%= i18n.t("admin.workload.total-tas") %></span>
             <strong><%= summaries == null ? 0 : summaries.size() %></strong>
-            <small>All visible recruitment records</small>
+            <small><%= i18n.t("admin.workload.total-tas-subtitle") %></small>
         </article>
         <article class="metric-card">
-            <span>Accepted assignments</span>
+            <span><%= i18n.t("admin.workload.accepted-assignments") %></span>
             <strong><%
                 int totalAccepted = 0;
                 if (summaries != null) {
@@ -24,34 +24,34 @@
                 }
                 out.print(totalAccepted);
             %></strong>
-            <small>Across all modules</small>
+            <small><%= i18n.t("admin.workload.accepted-assignments-subtitle") %></small>
         </article>
         <article class="metric-card">
-            <span>Overload alerts</span>
+            <span><%= i18n.t("admin.workload.overload-alerts") %></span>
             <strong><%= overloadCount == null ? 0 : overloadCount %></strong>
-            <small>Flagged at workload threshold</small>
+            <small><%= i18n.t("admin.workload.overload-alerts-subtitle") %></small>
         </article>
     </div>
 
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Workload Overview</h4>
-                <p>Threshold: 3 accepted jobs</p>
+                <h4><%= i18n.t("admin.workload.overview-heading") %></h4>
+                <p><%= i18n.t("admin.workload.threshold") %></p>
             </div>
             <div class="alert <%= overloadCount != null && overloadCount > 0 ? "danger" : "info" %>">
                 <%= overloadCount != null && overloadCount > 0
-                    ? overloadCount + " TA(s) have reached the workload threshold. Review allocation before confirming more offers."
-                    : "No TA is currently at the overload threshold." %>
+                    ? i18n.t("admin.workload.overload-warning", overloadCount)
+                    : i18n.t("admin.workload.no-overload") %>
             </div>
             <div class="table-shell" style="margin-top: 18px;">
                 <table>
                     <thead>
                     <tr>
-                        <th>TA</th>
-                        <th>Accepted Modules</th>
-                        <th>Count</th>
-                        <th>Workload Status</th>
+                        <th><%= i18n.t("admin.workload.ta") %></th>
+                        <th><%= i18n.t("admin.workload.accepted-modules") %></th>
+                        <th><%= i18n.t("admin.workload.count") %></th>
+                        <th><%= i18n.t("admin.workload.workload-status") %></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -62,7 +62,7 @@
                         <td><%= summary.getAcceptedCount() %></td>
                         <td>
                             <span class="status-chip <%= summary.isOverloadFlag() ? "status-overload" : "status-open" %>">
-                                <%= summary.isOverloadFlag() ? "Overload risk" : "Balanced" %>
+                                <%= summary.isOverloadFlag() ? i18n.t("admin.workload.overload-risk") : i18n.t("admin.workload.balanced") %>
                             </span>
                         </td>
                     </tr>
@@ -73,7 +73,7 @@
         </article>
         <article class="panel">
             <div class="panel-header">
-                <h4>AI Workload Balancing Advice</h4>
+                <h4><%= i18n.t("admin.workload.advice-heading") %></h4>
             </div>
             <div class="ai-card">
                 <div class="ai-insights">
@@ -83,7 +83,7 @@
                 </div>
             </div>
             <div class="alert info" style="margin-top: 18px;">
-                AI balancing advice is generated automatically based on current workload data. Admin should coordinate with MOs before making redistribution decisions.
+                <%= i18n.t("admin.workload.advice-alert") %>
             </div>
         </article>
     </div>

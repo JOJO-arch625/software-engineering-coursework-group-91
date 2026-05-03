@@ -9,10 +9,45 @@
 - lswsb: 2024018006 (Support TA)
 
 ## directory structure
+- coursework: 文书记录目录
 - data: json数据库
 - src: 前后端源码
 - test:测试代码
 - uploads:上传cv等
+
+## 运行必要环境
+- javajdk8 - 推荐使用openjdk
+- maven
+
+attention：must confirm 环境变量中有maven的bin以及java的bin
+
+## 构建项目
+在项目根目录执行：
+
+```powershell
+mvn -q "-Dmaven.repo.local=.m2/repository" -DskipTests package
+```
+
+预期结果：
+- 构建成功
+- 生成 WAR 文件：`target/ta-recruitment-system.war`
+
+## 本地运行
+推荐在 PowerShell 中执行下面这条命令：
+
+```powershell
+mvn org.apache.tomcat.maven:tomcat7-maven-plugin:2.2:run "-Dmaven.repo.local=.m2\repository"
+```
+
+说明：
+- 确保mvnbin已经在环境变量中配置
+- `-Dmaven.repo.local` 需要带引号，避免 PowerShell 把参数拆坏。
+
+启动成功后可在浏览器访问：
+
+- `http://127.0.0.1:8080/login`
+- 或 `http://localhost:8080/login`
+
 
 ## Current Implementation Docs
 - local run guide: `coursework/docs/implementation/LOCAL-RUNNING-GUIDE.md`

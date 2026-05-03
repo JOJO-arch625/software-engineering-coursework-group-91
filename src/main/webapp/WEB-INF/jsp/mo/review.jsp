@@ -11,18 +11,18 @@
     <div class="grid two-col">
         <article class="panel">
             <div class="panel-header">
-                <h4>Applicant Review<%= selectedJob == null ? "" : " - " + selectedJob.getTitle() %></h4>
-                <p>Select an applicant to view details and make a decision.</p>
+                <h4><%= i18n.t("mo.review.heading") %><%= selectedJob == null ? "" : " - " + selectedJob.getTitle() %></h4>
+                <p><%= i18n.t("mo.review.description") %></p>
             </div>
             <div class="table-shell">
                 <table>
                     <thead>
                     <tr>
-                        <th>Applicant</th>
-                        <th>Priority</th>
-                        <th>AI Fit</th>
-                        <th>Accepted</th>
-                        <th>Status</th>
+                        <th><%= i18n.t("mo.review.applicant") %></th>
+                        <th><%= i18n.t("mo.review.priority") %></th>
+                        <th><%= i18n.t("mo.review.ai-fit") %></th>
+                        <th><%= i18n.t("mo.review.accepted") %></th>
+                        <th><%= i18n.t("mo.review.status") %></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -39,7 +39,7 @@
                         <td><%= record.getPriority() %></td>
                         <td><strong><%= fitScore %>%</strong></td>
                         <td><%= pageService.countAcceptedJobsForTaPublic(record.getTaId()) %> / 3</td>
-                        <td><span class="status-chip <%= statusClass %>"><%= record.getStatus() %></span></td>
+                        <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     </tr>
                     <% } %>
                     </tbody>
@@ -49,73 +49,73 @@
 
         <article class="panel">
             <div class="panel-header">
-                <h4>Applicant Detail</h4>
+                <h4><%= i18n.t("mo.review.detail-heading") %></h4>
             </div>
             <% if (selectedApplication == null || selectedApplicant == null) { %>
-            <div class="alert info">Select an applicant from the list to view their details.</div>
+            <div class="alert info"><%= i18n.t("mo.review.select-applicant") %></div>
             <% } else {
                 int selectedFitScore = selectedJob == null ? 0 : pageService.calculateFitScore(selectedApplicant.getId(), selectedJob.getId());
                 List<String> selectedMissingSkills = selectedJob == null ? new java.util.ArrayList<String>() : pageService.getMissingSkills(selectedApplicant.getId(), selectedJob.getId());
             %>
             <h4 style="margin-bottom: 10px;"><%= selectedApplicant.getFullName() %></h4>
             <div class="ai-score-shell" style="margin-bottom: 12px;">
-                <span class="ai-score-label">Skill fit score</span>
+                <span class="ai-score-label"><%= i18n.t("mo.review.fit-score") %></span>
                 <strong><%= selectedFitScore %>%</strong>
             </div>
             <% if (!selectedMissingSkills.isEmpty()) { %>
             <div class="alert danger" style="margin-top: 0; margin-bottom: 12px;">
-                <strong>Missing skills:</strong> <%= String.join(", ", selectedMissingSkills) %>
+                <strong><%= i18n.t("mo.review.missing-skills") %>:</strong> <%= String.join(", ", selectedMissingSkills) %>
             </div>
             <% } else { %>
             <div class="alert success" style="margin-top: 0; margin-bottom: 12px;">
-                Full skill match for this position.
+                <%= i18n.t("mo.review.full-match") %>
             </div>
             <% } %>
             <dl class="detail-grid">
                 <div>
-                    <dt>Applicant Skills</dt>
+                    <dt><%= i18n.t("mo.review.applicant-skills") %></dt>
                     <dd><%= selectedApplication.getApplicantSkills() == null || selectedApplication.getApplicantSkills().isEmpty() ? selectedApplicant.getSkills() : selectedApplication.getApplicantSkills() %></dd>
                 </div>
                 <div>
-                    <dt>Profile Skills</dt>
+                    <dt><%= i18n.t("mo.review.profile-skills") %></dt>
                     <dd><%= selectedApplicant.getSkills() %></dd>
                 </div>
                 <div class="span-two">
-                    <dt>Description</dt>
-                    <dd><%= selectedApplication.getApplicantDescription() == null || selectedApplication.getApplicantDescription().isEmpty() ? "No description provided." : selectedApplication.getApplicantDescription() %></dd>
+                    <dt><%= i18n.t("mo.review.description") %></dt>
+                    <dd><%= selectedApplication.getApplicantDescription() == null || selectedApplication.getApplicantDescription().isEmpty() ? i18n.t("mo.review.no-description") : selectedApplication.getApplicantDescription() %></dd>
                 </div>
                 <div class="span-two">
-                    <dt>Motivation Note</dt>
+                    <dt><%= i18n.t("mo.review.motivation-note") %></dt>
                     <dd><%= selectedApplication.getNotes() == null ? "0" : selectedApplication.getNotes() %></dd>
                 </div>
                 <div>
-                    <dt>Student Number</dt>
+                    <dt><%= i18n.t("mo.review.student-number") %></dt>
                     <dd><%= selectedApplicant.getStudentNumber() %></dd>
                 </div>
                 <div>
-                    <dt>Email</dt>
+                    <dt><%= i18n.t("mo.review.email") %></dt>
                     <dd><%= selectedApplicant.getEmail() %></dd>
                 </div>
                 <div>
-                    <dt>Current Accepted Jobs</dt>
+                    <dt><%= i18n.t("mo.review.current-accepted") %></dt>
                     <dd><%= pageService.countAcceptedJobsForTaPublic(selectedApplicant.getId()) %> / 3</dd>
                 </div>
                 <div>
-                    <dt>Current Status</dt>
-                    <dd><%= selectedApplication.getStatus() %></dd>
+                    <dt><%= i18n.t("mo.review.current-status") %></dt>
+                    <dd><%= i18n.t("status." + selectedApplication.getStatus().toLowerCase().replace(" ", "-")) %></dd>
                 </div>
             </dl>
             <form method="post" action="<%= request.getContextPath() %>/mo/review" class="form-grid" style="margin-top: 18px;">
                 <input type="hidden" name="jobId" value="<%= selectedJob == null ? "" : selectedJob.getId() %>">
                 <input type="hidden" name="applicationId" value="<%= selectedApplication.getId() %>">
                 <label class="span-two">
-                    Review note
+                    <%= i18n.t("mo.review.review-note") %>
                     <textarea name="notes"><%= selectedApplication.getNotes() == null ? "" : selectedApplication.getNotes() %></textarea>
                 </label>
                 <div class="button-row span-two">
-                    <button class="secondary-button" type="submit" name="status" value="Under Review">Mark under review</button>
-                    <button class="primary-button" type="submit" name="status" value="Accepted">Accept</button>
-                    <button class="ghost-button" type="submit" name="status" value="Rejected">Reject</button>
+                    <button class="secondary-button" type="submit" name="status" value="Under Review"><%= i18n.t("mo.review.mark-under-review") %></button>
+                    <button class="primary-button" type="submit" name="status" value="Accepted"><%= i18n.t("mo.review.accept") %></button>
+                    <button class="ghost-button" type="submit" name="status" value="Rejected"><%= i18n.t("mo.review.reject") %></button>
                 </div>
             </form>
             <% } %>

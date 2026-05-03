@@ -7,20 +7,20 @@
 <section class="view active">
     <article class="panel">
         <div class="panel-header">
-            <h4>My Applications</h4>
-            <p>Transparent status tracking replaces the earlier hidden spreadsheet workflow.</p>
+            <h4><%= i18n.t("ta.applications.heading") %></h4>
+            <p><%= i18n.t("ta.applications.description") %></p>
         </div>
         <div class="alert info">
-            Visible rejection rule: rejected applications remain visible instead of disappearing silently.
+            <%= i18n.t("ta.applications.alert") %>
         </div>
         <div class="table-shell" style="margin-top: 18px;">
             <table>
                 <thead>
                 <tr>
-                    <th>Module</th>
-                    <th>Priority</th>
-                    <th>Status</th>
-                    <th>Notes</th>
+                    <th><%= i18n.t("ta.applications.module") %></th>
+                    <th><%= i18n.t("ta.applications.priority") %></th>
+                    <th><%= i18n.t("ta.applications.status") %></th>
+                    <th><%= i18n.t("ta.applications.notes") %></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -32,7 +32,7 @@
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong><br><span class="muted"><%= pageService.getJobTitle(record.getJobId()) %></span></td>
                     <td><%= record.getPriority() %></td>
-                    <td><span class="status-chip <%= statusClass %>"><%= record.getStatus() %></span></td>
+                    <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td><%= record.getNotes() %></td>
                 </tr>
                 <% } %>

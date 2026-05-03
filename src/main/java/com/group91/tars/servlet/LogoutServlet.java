@@ -11,7 +11,7 @@ public class LogoutServlet extends BasePageServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         request.getSession().invalidate();
-        flash(request, "info", "You have been logged out.");
+        flashI18n(request, "info", "flash.logout.done");
         redirect(request, response, "/login");
     }
 }

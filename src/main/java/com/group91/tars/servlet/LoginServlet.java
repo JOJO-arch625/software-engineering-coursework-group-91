@@ -28,13 +28,13 @@ public class LoginServlet extends BasePageServlet {
         throws IOException {
         UserAccount account = service.authenticate(request.getParameter("username"), request.getParameter("password"));
         if (account == null) {
-            flash(request, "error", "Invalid username or password. Please use one of the demo accounts.");
+            flashI18n(request, "error", "flash.login.invalid");
             redirect(request, response, "/login");
             return;
         }
 
         request.getSession(true).setAttribute(SESSION_USER, account);
-        flash(request, "success", "Welcome back, " + account.getDisplayName() + ".");
+        flashI18n(request, "success", "flash.login.welcome", account.getDisplayName());
         redirect(request, response, service.getHomePathForRole(account.getRole()));
     }
 }
