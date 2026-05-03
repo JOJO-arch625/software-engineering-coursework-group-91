@@ -274,6 +274,13 @@ public class TarsService {
         String finalName = profile.getFullName().replaceAll("[^A-Za-z0-9]", "") + "_" + submittedName.replaceAll("\\s+", "_");
 
         try (InputStream inputStream = part.getInputStream()) {
+            // Delete old CV file if it exists
+            if (profile.getCvPath() != null && !profile.getCvPath().isEmpty()) {
+                java.io.File oldFile = new java.io.File(profile.getCvPath());
+                if (oldFile.exists()) {
+                    oldFile.delete();
+                }
+            }
             String path = store.saveCvFile(inputStream, finalName);
             profile.setCvPath(path);
             saveTaProfile(taId, profile);
