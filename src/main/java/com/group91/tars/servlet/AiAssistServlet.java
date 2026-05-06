@@ -7,6 +7,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Renders the AI assist concept panel at {@code /ai/assist},
+ * displaying AI feature status notes and guidance.
+ */
 @WebServlet("/ai/assist")
 public class AiAssistServlet extends BasePageServlet {
     @Override

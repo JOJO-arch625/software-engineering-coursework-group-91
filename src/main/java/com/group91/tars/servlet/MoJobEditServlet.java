@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Handles job posting creation and editing at {@code /mo/jobs/edit}.
+ * GET renders the job editor form; POST processes save and close actions.
+ */
 @WebServlet("/mo/jobs/edit")
 public class MoJobEditServlet extends BasePageServlet {
     @Override
@@ -47,7 +51,11 @@ public class MoJobEditServlet extends BasePageServlet {
             draft.setStatus(request.getParameter("status"));
             result = service.saveJobPosting(getCurrentUser(request).getLinkedId(), draft);
         }
-        flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.job.created");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.job.validation");
+        }
         redirect(request, response, "/mo/jobs/edit" + buildQuerySuffix(request.getParameter("id")));
     }
 

@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Renders the TA dashboard at {@code /ta/dashboard}, displaying the TA's profile
+ * summary and notification feed.
+ */
 @WebServlet("/ta/dashboard")
 public class TaDashboardServlet extends BasePageServlet {
     @Override

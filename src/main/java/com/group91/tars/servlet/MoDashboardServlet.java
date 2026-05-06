@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Renders the MO dashboard at {@code /mo/dashboard}, displaying the MO's
+ * job postings, applicant counts, and pending review metrics.
+ */
 @WebServlet("/mo/dashboard")
 public class MoDashboardServlet extends BasePageServlet {
     @Override

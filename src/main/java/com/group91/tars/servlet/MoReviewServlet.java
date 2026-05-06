@@ -13,6 +13,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles applicant review at {@code /mo/review}. GET shows the split-panel
+ * review interface; POST processes accept/reject/under-review decisions.
+ */
 @WebServlet("/mo/review")
 public class MoReviewServlet extends BasePageServlet {
     @Override
@@ -46,7 +50,11 @@ public class MoReviewServlet extends BasePageServlet {
             request.getParameter("status"),
             request.getParameter("notes")
         );
-        flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
+        }
         String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId") + "&appId=" + request.getParameter("applicationId");
         redirect(request, response, redirectTarget);
     }

@@ -3,11 +3,21 @@ package com.group91.tars.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Computed (non-persisted) summary of a TA's current workload in the ISTARS system.
+ * Aggregated from accepted applications, this model is used by the Admin workload
+ * dashboard to display each TA's assignment count and overload status.
+ */
 public class WorkloadSummary {
+    /** TA profile identifier (e.g. "ta-1"). */
     private String taId;
+    /** TA full name for display. */
     private String taName;
+    /** List of module codes for the TA's accepted jobs. */
     private List<String> acceptedModules = new ArrayList<String>();
+    /** Number of accepted job assignments. */
     private int acceptedCount;
+    /** Whether the TA has reached or exceeded the workload cap. */
     private boolean overloadFlag;
 
     public String getTaId() {

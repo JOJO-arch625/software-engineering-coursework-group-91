@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Handles the notification inbox at {@code /inbox}. GET renders the notification
+ * list; POST processes mark-read and mark-all-read actions.
+ */
 @WebServlet("/inbox")
 public class InboxServlet extends BasePageServlet {
     @Override
@@ -43,9 +47,13 @@ public class InboxServlet extends BasePageServlet {
         } else if ("markAllRead".equals(action)) {
             result = service.markAllNotificationsRead(currentUser.getLinkedId());
         } else {
-            result = OperationResult.failure("Unknown action.");
+            result = OperationResult.failure("flash.inbox.unknown-action", "Unknown action.");
         }
-        flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.inbox.marked-read");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.inbox.unknown-action");
+        }
         redirect(request, response, "/inbox");
     }
 }

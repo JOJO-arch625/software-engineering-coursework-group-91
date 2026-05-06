@@ -2,7 +2,6 @@ package com.group91.tars.servlet;
 
 import com.group91.tars.i18n.I18n;
 import com.group91.tars.i18n.LocaleFilter;
-import com.group91.tars.model.FlashMessage;
 import com.group91.tars.model.UserAccount;
 import com.group91.tars.service.TarsService;
 import com.group91.tars.web.FlashScope;
