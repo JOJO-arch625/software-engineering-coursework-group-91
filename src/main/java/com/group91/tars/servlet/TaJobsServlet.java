@@ -8,6 +8,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Renders the list of open job postings at {@code /ta/jobs} for TAs to browse.
+ */
 @WebServlet("/ta/jobs")
 public class TaJobsServlet extends BasePageServlet {
     @Override

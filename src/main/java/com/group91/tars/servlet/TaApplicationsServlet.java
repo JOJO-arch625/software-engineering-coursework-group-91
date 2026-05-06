@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Renders the TA's application tracking page at {@code /ta/applications},
+ * showing all submitted applications with their current statuses.
+ */
 @WebServlet("/ta/applications")
 public class TaApplicationsServlet extends BasePageServlet {
     @Override

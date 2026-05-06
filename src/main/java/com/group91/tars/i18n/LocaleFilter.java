@@ -7,6 +7,11 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Locale;
 
+/**
+ * Servlet filter that manages the user's locale preference across all requests.
+ * Inspects the {@code lang} query parameter and, if present, stores the
+ * corresponding {@link Locale} in the session. Defaults to English.
+ */
 @WebFilter("/*")
 public class LocaleFilter implements Filter {
 

@@ -22,6 +22,11 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Singleton data access layer that persists all ISTARS entities as JSON files
+ * on disk. Provides load/save operations for accounts, TA profiles, job postings,
+ * applications, and notifications. Auto-generates seed data on first run.
+ */
 public class JsonDataStore {
     private static final JsonDataStore INSTANCE = new JsonDataStore();
 
@@ -137,17 +142,17 @@ public class JsonDataStore {
 
         List<TAProfile> profiles = new ArrayList<TAProfile>();
         profiles.add(createProfile("ta-1", "Yuyanchen Long", "231224653",
-            "yuyanchen.long@qmul.ac.uk", "+86 188 0000 0000",
+            "yuyanchen.long@bupt.edu.cn", "+86 188 0000 0000",
             "Java, Python, VHDL, Object-Oriented Programming",
             "Available on Tuesday afternoon, Thursday evening, and Friday morning.",
             "uploads/cv/YuyanchenLong_CV.pdf"));
         profiles.add(createProfile("ta-2", "Ming Li", "231224601",
-            "ming.li@qmul.ac.uk", "+86 177 0000 0001",
+            "ming.li@bupt.edu.cn", "+86 177 0000 0001",
             "Python, Lab support, Data structures",
             "Available on Wednesday afternoon and Friday afternoon.",
             "uploads/cv/MingLi_CV.pdf"));
         profiles.add(createProfile("ta-3", "Siyu Chen", "231224612",
-            "siyu.chen@qmul.ac.uk", "+86 177 0000 0002",
+            "siyu.chen@bupt.edu.cn", "+86 177 0000 0002",
             "Digital logic, Simulation, Student support",
             "Available on Monday morning and Thursday afternoon.",
             "uploads/cv/SiyuChen_CV.pdf"));

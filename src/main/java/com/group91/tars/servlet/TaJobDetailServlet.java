@@ -10,6 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Handles job detail viewing and application submission at {@code /ta/job}.
+ * GET shows job details with AI fit scoring; POST processes TA applications.
+ */
 @WebServlet("/ta/job")
 public class TaJobDetailServlet extends BasePageServlet {
     @Override
@@ -40,7 +44,11 @@ public class TaJobDetailServlet extends BasePageServlet {
             request.getParameter("applicantSkills"),
             request.getParameter("applicantDescription")
         );
-        flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.job.submitted");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.job.not-found");
+        }
         response.sendRedirect(request.getContextPath() + "/ta/job?id=" + jobId);
     }
 

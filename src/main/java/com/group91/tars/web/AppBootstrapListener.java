@@ -6,6 +6,10 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+/**
+ * Application lifecycle listener that initialises the data store on startup.
+ * Triggers seed data generation if JSON files do not already exist.
+ */
 @WebListener
 public class AppBootstrapListener implements ServletContextListener {
     @Override

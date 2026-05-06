@@ -14,6 +14,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Handles global search at {@code /search}. Searches across jobs, applications,
+ * and applicant profiles with role-based result scoping.
+ */
 @WebServlet("/search")
 public class SearchServlet extends BasePageServlet {
     @Override

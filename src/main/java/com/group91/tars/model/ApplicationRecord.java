@@ -1,14 +1,29 @@
 package com.group91.tars.model;
 
+/**
+ * Represents a TA application record in the ISTARS recruitment system.
+ * An application links a TA (via taId) to a job posting (via jobId) and
+ * tracks the application lifecycle: Submitted - Under Review - Accepted / Rejected.
+ * The notes field stores either the TA's motivation note or the MO's review feedback.
+ */
 public class ApplicationRecord {
+    /** Unique identifier (e.g. "app-1"). */
     private String id;
+    /** Foreign key referencing the applied JobPosting's id. */
     private String jobId;
+    /** Foreign key referencing the applying TAProfile's id. */
     private String taId;
+    /** Preference ranking: "Priority 1", "Priority 2", or "Priority 3". */
     private String priority;
+    /** Current status: "Submitted", "Under Review", "Accepted", or "Rejected". */
     private String status;
+    /** Motivation note from the TA or review feedback from the MO. */
     private String notes;
+    /** Timestamp of submission in "yyyy-MM-dd HH:mm" format. */
     private String submittedAt;
+    /** Skills declared by the TA at the time of application. */
     private String applicantSkills;
+    /** Self-description provided by the TA at the time of application. */
     private String applicantDescription;
 
     public String getId() {

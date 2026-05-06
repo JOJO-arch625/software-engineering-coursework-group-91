@@ -8,6 +8,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+/**
+ * Renders the Admin workload dashboard at {@code /admin/workload},
+ * displaying all TA workload summaries and overload alerts.
+ */
 @WebServlet("/admin/workload")
 public class AdminWorkloadServlet extends BasePageServlet {
     @Override

@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Renders the gateway overview page at {@code /gateway} after login,
+ * showing role-specific cards, build coverage, and enforced rules.
+ */
 @WebServlet("/gateway")
 public class HomeServlet extends BasePageServlet {
     @Override

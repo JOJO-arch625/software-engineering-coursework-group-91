@@ -34,5 +34,17 @@
     "deadline": "2026-05-09",
     "status": "Open",
     "description": "Help students with coursework projects, Git workflows, and code review sessions."
+  },
+  {
+    "id": "job-161450aa",
+    "moId": "mo-1",
+    "moduleCode": "TEST001",
+    "title": "Test Job",
+    "skills": "Java",
+    "requirements": "Testing",
+    "workload": "3 hours / week",
+    "deadline": "2026-12-31",
+    "status": "Open",
+    "description": "Test"
   }
 ]

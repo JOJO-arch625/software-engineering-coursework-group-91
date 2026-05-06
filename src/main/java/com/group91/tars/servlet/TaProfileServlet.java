@@ -12,6 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.IOException;
 
+/**
+ * Handles TA profile viewing and editing at {@code /ta/profile}.
+ * GET renders the profile form; POST processes profile saves and CV uploads.
+ */
 @WebServlet("/ta/profile")
 @MultipartConfig
 public class TaProfileServlet extends BasePageServlet {
@@ -49,7 +53,11 @@ public class TaProfileServlet extends BasePageServlet {
             profile.setCvPath(existing == null ? null : existing.getCvPath());
             result = service.saveTaProfile(getCurrentUser(request).getLinkedId(), profile);
         }
-        flash(request, result.isSuccess() ? "success" : "error", result.getMessage());
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.profile.saved");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.profile.validation");
+        }
         redirect(request, response, "/ta/profile");
     }
 }

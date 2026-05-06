@@ -1,15 +1,32 @@
 package com.group91.tars.model;
 
+/**
+ * Represents a TA job posting created by a Module Organiser in the ISTARS system.
+ * Each posting defines a TA vacancy for a specific academic module, including
+ * required skills, workload, and an application deadline. Postings transition
+ * from "Open" to "Closed" status either manually by the MO or automatically
+ * when the deadline passes.
+ */
 public class JobPosting {
+    /** Unique identifier (e.g. "job-1"). */
     private String id;
+    /** Foreign key referencing the MO's linkedId who created this posting (e.g. "mo-1"). */
     private String moId;
+    /** Academic module code (e.g. "EIE3320"). */
     private String moduleCode;
+    /** Job title (e.g. "Object-Oriented Programming TA"). */
     private String title;
+    /** Comma-separated list of required skills for the position. */
     private String skills;
+    /** Knowledge and competency requirements description. */
     private String requirements;
+    /** Weekly workload description (e.g. "6 hours / week"). */
     private String workload;
+    /** Application deadline in yyyy-MM-dd format. Must be a future date when creating a new posting. */
     private String deadline;
+    /** Posting status: "Open" or "Closed". Expired postings are auto-closed by the system. */
     private String status;
+    /** Free-text description of the TA role and responsibilities. */
     private String description;
 
     public String getId() {
