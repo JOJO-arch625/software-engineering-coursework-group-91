@@ -168,15 +168,15 @@ public class JsonDataStore {
         List<JobPosting> jobs = new ArrayList<JobPosting>();
         jobs.add(createJob("job-1", "mo-1", "EIE3320", "Object-Oriented Programming TA",
             "Java, OOP, debugging", "Strong Java syntax, classes, arrays, exception handling, and lab support communication.",
-            "6 hours / week", "2026-04-10", "Open",
+            "6 hours / week", "2026-12-10", "Open",
             "Support weekly labs and guide students through Java exercises."));
         jobs.add(createJob("job-2", "mo-1", "EIE2105", "Digital Systems TA",
             "VHDL, Boolean logic, simulation", "Basic circuit design, VHDL syntax, waveform debugging, and hardware fundamentals.",
-            "5 hours / week", "2026-04-11", "Open",
+            "5 hours / week", "2026-12-11", "Open",
             "Assist digital systems lab sessions and hardware simulation support."));
         jobs.add(createJob("job-3", "mo-1", "ECS5001", "Data Analytics TA",
             "Python, pandas, plotting", "Python basics, data processing, notebook workflows, and problem explanation skills.",
-            "4 hours / week", "2026-04-09", "Closed",
+            "4 hours / week", "2026-05-01", "Closed",
             "Help students with Python notebooks and analytics exercises."));
 
         writeList(jobsFile, jobs);

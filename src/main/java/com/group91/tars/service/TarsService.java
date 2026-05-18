@@ -7,6 +7,12 @@ import com.group91.tars.model.OperationResult;
 import com.group91.tars.model.TAProfile;
 import com.group91.tars.model.UserAccount;
 import com.group91.tars.model.WorkloadSummary;
+import com.group91.tars.model.ai.AiCandidateSummary;
+import com.group91.tars.model.ai.AiChatMemory;
+import com.group91.tars.model.ai.AiFitResult;
+import com.group91.tars.model.ai.AiWorkloadAdvice;
+import com.group91.tars.service.ai.AiAgentService;
+import com.group91.tars.service.ai.tool.ToolCallingResult;
 import com.group91.tars.storage.JsonDataStore;
 
 import javax.servlet.http.Part;
@@ -43,6 +49,7 @@ public class TarsService {
     private static final TarsService INSTANCE = new TarsService();
 
     private final JsonDataStore store = JsonDataStore.getInstance();
+    private final AiAgentService aiAgentService = AiAgentService.getInstance();
 
     private TarsService() {
     }
@@ -777,9 +784,10 @@ public class TarsService {
      */
     public List<String> getAiTodoNotes() {
         List<String> todoNotes = new ArrayList<String>();
-        todoNotes.add("AI skill-fit scoring is now available on job detail and review pages.");
-        todoNotes.add("Missing-skill suggestions are shown before TA submission.");
-        todoNotes.add("Workload balancing advice is available on Admin and MO dashboards.");
+        todoNotes.add("AI agents can provide TA fit advice and hiring support summaries.");
+        todoNotes.add("PDF CV text is analysed when a PDF CV is available.");
+        todoNotes.add("Local rule fallback is used when LLM mode is disabled or unavailable.");
+        todoNotes.add("AI output is advisory only and never accepts or rejects applications automatically.");
         return todoNotes;
     }
 
@@ -964,6 +972,102 @@ public class TarsService {
     }
 
     /**
+     * Returns advisory AI fit guidance for a TA/job pair.
+     *
+     * @param taId  the TA profile identifier
+     * @param jobId the job posting identifier
+     * @return an advisory AI fit result
+     */
+    public AiFitResult getTaFitAdvice(String taId, String jobId) {
+        return getTaFitAdvice(taId, jobId, null);
+    }
+
+    /**
+     * Returns advisory AI fit guidance for a TA/job pair with user-scoped tool permissions.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param currentUser the authenticated user for tool permission checks
+     * @return an advisory AI fit result
+     */
+    public AiFitResult getTaFitAdvice(String taId, String jobId, UserAccount currentUser) {
+        if (aiAgentService.isToolCallingEnabled()) {
+            return aiAgentService.adviseTaFitWithTools(taId, jobId, currentUser);
+        }
+        TAProfile profile = getProfileById(taId);
+        JobPosting job = getJobById(jobId);
+        return aiAgentService.adviseTaFit(profile, job, countAcceptedJobsForTa(taId));
+    }
+
+    /**
+     * Returns advisory AI hiring support for a selected candidate.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param application the selected application record
+     * @return an advisory AI candidate summary
+     */
+    public AiCandidateSummary getCandidateSummary(String taId, String jobId, ApplicationRecord application) {
+        return getCandidateSummary(taId, jobId, application, null);
+    }
+
+    /**
+     * Returns advisory AI hiring support for a selected candidate with user-scoped tool permissions.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param application the selected application record
+     * @param currentUser the authenticated user for tool permission checks
+     * @return an advisory AI candidate summary
+     */
+    public AiCandidateSummary getCandidateSummary(String taId, String jobId, ApplicationRecord application,
+                                                  UserAccount currentUser) {
+        if (aiAgentService.isToolCallingEnabled()) {
+            return aiAgentService.summarizeCandidateWithTools(
+                taId,
+                jobId,
+                application == null ? null : application.getId(),
+                currentUser
+            );
+        }
+        TAProfile profile = getProfileById(taId);
+        JobPosting job = getJobById(jobId);
+        return aiAgentService.summarizeCandidate(profile, job, application, countAcceptedJobsForTa(taId));
+    }
+
+    /**
+     * Returns advisory AI workload notes for the admin workload dashboard.
+     *
+     * @return structured workload advice for each TA
+     */
+    public List<AiWorkloadAdvice> getAiWorkloadAdvice() {
+        return aiAgentService.adviseWorkload(getWorkloadSummaries());
+    }
+
+    /**
+     * Runs the interactive tool-calling AI chat workspace.
+     *
+     * @param userMessage the user's natural language request
+     * @param currentUser the authenticated user for permission-scoped tools
+     * @return structured chat result with tool trace and final JSON
+     */
+    public ToolCallingResult chatWithAiAgent(String userMessage, UserAccount currentUser) {
+        return aiAgentService.chat(userMessage, currentUser);
+    }
+
+    /**
+     * Runs the interactive tool-calling AI chat workspace with session memory.
+     *
+     * @param userMessage the user's natural language request
+     * @param currentUser the authenticated user for permission-scoped tools
+     * @param memory short-term session memory for resolving follow-up references
+     * @return structured chat result with tool trace and final JSON
+     */
+    public ToolCallingResult chatWithAiAgent(String userMessage, UserAccount currentUser, AiChatMemory memory) {
+        return aiAgentService.chat(userMessage, currentUser, memory);
+    }
+
+    /**
      * Calculates a skill fit score (0-100) between a TA's declared skills
      * and a job posting's required skills. The score is computed as:
      * (number of matched job skills / total job skills) * 100.
@@ -1048,31 +1152,16 @@ public class TarsService {
      */
     public List<String> getWorkloadBalancingAdvice() {
         List<String> advice = new ArrayList<String>();
-        List<WorkloadSummary> summaries = getWorkloadSummaries();
-        List<WorkloadSummary> overloaded = new ArrayList<WorkloadSummary>();
-        List<WorkloadSummary> available = new ArrayList<WorkloadSummary>();
-        for (WorkloadSummary summary : summaries) {
-            if (summary.isOverloadFlag()) {
-                overloaded.add(summary);
-            } else if (summary.getAcceptedCount() < MAX_ACCEPTED_JOBS) {
-                available.add(summary);
+        List<AiWorkloadAdvice> aiAdvice = getAiWorkloadAdvice();
+        boolean hasRisk = false;
+        for (AiWorkloadAdvice item : aiAdvice) {
+            if ("at_cap".equals(item.getWorkloadRisk()) || "caution".equals(item.getWorkloadRisk())) {
+                hasRisk = true;
+                advice.add(item.getTaName() + ": " + item.getAdvice());
             }
         }
-        if (overloaded.isEmpty()) {
+        if (!hasRisk) {
             advice.add("No workload balancing issues detected. All TAs are within acceptable limits.");
-            return advice;
-        }
-        for (WorkloadSummary over : overloaded) {
-            advice.add(over.getTaName() + " is at the workload cap (" + over.getAcceptedCount() + "/" + MAX_ACCEPTED_JOBS + ") with modules: " + String.join(", ", over.getAcceptedModules()) + ".");
-            if (!available.isEmpty()) {
-                List<String> suggestions = new ArrayList<String>();
-                for (WorkloadSummary avail : available) {
-                    suggestions.add(avail.getTaName() + " (" + avail.getAcceptedCount() + "/" + MAX_ACCEPTED_JOBS + ")");
-                }
-                advice.add("Consider redistributing future assignments to: " + String.join(", ", suggestions) + ".");
-            } else {
-                advice.add("No TAs currently have capacity for redistribution. Consider hiring additional TAs.");
-            }
         }
         return advice;
     }
@@ -1116,6 +1205,9 @@ public class TarsService {
      * @return the number of applications with "Accepted" status for the specified TA
      */
     private int countAcceptedJobsForTa(String taId) {
+        if (isBlank(taId)) {
+            return 0;
+        }
         int count = 0;
         for (ApplicationRecord application : store.loadApplications()) {
             if (taId.equals(application.getTaId()) && "Accepted".equals(application.getStatus())) {

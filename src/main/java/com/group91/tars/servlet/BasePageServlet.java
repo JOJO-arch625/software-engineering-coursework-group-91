@@ -17,6 +17,8 @@ import java.util.Locale;
 
 public abstract class BasePageServlet extends HttpServlet {
     protected static final String SESSION_USER = "currentUser";
+    private static final String AUTH_REQUIRED_MESSAGE = "Please log in before accessing the recruitment workspace.";
+    private static final String NO_PERMISSION_MESSAGE = "Your account does not have permission to open that page.";
     protected final TarsService service = TarsService.getInstance();
 
     protected void preparePage(HttpServletRequest request, String currentView, String viewTag, String viewTitle) {

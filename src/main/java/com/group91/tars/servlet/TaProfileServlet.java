@@ -58,6 +58,11 @@ public class TaProfileServlet extends BasePageServlet {
         } else {
             flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.profile.validation");
         }
-        redirect(request, response, "/ta/profile");
+        String returnTo = request.getParameter("returnTo");
+        redirect(request, response, isSafeReturnPath(returnTo) ? returnTo : "/ta/profile");
+    }
+
+    private boolean isSafeReturnPath(String value) {
+        return value != null && value.startsWith("/") && !value.startsWith("//") && !value.contains("://");
     }
 }
