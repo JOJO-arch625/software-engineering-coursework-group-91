@@ -54,6 +54,28 @@ mvn org.apache.tomcat.maven:tomcat7-maven-plugin:2.2:run "-Dmaven.repo.local=.m2
 - implemented features and TODO scope: `docs/implementation/FEATURE-STATUS.md`
 - sprint handoff: `coursework/docs/implementation/SPRINT-2-HANDOFF.md`
 
+## AI Agent Configuration
+
+The TA recruitment system includes advisory AI agents for TA fit advice, MO candidate summaries, and Admin workload advice.
+
+```env
+AI_MODE=auto
+AI_TOOL_CALLING_ENABLED=false
+LLM_API_KEY=
+LLM_BASE_URL=https://aihubmix.com/v1
+LLM_MODEL=gpt-4.1-mini-free
+```
+
+- `AI_MODE=local` runs deterministic local AI only.
+- `AI_MODE=auto` tries the LLM when `LLM_API_KEY` is available and falls back to local rules if unavailable or failed.
+- `AI_MODE=llm` requires the LLM and reports an error state if the request cannot complete.
+- `AI_TOOL_CALLING_ENABLED=true` enables the tool-calling agent loop for `/ai/assist/chat` and LLM-backed TA/MO advisory summaries.
+- `OPENAI_API_KEY`, `OPENAI_BASE_URL`, and `OPENAI_MODEL` are also accepted as compatibility aliases.
+
+PDF CV analysis uses Apache PDFBox. Only PDF CV content is analysed in v1, and extracted CV text is not stored in JSON.
+
+For local development, copy `.env.example` to `.env` and fill in `LLM_API_KEY`. The app reads `.env` from the project root on startup. Real system environment variables still take priority over `.env` values.
+
 ## 中文实现文档
 - 本地运行说明：`coursework/docs/implementation/LOCAL-RUNNING-GUIDE.zh-CN.md`
 - 已实现功能与 TODO 说明：`coursework/docs/implementation/FEATURE-STATUS.zh-CN.md`

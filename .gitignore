@@ -4,3 +4,7 @@ tmp/
 target/
 .m2/
 .claude/
+workplace/
+.env
+.env.local
+.deepagents/.env

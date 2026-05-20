@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readProjectJson } from "../../helpers/fileUtils.mjs";
+import { readProjectJson } from "../../helpers/projectFiles.mjs";
 
 export function registerExtraServiceRuleTests(runner) {
   runner.suite("Extra Backend Service Rules", (suite) => {

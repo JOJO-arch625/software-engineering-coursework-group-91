@@ -1,6 +1,8 @@
 <%@ page import="com.group91.tars.model.TAProfile" %>
 <%
     TAProfile profile = (TAProfile) request.getAttribute("profile");
+    String cvPath = profile == null ? null : profile.getCvPath();
+    boolean hasPdfCv = cvPath != null && cvPath.toLowerCase().endsWith(".pdf");
 %>
 <%@ include file="../fragments/pageStart.jspf" %>
 <section class="view active">
@@ -47,7 +49,11 @@
                 <h4><%= i18n.t("ta.profile.cv-heading") %></h4>
                 <p><%= i18n.t("ta.profile.cv-description") %></p>
             </div>
-            <p class="file-name"><%= profile != null && profile.getCvPath() != null ? profile.getCvPath() : i18n.t("ta.profile.cv-no-file") %></p>
+            <p class="file-name"><%= cvPath != null ? cvPath : i18n.t("ta.profile.cv-no-file") %></p>
+            <div class="alert <%= hasPdfCv ? "success" : "info" %>" style="margin-top: 0; margin-bottom: 16px;">
+                <strong><%= hasPdfCv ? "AI analysis ready" : "AI analysis supports PDF only" %></strong><br>
+                PDF CVs can be used by the AI Fit Advisor to extract skill evidence. Only PDF content is analysed in this version.
+            </div>
             <form method="post" action="<%= request.getContextPath() %>/ta/profile" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="uploadCv">
                 <label>
