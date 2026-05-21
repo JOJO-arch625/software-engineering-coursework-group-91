@@ -46,6 +46,7 @@ public class MoJobEditServlet extends BasePageServlet {
             draft.setSkills(request.getParameter("skills"));
             draft.setRequirements(request.getParameter("requirements"));
             draft.setWorkload(request.getParameter("workload"));
+            draft.setWeeklyHours(parseInt(request.getParameter("weeklyHours")));
             draft.setDeadline(request.getParameter("deadline"));
             draft.setDescription(request.getParameter("description"));
             draft.setStatus(request.getParameter("status"));
@@ -72,5 +73,16 @@ public class MoJobEditServlet extends BasePageServlet {
 
     private String buildQuerySuffix(String id) {
         return (id == null || id.trim().isEmpty()) ? "" : "?id=" + id;
+    }
+
+    private int parseInt(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
     }
 }

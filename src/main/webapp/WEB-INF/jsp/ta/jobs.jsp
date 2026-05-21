@@ -1,6 +1,7 @@
-<%@ page import="java.util.List,com.group91.tars.model.JobPosting" %>
+<%@ page import="java.util.List,com.group91.tars.model.JobPosting,com.group91.tars.service.TarsService" %>
 <%
     List<JobPosting> jobs = (List<JobPosting>) request.getAttribute("jobs");
+    TarsService pageService = TarsService.getInstance();
 %>
 <%@ include file="../fragments/pageStart.jspf" %>
 <section class="view active">
@@ -28,6 +29,7 @@
                     <span class="pill pill-neutral"><%= jobItem.getSkills() %></span>
                     <span class="pill pill-neutral"><%= jobItem.getWorkload() %></span>
                     <span class="pill pill-neutral"><%= i18n.t("ta.job.detail.deadline") %>: <%= jobItem.getDeadline() %></span>
+                    <span class="pill pill-neutral"><%= i18n.t("ta.jobs.mo-name") %>: <%= pageService.getMoDisplayName(jobItem.getMoId()) %></span>
                 </div>
                 <div class="button-row">
                     <a class="secondary-button" href="<%= request.getContextPath() %>/ta/job?id=<%= jobItem.getId() %>"><%= i18n.t("common.view-detail") %></a>

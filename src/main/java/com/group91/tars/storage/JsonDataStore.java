@@ -143,7 +143,7 @@ public class JsonDataStore {
         List<TAProfile> profiles = new ArrayList<TAProfile>();
         profiles.add(createProfile("ta-1", "Yuyanchen Long", "231224653",
             "yuyanchen.long@bupt.edu.cn", "+86 188 0000 0000",
-            "Java, Python, VHDL, Object-Oriented Programming",
+            "Java, Python, VHDL, Object-Oriented Programming, debugging",
             "Available on Tuesday afternoon, Thursday evening, and Friday morning.",
             "uploads/cv/YuyanchenLong_CV.pdf"));
         profiles.add(createProfile("ta-2", "Ming Li", "231224601",
@@ -168,15 +168,15 @@ public class JsonDataStore {
         List<JobPosting> jobs = new ArrayList<JobPosting>();
         jobs.add(createJob("job-1", "mo-1", "EIE3320", "Object-Oriented Programming TA",
             "Java, OOP, debugging", "Strong Java syntax, classes, arrays, exception handling, and lab support communication.",
-            "6 hours / week", "2026-12-10", "Open",
+            "6 hours / week", 6, "2026-12-10", "Open",
             "Support weekly labs and guide students through Java exercises."));
         jobs.add(createJob("job-2", "mo-1", "EIE2105", "Digital Systems TA",
             "VHDL, Boolean logic, simulation", "Basic circuit design, VHDL syntax, waveform debugging, and hardware fundamentals.",
-            "5 hours / week", "2026-12-11", "Open",
+            "5 hours / week", 5, "2026-12-11", "Open",
             "Assist digital systems lab sessions and hardware simulation support."));
         jobs.add(createJob("job-3", "mo-1", "ECS5001", "Data Analytics TA",
             "Python, pandas, plotting", "Python basics, data processing, notebook workflows, and problem explanation skills.",
-            "4 hours / week", "2026-05-01", "Closed",
+            "4 hours / week", 4, "2026-05-01", "Closed",
             "Help students with Python notebooks and analytics exercises."));
 
         writeList(jobsFile, jobs);
@@ -189,16 +189,22 @@ public class JsonDataStore {
 
         List<ApplicationRecord> applications = new ArrayList<ApplicationRecord>();
         applications.add(createApplication("app-1", "job-2", "ta-1", "Priority 1", "Under Review",
+            "I can support digital systems lab sessions and help students debug exercises.",
             "MO reviewing VHDL experience.", "2026-03-24 10:00"));
         applications.add(createApplication("app-2", "job-3", "ta-1", "Priority 2", "Rejected",
+            "I have Python experience and can help students with coursework notebooks.",
             "Role filled. Transparent rejection shown to TA.", "2026-03-23 18:30"));
         applications.add(createApplication("app-3", "job-1", "ta-2", "Priority 1", "Accepted",
+            "I have experience in programming labs and can help students debug Java code.",
             "Accepted for weekly Java lab support.", "2026-03-22 09:00"));
         applications.add(createApplication("app-4", "job-2", "ta-3", "Priority 1", "Accepted",
+            "I have a strong digital logic background and can support waveform debugging.",
             "Accepted for digital systems support.", "2026-03-22 09:10"));
         applications.add(createApplication("app-5", "job-1", "ta-3", "Priority 2", "Accepted",
+            "I can help with object-oriented programming concepts and lab support.",
             "Accepted for additional OOP sessions.", "2026-03-23 14:20"));
         applications.add(createApplication("app-6", "job-3", "ta-3", "Priority 3", "Accepted",
+            "I can support Python notebook workflows and analytics exercises.",
             "Accepted before the role was closed.", "2026-03-21 11:45"));
 
         writeList(applicationsFile, applications);
@@ -244,7 +250,7 @@ public class JsonDataStore {
     }
 
     private JobPosting createJob(String id, String moId, String moduleCode, String title, String skills,
-                                 String requirements, String workload, String deadline, String status,
+                                 String requirements, String workload, int weeklyHours, String deadline, String status,
                                  String description) {
         JobPosting job = new JobPosting();
         job.setId(id);
@@ -254,6 +260,7 @@ public class JsonDataStore {
         job.setSkills(skills);
         job.setRequirements(requirements);
         job.setWorkload(workload);
+        job.setWeeklyHours(weeklyHours);
         job.setDeadline(deadline);
         job.setStatus(status);
         job.setDescription(description);
@@ -261,7 +268,7 @@ public class JsonDataStore {
     }
 
     private ApplicationRecord createApplication(String id, String jobId, String taId, String priority,
-                                                String status, String notes, String submittedAt) {
+                                                String status, String notes, String reviewerNotes, String submittedAt) {
         ApplicationRecord application = new ApplicationRecord();
         application.setId(id);
         application.setJobId(jobId);
@@ -269,6 +276,7 @@ public class JsonDataStore {
         application.setPriority(priority);
         application.setStatus(status);
         application.setNotes(notes);
+        application.setReviewerNotes(reviewerNotes);
         application.setSubmittedAt(submittedAt);
         return application;
     }

@@ -2,6 +2,7 @@
 <%
     List<WorkloadSummary> summaries = (List<WorkloadSummary>) request.getAttribute("summaries");
     Integer overloadCount = (Integer) request.getAttribute("overloadCount");
+    String query = (String) request.getAttribute("query");
     TarsService pageService = TarsService.getInstance();
     List<AiWorkloadAdvice> aiWorkloadAdvice = pageService.getAiWorkloadAdvice();
 %>
@@ -39,6 +40,16 @@
                 <h4><%= i18n.t("admin.workload.overview-heading") %></h4>
                 <p><%= i18n.t("admin.workload.threshold") %></p>
             </div>
+            <form method="get" action="<%= request.getContextPath() %>/admin/workload" class="form-grid" style="margin-bottom: 16px;">
+                <label>
+                    <%= i18n.t("admin.workload.search-label") %>
+                    <input type="search" name="q" value="<%= query == null ? "" : query %>" placeholder="<%= i18n.t("admin.workload.search-placeholder") %>">
+                </label>
+                <div class="button-row">
+                    <button class="secondary-button" type="submit"><%= i18n.t("common.search") %></button>
+                    <a class="ghost-button" href="<%= request.getContextPath() %>/admin/workload"><%= i18n.t("common.clear") %></a>
+                </div>
+            </form>
             <div class="alert <%= overloadCount != null && overloadCount > 0 ? "danger" : "info" %>">
                 <%= overloadCount != null && overloadCount > 0
                     ? i18n.t("admin.workload.overload-warning", overloadCount)
@@ -51,15 +62,17 @@
                         <th><%= i18n.t("admin.workload.ta") %></th>
                         <th><%= i18n.t("admin.workload.accepted-modules") %></th>
                         <th><%= i18n.t("admin.workload.count") %></th>
+                        <th><%= i18n.t("admin.workload.weekly-hours") %></th>
                         <th><%= i18n.t("admin.workload.workload-status") %></th>
                     </tr>
                     </thead>
                     <tbody>
                     <% for (WorkloadSummary summary : summaries) { %>
-                    <tr>
-                        <td><%= summary.getTaName() %></td>
+                    <tr class="<%= summary.isOverloadFlag() ? "overload-row" : "" %>">
+                        <td><%= summary.getTaName() %><br><span class="muted"><%= summary.getTaId() %></span></td>
                         <td><%= summary.getAcceptedModules().isEmpty() ? "-" : String.join(", ", summary.getAcceptedModules()) %></td>
                         <td><%= summary.getAcceptedCount() %></td>
+                        <td><%= summary.getTotalWeeklyHours() %></td>
                         <td>
                             <span class="status-chip <%= summary.isOverloadFlag() ? "status-overload" : "status-open" %>">
                                 <%= summary.isOverloadFlag() ? i18n.t("admin.workload.overload-risk") : i18n.t("admin.workload.balanced") %>

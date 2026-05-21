@@ -45,17 +45,28 @@ public class MoReviewServlet extends BasePageServlet {
         if (!requireRole(request, response, TarsService.ROLE_MO)) {
             return;
         }
-        OperationResult result = service.updateApplicationStatus(
-            request.getParameter("applicationId"),
-            request.getParameter("status"),
-            request.getParameter("notes")
-        );
+        String action = request.getParameter("action");
+        OperationResult result;
+        if ("bulkShortlist".equals(action)) {
+            result = service.bulkShortlistApplications(
+                request.getParameter("jobId"),
+                request.getParameter("notes")
+            );
+        } else {
+            result = service.updateApplicationStatus(
+                request.getParameter("applicationId"),
+                request.getParameter("status"),
+                request.getParameter("notes")
+            );
+        }
         if (result.isSuccess()) {
             flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
         } else {
             flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
         }
-        String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId") + "&appId=" + request.getParameter("applicationId");
+        String appId = request.getParameter("applicationId");
+        String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId")
+            + (appId == null || appId.trim().isEmpty() ? "" : "&appId=" + appId);
         redirect(request, response, redirectTarget);
     }
 
