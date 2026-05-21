@@ -1,6 +1,12 @@
 <%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiWorkloadAdvice,com.group91.tars.service.TarsService" %>
 <%
     List<String> aiTodos = (List<String>) request.getAttribute("aiTodos");
+    String aiChatMessagesJson = (String) request.getAttribute("aiChatMessagesJson");
+    String aiChatTraceJson = (String) request.getAttribute("aiChatTraceJson");
+    String aiChatFinalJson = (String) request.getAttribute("aiChatFinalJson");
+    if (aiChatMessagesJson == null) aiChatMessagesJson = "[]";
+    if (aiChatTraceJson == null) aiChatTraceJson = "[]";
+    if (aiChatFinalJson == null) aiChatFinalJson = "{}";
     TarsService pageService = TarsService.getInstance();
 %>
 <%@ include file="../fragments/pageStart.jspf" %>
@@ -247,6 +253,9 @@
         var finalJson = workspace.querySelector("[data-agent-final]");
         var endpoint = "<%= request.getContextPath() %>/ai/assist/chat";
         var clearEndpoint = "<%= request.getContextPath() %>/ai/assist/chat/clear";
+        var hydratedMessages = <%= aiChatMessagesJson %>;
+        var hydratedTrace = <%= aiChatTraceJson %>;
+        var hydratedFinalJson = <%= aiChatFinalJson %>;
         var clearButton = workspace.querySelector("[data-agent-clear]");
         var tabs = document.querySelectorAll("[data-tab-target]");
         var pages = document.querySelectorAll("[data-workbench-page]");
@@ -293,6 +302,21 @@
             });
         }
 
+        function renderHydratedMemory() {
+            if (!hydratedMessages || !hydratedMessages.length) {
+                return;
+            }
+            messages.innerHTML = "";
+            hydratedMessages.forEach(function (item) {
+                var role = item && item.role === "user" ? "agent-message-user" : "agent-message-assistant";
+                addMessage(item && item.content ? item.content : "", role);
+            });
+            renderTrace(hydratedTrace || []);
+            finalJson.textContent = JSON.stringify(hydratedFinalJson || {}, null, 2);
+            source.textContent = hydratedFinalJson && hydratedFinalJson.sourceMode ? hydratedFinalJson.sourceMode : "memory";
+            source.className = "ai-source-chip ai-source-" + (source.textContent === "memory" ? "local" : source.textContent === "error" ? "error" : "llm");
+        }
+
         function resolveAgentReply(data) {
             var finalJson = data && data.finalJson ? data.finalJson : {};
             if (data && data.reply) {
@@ -329,11 +353,18 @@
                 if (!response.ok) {
                     throw new Error("HTTP " + response.status);
                 }
+                return response.json();
+            }).then(function () {
+                hydratedMessages = [];
+                hydratedTrace = [];
+                hydratedFinalJson = {};
                 resetChatUi();
             }).catch(function (error) {
                 addMessage("Clear chat failed: " + error.message, "agent-message-assistant");
             });
         });
+
+        renderHydratedMemory();
 
         form.addEventListener("submit", function (event) {
             event.preventDefault();

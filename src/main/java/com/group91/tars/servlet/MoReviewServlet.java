@@ -26,11 +26,13 @@ public class MoReviewServlet extends BasePageServlet {
             return;
         }
         preparePage(request, "review", "MO Flow", "Applicant Review");
-        JobPosting selectedJob = resolveJob(request);
+        List<JobPosting> moJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        JobPosting selectedJob = resolveJob(request, moJobs);
         List<ApplicationRecord> applications = selectedJob == null
             ? new ArrayList<ApplicationRecord>()
             : service.getApplicationsForJob(selectedJob.getId());
         ApplicationRecord selectedApplication = resolveApplication(request, applications);
+        request.setAttribute("moJobs", moJobs);
         request.setAttribute("selectedJob", selectedJob);
         request.setAttribute("applications", applications);
         request.setAttribute("selectedApplication", selectedApplication);
@@ -43,6 +45,10 @@ public class MoReviewServlet extends BasePageServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
         throws IOException {
         if (!requireRole(request, response, TarsService.ROLE_MO)) {
+            return;
+        }
+        if (!canReviewApplication(request)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
         OperationResult result = service.updateApplicationStatus(
@@ -59,18 +65,16 @@ public class MoReviewServlet extends BasePageServlet {
         redirect(request, response, redirectTarget);
     }
 
-    private JobPosting resolveJob(HttpServletRequest request) {
+    private JobPosting resolveJob(HttpServletRequest request, List<JobPosting> moJobs) {
         String jobId = request.getParameter("jobId");
         if (jobId != null) {
-            JobPosting explicit = service.getJobById(jobId);
-            if (explicit != null) {
-                return explicit;
+            for (JobPosting job : moJobs) {
+                if (jobId.equals(job.getId())) {
+                    return job;
+                }
             }
         }
-        if (!service.getJobsForMo(getCurrentUser(request).getLinkedId()).isEmpty()) {
-            return service.getJobsForMo(getCurrentUser(request).getLinkedId()).get(0);
-        }
-        return null;
+        return moJobs.isEmpty() ? null : moJobs.get(0);
     }
 
     private ApplicationRecord resolveApplication(HttpServletRequest request, List<ApplicationRecord> applications) {
@@ -83,5 +87,24 @@ public class MoReviewServlet extends BasePageServlet {
             }
         }
         return applications.isEmpty() ? null : applications.get(0);
+    }
+
+    private boolean canReviewApplication(HttpServletRequest request) {
+        String jobId = request.getParameter("jobId");
+        String applicationId = request.getParameter("applicationId");
+        if (jobId == null || applicationId == null) {
+            return false;
+        }
+        for (JobPosting job : service.getJobsForMo(getCurrentUser(request).getLinkedId())) {
+            if (!jobId.equals(job.getId())) {
+                continue;
+            }
+            for (ApplicationRecord application : service.getApplicationsForJob(job.getId())) {
+                if (applicationId.equals(application.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

@@ -18,5 +18,15 @@
     "skills": "Python, Lab support, Data structures",
     "availability": "Available on Wednesday afternoon and Friday afternoon.",
     "cvPath": "uploads/cv/lidarou_CV.pdf"
+  },
+  {
+    "id": "ta-3",
+    "fullName": "Siyu Chen",
+    "studentNumber": "231224612",
+    "email": "siyu.chen@bupt.edu.cn",
+    "phone": "+86 177 0000 0002",
+    "skills": "Digital logic, Simulation, Student support",
+    "availability": "Available on Monday morning and Thursday afternoon.",
+    "cvPath": "uploads/cv/SiyuChen_CV.pdf"
   }
 ]

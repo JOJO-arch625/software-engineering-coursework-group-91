@@ -18,6 +18,7 @@ public class AiChatMemory implements Serializable {
 
     private final List<AiChatMessage> messages = new ArrayList<AiChatMessage>();
     private String latestToolTraceJson = "[]";
+    private String latestFinalJson = "{}";
     private String role;
     private String userId;
 
@@ -56,9 +57,14 @@ public class AiChatMemory implements Serializable {
         latestToolTraceJson = array.toString();
     }
 
+    public void setLatestFinalJson(JsonObject finalJson) {
+        latestFinalJson = finalJson == null ? "{}" : finalJson.toString();
+    }
+
     public void clear() {
         messages.clear();
         latestToolTraceJson = "[]";
+        latestFinalJson = "{}";
     }
 
     public JsonArray toMessagesJson() {
@@ -78,6 +84,14 @@ public class AiChatMemory implements Serializable {
             return new JsonParser().parse(latestToolTraceJson).getAsJsonArray();
         } catch (RuntimeException exception) {
             return new JsonArray();
+        }
+    }
+
+    public JsonObject toFinalJson() {
+        try {
+            return new JsonParser().parse(latestFinalJson).getAsJsonObject();
+        } catch (RuntimeException exception) {
+            return new JsonObject();
         }
     }
 

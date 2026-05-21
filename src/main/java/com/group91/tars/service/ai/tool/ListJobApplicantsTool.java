@@ -3,6 +3,7 @@ package com.group91.tars.service.ai.tool;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.group91.tars.model.ApplicationRecord;
+import com.group91.tars.model.TAProfile;
 
 public class ListJobApplicantsTool implements AgentTool {
     private final RecruitmentToolSupport support;
@@ -41,6 +42,17 @@ public class ListJobApplicantsTool implements AgentTool {
             item.addProperty("applicationId", application.getId());
             item.addProperty("status", application.getStatus());
             item.addProperty("priority", application.getPriority());
+            item.addProperty("notes", application.getNotes());
+            item.addProperty("submittedAt", application.getSubmittedAt());
+            item.addProperty("applicantSkills", application.getApplicantSkills());
+            item.addProperty("applicantDescription", application.getApplicantDescription());
+            TAProfile profile = support.findProfile(application.getTaId());
+            if (profile != null && support.canReadTa(profile.getId())) {
+                item.addProperty("fullName", profile.getFullName());
+                item.addProperty("skills", profile.getSkills());
+                item.addProperty("availability", profile.getAvailability());
+                item.addProperty("hasCv", profile.getCvPath() != null && !profile.getCvPath().trim().isEmpty());
+            }
             applicants.add(item);
         }
         JsonObject data = new JsonObject();
