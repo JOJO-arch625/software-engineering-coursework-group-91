@@ -1,23 +1,23 @@
 [
   {
     "id": "ta-1",
-    "fullName": "Yuyanchen",
-    "studentNumber": "231224601",
-    "email": "xxx@bupt.edu.cn",
+    "fullName": "Yuyanchen Long",
+    "studentNumber": "231224653",
+    "email": "yuyanchen.long@bupt.edu.cn",
     "phone": "+86 188 0000 0000",
-    "skills": "Java, Python, VHDL, Object-Oriented Programming",
+    "skills": "Java, Python, VHDL, Object-Oriented Programming, debugging",
     "availability": "Available on Tuesday afternoon, Thursday evening, and Friday morning.",
-    "cvPath": "uploads/cv/Yuyanchen_EBU6304_01_Introduction_to_Software_Engineering.pdf"
+    "cvPath": "uploads/cv/YuyanchenLong_CV.pdf"
   },
   {
     "id": "ta-2",
-    "fullName": "lidarou",
-    "studentNumber": "123",
-    "email": "darou.li@bupt.edu.cn",
+    "fullName": "Ming Li",
+    "studentNumber": "231224601",
+    "email": "ming.li@bupt.edu.cn",
     "phone": "+86 177 0000 0001",
     "skills": "Python, Lab support, Data structures",
     "availability": "Available on Wednesday afternoon and Friday afternoon.",
-    "cvPath": "uploads/cv/lidarou_CV.pdf"
+    "cvPath": "uploads/cv/MingLi_CV.pdf"
   },
   {
     "id": "ta-3",
@@ -25,7 +25,7 @@
     "studentNumber": "231224612",
     "email": "siyu.chen@bupt.edu.cn",
     "phone": "+86 177 0000 0002",
-    "skills": "Digital logic, Simulation, Student support",
+    "skills": "Java, VHDL, Python, Digital logic, Simulation, Student support",
     "availability": "Available on Monday morning and Thursday afternoon.",
     "cvPath": "uploads/cv/SiyuChen_CV.pdf"
   }

@@ -42,28 +42,45 @@ public class MoReviewServlet extends BasePageServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-        throws IOException {
-        if (!requireRole(request, response, TarsService.ROLE_MO)) {
+protected void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws IOException {
+    if (!requireRole(request, response, TarsService.ROLE_MO)) {
+        return;
+    }
+
+    String action = request.getParameter("action");
+    OperationResult result;
+    if ("bulkShortlist".equals(action)) {
+        if (!canReviewJob(request)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
+        result = service.bulkShortlistApplications(
+            request.getParameter("jobId"),
+            request.getParameter("notes")
+        );
+    } else {
         if (!canReviewApplication(request)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-        OperationResult result = service.updateApplicationStatus(
+        result = service.updateApplicationStatus(
             request.getParameter("applicationId"),
             request.getParameter("status"),
             request.getParameter("notes")
         );
-        if (result.isSuccess()) {
-            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
-        } else {
-            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
-        }
-        String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId") + "&appId=" + request.getParameter("applicationId");
-        redirect(request, response, redirectTarget);
     }
+
+    if (result.isSuccess()) {
+        flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
+    } else {
+        flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
+    }
+    String appId = request.getParameter("applicationId");
+    String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId")
+        + (appId == null || appId.trim().isEmpty() ? "" : "&appId=" + appId);
+    redirect(request, response, redirectTarget);
+}
 
     private JobPosting resolveJob(HttpServletRequest request, List<JobPosting> moJobs) {
         String jobId = request.getParameter("jobId");
@@ -107,4 +124,16 @@ public class MoReviewServlet extends BasePageServlet {
         }
         return false;
     }
+  private boolean canReviewJob(HttpServletRequest request) {
+    String jobId = request.getParameter("jobId");
+    if (jobId == null) {
+        return false;
+    }
+    for (JobPosting job : service.getJobsForMo(getCurrentUser(request).getLinkedId())) {
+        if (jobId.equals(job.getId())) {
+            return true;
+        }
+    }
+    return false;
+}
 }

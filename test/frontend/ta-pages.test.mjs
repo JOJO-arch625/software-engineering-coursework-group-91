@@ -25,6 +25,8 @@ export default function registerTaPageTests(runner) {
       assertContainsText(html, "Available Jobs");
       assertContainsText(html, "Object-Oriented Programming TA");
       assertContainsText(html, "Digital Systems TA");
+      assertContainsText(html, "Responsible MO");
+      assertContainsText(html, "Application deadline");
       assertNotContainsText(html, "Data Analytics TA");
       assertNotContainsText(html, "Closed");
     });
@@ -37,8 +39,19 @@ export default function registerTaPageTests(runner) {
       assertContainsText(html, "Visible rejection rule");
       assertContainsText(html, "Digital Systems TA");
       assertContainsText(html, "Under Review");
+      assertContainsText(html, "MO review");
       assertContainsText(html, "Data Analytics TA");
       assertContainsText(html, "Rejected");
+    });
+
+    test("dashboard shows explainable AI recommendations", async () => {
+      const { response, html } = await client.getHtml("/ta/dashboard");
+
+      assert.equal(response.status, 200);
+      assertContainsText(html, "AI Job Recommendations");
+      assertContainsText(html, "AI recommendation is for reference only");
+      assertContainsText(html, "Matched");
+      assertContainsText(html, "match rate");
     });
 
     test("job detail page exposes the application form and optional AI summary", async () => {

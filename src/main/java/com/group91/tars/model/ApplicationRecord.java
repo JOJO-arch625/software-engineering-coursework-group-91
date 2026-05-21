@@ -3,8 +3,9 @@ package com.group91.tars.model;
 /**
  * Represents a TA application record in the ISTARS recruitment system.
  * An application links a TA (via taId) to a job posting (via jobId) and
- * tracks the application lifecycle: Submitted - Under Review - Accepted / Rejected.
- * The notes field stores either the TA's motivation note or the MO's review feedback.
+ * tracks the application lifecycle: Submitted - Under Review - Shortlisted -
+ * Accepted / Rejected. The notes field stores the TA's motivation note, while
+ * reviewerNotes stores MO review feedback independently.
  */
 public class ApplicationRecord {
     /** Unique identifier (e.g. "app-1"). */
@@ -15,10 +16,12 @@ public class ApplicationRecord {
     private String taId;
     /** Preference ranking: "Priority 1", "Priority 2", or "Priority 3". */
     private String priority;
-    /** Current status: "Submitted", "Under Review", "Accepted", or "Rejected". */
+    /** Current status: "Submitted", "Under Review", "Shortlisted", "Accepted", or "Rejected". */
     private String status;
-    /** Motivation note from the TA or review feedback from the MO. */
+    /** Motivation note from the TA. */
     private String notes;
+    /** Review feedback entered by the MO. */
+    private String reviewerNotes;
     /** Timestamp of submission in "yyyy-MM-dd HH:mm" format. */
     private String submittedAt;
     /** Skills declared by the TA at the time of application. */
@@ -72,6 +75,14 @@ public class ApplicationRecord {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getReviewerNotes() {
+        return reviewerNotes;
+    }
+
+    public void setReviewerNotes(String reviewerNotes) {
+        this.reviewerNotes = reviewerNotes;
     }
 
     public String getSubmittedAt() {

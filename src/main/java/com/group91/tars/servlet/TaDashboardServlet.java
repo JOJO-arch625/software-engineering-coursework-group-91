@@ -23,6 +23,7 @@ public class TaDashboardServlet extends BasePageServlet {
         preparePage(request, "ta-dashboard", "TA Flow", "TA Dashboard");
         request.setAttribute("profile", service.getTaProfile(getCurrentUser(request).getLinkedId()));
         request.setAttribute("notifications", service.getNotificationsForTa(getCurrentUser(request).getLinkedId()));
+        request.setAttribute("recommendations", service.getRecommendedJobsForTa(getCurrentUser(request).getLinkedId()));
         forward(request, response, "/WEB-INF/jsp/ta/dashboard.jsp");
     }
 }

@@ -17,6 +17,8 @@ public class WorkloadSummary {
     private List<String> acceptedModules = new ArrayList<String>();
     /** Number of accepted job assignments. */
     private int acceptedCount;
+    /** Sum of accepted job weekly hours. */
+    private int totalWeeklyHours;
     /** Whether the TA has reached or exceeded the workload cap. */
     private boolean overloadFlag;
 
@@ -50,6 +52,14 @@ public class WorkloadSummary {
 
     public void setAcceptedCount(int acceptedCount) {
         this.acceptedCount = acceptedCount;
+    }
+
+    public int getTotalWeeklyHours() {
+        return totalWeeklyHours;
+    }
+
+    public void setTotalWeeklyHours(int totalWeeklyHours) {
+        this.totalWeeklyHours = totalWeeklyHours;
     }
 
     public boolean isOverloadFlag() {
