@@ -19,6 +19,7 @@ public class RecruitmentToolRegistryFactory {
         registry.register(new GetTaProfileTool(support));
         registry.register(new GetJobPostingTool(support));
         registry.register(new ListOpenJobsTool(support));
+        registry.register(new ListManagedJobsTool(support));
         registry.register(new ExtractCvTextTool(support, cvTextExtractor));
         registry.register(new CalculateFitScoreTool(support, localRuleAiEngine));
         registry.register(new GetWorkloadStatusTool(support));

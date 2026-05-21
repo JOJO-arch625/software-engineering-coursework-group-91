@@ -37,6 +37,10 @@ public class AiAssistServlet extends BasePageServlet {
             return;
         }
         preparePage(request, "ai-assist", "Optional", "AI Assist Concept");
+        AiChatMemory memory = getMemory(request, getCurrentUser(request));
+        request.setAttribute("aiChatMessagesJson", asScriptJson(memory.toMessagesJson().toString()));
+        request.setAttribute("aiChatTraceJson", asScriptJson(memory.toToolTraceJson().toString()));
+        request.setAttribute("aiChatFinalJson", asScriptJson(memory.toFinalJson().toString()));
         request.setAttribute("aiTodos", service.getAiTodoNotes());
         forward(request, response, "/WEB-INF/jsp/ai/assist.jsp");
     }
@@ -66,10 +70,14 @@ public class AiAssistServlet extends BasePageServlet {
         AiChatMemory memory = getMemory(request, currentUser);
         if (isClearRequest(request)) {
             memory.clear();
+            request.getSession(true).removeAttribute(AI_CHAT_MEMORY);
             JsonObject cleared = new JsonObject();
             cleared.addProperty("success", true);
             cleared.addProperty("sourceMode", "local");
             cleared.addProperty("message", "AI chat memory cleared.");
+            cleared.add("messages", memory.toMessagesJson());
+            cleared.add("toolTrace", memory.toToolTraceJson());
+            cleared.add("finalJson", memory.toFinalJson());
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().write(gson.toJson(cleared));
             return;
@@ -105,6 +113,7 @@ public class AiAssistServlet extends BasePageServlet {
         ToolCallingResult result = service.chatWithAiAgent(message, currentUser, memory);
         memory.addMessage("assistant", result.getReply());
         memory.setLatestToolTrace(result.getToolTrace());
+        memory.setLatestFinalJson(result.getFinalJson());
 
         response.setStatus(HttpServletResponse.SC_OK);
         response.getWriter().write(gson.toJson(result.toJson()));
@@ -148,5 +157,12 @@ public class AiAssistServlet extends BasePageServlet {
             builder.append(line);
         }
         return builder.toString();
+    }
+
+    private String asScriptJson(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            return "{}";
+        }
+        return json.replace("</", "<\\/");
     }
 }

@@ -62,6 +62,11 @@ class RecruitmentToolSupport {
             || TarsService.ROLE_ADMIN.equals(currentUser.getRole()));
     }
 
+    boolean canListManagedJobs() {
+        return currentUser != null && (TarsService.ROLE_MO.equals(currentUser.getRole())
+            || TarsService.ROLE_ADMIN.equals(currentUser.getRole()));
+    }
+
     boolean canListApplicants(String jobId) {
         if (currentUser == null) {
             return false;

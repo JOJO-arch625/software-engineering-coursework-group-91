@@ -8,6 +8,10 @@ import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.Notification;
 import com.group91.tars.model.TAProfile;
 import com.group91.tars.model.UserAccount;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -230,9 +234,83 @@ public class JsonDataStore {
 
     private void createPlaceholderCv(String fileName) throws IOException {
         Path path = uploadDirectory.resolve(fileName);
-        if (!Files.exists(path)) {
-            Files.write(path, ("Placeholder CV for demo use: " + fileName).getBytes(StandardCharsets.UTF_8));
+        if (!Files.exists(path) || isLegacyPlaceholderCv(path)) {
+            writeSamplePdfCv(path, fileName);
         }
+    }
+
+    private boolean isLegacyPlaceholderCv(Path path) throws IOException {
+        if (!Files.exists(path) || Files.size(path) > 256) {
+            return false;
+        }
+        String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        return content.startsWith("Placeholder CV for demo use:");
+    }
+
+    private void writeSamplePdfCv(Path path, String fileName) throws IOException {
+        PDDocument document = new PDDocument();
+        try {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDPageContentStream stream = new PDPageContentStream(document, page);
+            try {
+                stream.beginText();
+                stream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+                stream.newLineAtOffset(56, 730);
+                stream.showText(sampleCvTitle(fileName));
+                stream.setFont(PDType1Font.HELVETICA, 11);
+                stream.setLeading(16);
+                for (String line : sampleCvLines(fileName)) {
+                    stream.newLine();
+                    stream.showText(line);
+                }
+                stream.endText();
+            } finally {
+                stream.close();
+            }
+            document.save(path.toFile());
+        } finally {
+            document.close();
+        }
+    }
+
+    private String sampleCvTitle(String fileName) {
+        if ("SiyuChen_CV.pdf".equals(fileName)) {
+            return "Siyu Chen - Teaching Assistant CV";
+        }
+        if ("MingLi_CV.pdf".equals(fileName)) {
+            return "Ming Li - Teaching Assistant CV";
+        }
+        return "Yuyanchen Long - Teaching Assistant CV";
+    }
+
+    private String[] sampleCvLines(String fileName) {
+        if ("SiyuChen_CV.pdf".equals(fileName)) {
+            return new String[] {
+                "Profile: Digital systems and analytics teaching assistant candidate.",
+                "Skills: Digital logic, VHDL basics, simulation, waveform debugging, Python notebooks.",
+                "Lab support: Guided students through circuit simulation and Boolean logic exercises.",
+                "Analytics support: Helped peers with pandas data processing and plotting workflows.",
+                "Teaching: Patient student support, troubleshooting, and step-by-step explanations.",
+                "Availability: Monday morning and Thursday afternoon."
+            };
+        }
+        if ("MingLi_CV.pdf".equals(fileName)) {
+            return new String[] {
+                "Profile: Programming lab support candidate.",
+                "Skills: Python, data structures, Java basics, debugging, lab communication.",
+                "Experience: Helped students understand arrays, loops, and notebook workflows.",
+                "Teaching: Supported small-group programming exercises and troubleshooting.",
+                "Availability: Wednesday afternoon and Friday afternoon."
+            };
+        }
+        return new String[] {
+            "Profile: Software and digital systems teaching assistant candidate.",
+            "Skills: Java, Python, VHDL, object-oriented programming, lab support.",
+            "Experience: Supported coursework discussions and debugging exercises.",
+            "Teaching: Explains programming concepts clearly and works well with students.",
+            "Availability: Tuesday afternoon, Thursday evening, and Friday morning."
+        };
     }
 
     private TAProfile createProfile(String id, String fullName, String studentNumber, String email,

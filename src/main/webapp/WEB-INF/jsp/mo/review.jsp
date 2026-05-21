@@ -1,6 +1,7 @@
 <%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiCandidateSummary,com.group91.tars.service.TarsService" %>
 <%
     JobPosting selectedJob = (JobPosting) request.getAttribute("selectedJob");
+    List<JobPosting> moJobs = (List<JobPosting>) request.getAttribute("moJobs");
     List<ApplicationRecord> applications = (List<ApplicationRecord>) request.getAttribute("applications");
     ApplicationRecord selectedApplication = (ApplicationRecord) request.getAttribute("selectedApplication");
     TAProfile selectedApplicant = (TAProfile) request.getAttribute("selectedApplicant");
@@ -14,6 +15,25 @@
                 <h4><%= i18n.t("mo.review.heading") %><%= selectedJob == null ? "" : " - " + selectedJob.getTitle() %></h4>
                 <p><%= i18n.t("mo.review.description") %></p>
             </div>
+            <% if (moJobs != null && !moJobs.isEmpty()) { %>
+            <div class="review-job-switcher" aria-label="MO job postings">
+                <% for (JobPosting jobOption : moJobs) {
+                    boolean isCurrentJob = selectedJob != null && jobOption.getId().equals(selectedJob.getId());
+                    int applicantCount = pageService.countApplicantsForJob(jobOption.getId());
+                %>
+                <a class="review-job-chip <%= isCurrentJob ? "active" : "" %>"
+                   href="<%= request.getContextPath() %>/mo/review?jobId=<%= jobOption.getId() %>">
+                    <strong><%= jobOption.getModuleCode() %></strong>
+                    <span><%= jobOption.getTitle() %></span>
+                    <em><%= applicantCount %> applicants</em>
+                </a>
+                <% } %>
+            </div>
+            <% } %>
+            <p class="muted review-list-caption">
+                Showing <%= applications == null ? 0 : applications.size() %> applicants for
+                <strong><%= selectedJob == null ? "no selected posting" : selectedJob.getModuleCode() + " " + selectedJob.getTitle() %></strong>.
+            </p>
             <div class="table-shell">
                 <table>
                     <thead>
@@ -22,6 +42,7 @@
                         <th><%= i18n.t("mo.review.priority") %></th>
                         <th><%= i18n.t("mo.review.ai-fit") %></th>
                         <th><%= i18n.t("mo.review.accepted") %></th>
+                        <th>CV</th>
                         <th><%= i18n.t("mo.review.status") %></th>
                     </tr>
                     </thead>
@@ -34,12 +55,20 @@
                             : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                         int fitScore = selectedJob == null ? 0 : pageService.calculateFitScore(record.getTaId(), selectedJob.getId());
                         boolean isSelected = selectedApplication != null && record.getId().equals(selectedApplication.getId());
+                        boolean hasApplicantCv = applicant != null && applicant.getCvPath() != null && !applicant.getCvPath().trim().isEmpty();
                     %>
                     <tr style="<%= isSelected ? "background: rgba(0,180,216,0.08);" : "" %>">
                         <td><a class="table-link" href="<%= request.getContextPath() %>/mo/review?jobId=<%= selectedJob == null ? "" : selectedJob.getId() %>&appId=<%= record.getId() %>"><%= applicant == null ? record.getTaId() : applicant.getFullName() %></a></td>
                         <td><%= record.getPriority() %></td>
                         <td><strong><%= fitScore %>%</strong></td>
                         <td><%= pageService.countAcceptedJobsForTaPublic(record.getTaId()) %> / 3</td>
+                        <td>
+                            <% if (hasApplicantCv) { %>
+                            <a class="table-link" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= record.getTaId() %>">View CV</a>
+                            <% } else { %>
+                            <span class="muted">No CV</span>
+                            <% } %>
+                        </td>
                         <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     </tr>
                     <% } %>
@@ -68,8 +97,19 @@
                 String candidateSourceLabel = "llm_tool".equals(candidateSourceMode) ? "tool-calling agent"
                     : ("llm".equals(candidateSourceMode) ? "LLM agent"
                     : ("error".equals(candidateSourceMode) ? "AI error state" : "local rule engine"));
+                String selectedCvPath = selectedApplicant.getCvPath();
+                boolean selectedHasCv = selectedCvPath != null && !selectedCvPath.trim().isEmpty();
             %>
             <h4 style="margin-bottom: 10px;"><%= selectedApplicant.getFullName() %></h4>
+            <div class="ai-evidence-box" style="margin-bottom: 12px;">
+                <strong>Applicant CV attachment</strong>
+                <% if (selectedHasCv) { %>
+                <p class="file-name"><%= selectedCvPath %></p>
+                <a class="secondary-button" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= selectedApplicant.getId() %>">Open CV</a>
+                <% } else { %>
+                <p>No CV has been uploaded for this applicant.</p>
+                <% } %>
+            </div>
             <div class="ai-score-shell" style="margin-bottom: 12px;">
                 <span class="ai-score-label"><%= i18n.t("mo.review.fit-score") %></span>
                 <strong><%= selectedFitScore %>%</strong>
