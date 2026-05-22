@@ -24,7 +24,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login | <%= i18n.t("page.title.suffix") %></title>
-    <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260503a">
+    <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260522b">
 </head>
 <body class="login-page">
 <header class="login-topbar">
@@ -32,6 +32,7 @@
         <span class="wordmark"><%= i18n.t("brand.title") %></span>
     </div>
     <div class="topbar-right">
+        <button class="help-toggle" type="button" data-help-open title="<%= i18n.t("topbar.help") %>"><%= i18n.t("topbar.help") %></button>
         <a class="lang-toggle" href="<%= langToggleUrl %>" title="<%= "zh".equals(lang) ? "Switch to English" : "切换到中文" %>">
             <%= "zh".equals(lang) ? "EN" : "中文" %>
         </a>
@@ -107,5 +108,6 @@
         </aside>
     </section>
 </main>
+<%@ include file="fragments/helpModal.jspf" %>
 </body>
 </html>
