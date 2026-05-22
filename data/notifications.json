@@ -3,7 +3,7 @@
     "id": "notif-1",
     "userId": "ta-1",
     "category": "status",
-    "message": "Your application for Digital Systems TA is now Under Review.",
+    "message": "Your application for Software Engineering TA is now Under Review.",
     "link": "/ta/applications",
     "read": true,
     "createdAt": "2026-03-24 10:05"
@@ -12,7 +12,7 @@
     "id": "notif-2",
     "userId": "ta-1",
     "category": "status",
-    "message": "Your application for Data Analytics TA has been Rejected.",
+    "message": "Your application for Software Engineering TA has been Rejected.",
     "link": "/ta/applications",
     "read": true,
     "createdAt": "2026-03-23 19:00"
@@ -21,7 +21,7 @@
     "id": "notif-3",
     "userId": "ta-2",
     "category": "status",
-    "message": "Your application for Object-Oriented Programming TA has been Accepted.",
+    "message": "Your application for Software Engineering TA has been Accepted.",
     "link": "/ta/applications",
     "read": true,
     "createdAt": "2026-03-22 09:30"
@@ -39,7 +39,7 @@
     "id": "notif-5",
     "userId": "ta-3",
     "category": "status",
-    "message": "Your application for Object-Oriented Programming TA has been Accepted.",
+    "message": "Your application for Software Engineering TA has been Accepted.",
     "link": "/ta/applications",
     "read": true,
     "createdAt": "2026-03-23 14:50"
@@ -57,7 +57,7 @@
     "id": "notif-7",
     "userId": "mo-1",
     "category": "review",
-    "message": "New applicant for Digital Systems TA: Yuyanchen Long.",
+    "message": "New applicant for Software Engineering TA: Yuyanchen Long.",
     "link": "/mo/review?jobId\u003djob-2",
     "read": true,
     "createdAt": "2026-03-24 10:00"
@@ -66,7 +66,7 @@
     "id": "notif-8",
     "userId": "mo-1",
     "category": "review",
-    "message": "New applicant for Object-Oriented Programming TA: Ming Li.",
+    "message": "New applicant for Software Engineering TA: Ming Li.",
     "link": "/mo/review?jobId\u003djob-1",
     "read": true,
     "createdAt": "2026-03-22 09:00"
@@ -75,7 +75,7 @@
     "id": "notif-9",
     "userId": "mo-1",
     "category": "deadline",
-    "message": "Data Analytics TA posting deadline has passed.",
+    "message": "Software Engineering TA posting deadline has passed.",
     "link": "/mo/jobs/edit?id\u003djob-3",
     "read": true,
     "createdAt": "2026-04-09 23:59"
@@ -102,9 +102,36 @@
     "id": "notif-37615382788400",
     "userId": "ta-1",
     "category": "status",
-    "message": "Your application for Software Engineering TA - Tutorial Support has been Under Review.",
+    "message": "Your application for Software Engineering TA has been Under Review.",
+    "link": "/ta/applications",
+    "read": true,
+    "createdAt": "2026-05-03 21:07"
+  },
+  {
+    "id": "notif-20724031650600",
+    "userId": "ta-1",
+    "category": "status",
+    "message": "Your application for Data Analytics TA has been Accepted.",
     "link": "/ta/applications",
     "read": false,
-    "createdAt": "2026-05-03 21:07"
+    "createdAt": "2026-05-22 22:30"
+  },
+  {
+    "id": "notif-20740459795200",
+    "userId": "ta-1",
+    "category": "status",
+    "message": "Your application for Digital Systems TA has been Accepted.",
+    "link": "/ta/applications",
+    "read": true,
+    "createdAt": "2026-05-22 22:31"
+  },
+  {
+    "id": "notif-20745059723900",
+    "userId": "ta-1",
+    "category": "status",
+    "message": "Your application for Digital Systems TA has been Accepted.",
+    "link": "/ta/applications",
+    "read": false,
+    "createdAt": "2026-05-22 22:31"
   }
 ]

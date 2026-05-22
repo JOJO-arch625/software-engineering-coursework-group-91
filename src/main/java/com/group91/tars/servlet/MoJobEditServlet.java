@@ -13,6 +13,8 @@ import java.io.IOException;
 /**
  * Handles job posting creation and editing at {@code /mo/jobs/edit}.
  * GET renders the job editor form; POST processes save and close actions.
+ * Course code is hardcoded to EBU6304 - Software Engineering; any attempt
+ * to submit a different module code is rejected with a validation error.
  */
 @WebServlet("/mo/jobs/edit")
 public class MoJobEditServlet extends BasePageServlet {
@@ -39,9 +41,15 @@ public class MoJobEditServlet extends BasePageServlet {
         if ("close".equals(action)) {
             result = service.closeJobPosting(request.getParameter("id"));
         } else {
+            String submittedCode = request.getParameter("moduleCode");
+            if (!service.isValidMoCourseCode(submittedCode)) {
+                flashI18n(request, "error", "flash.job.invalid-course-code");
+                redirect(request, response, "/mo/jobs/edit" + buildQuerySuffix(request.getParameter("id")));
+                return;
+            }
             JobPosting draft = new JobPosting();
             draft.setId(request.getParameter("id"));
-            draft.setModuleCode(request.getParameter("moduleCode"));
+            draft.setModuleCode(TarsService.MO_COURSE_CODE);
             draft.setTitle(request.getParameter("title"));
             draft.setSkills(request.getParameter("skills"));
             draft.setRequirements(request.getParameter("requirements"));
@@ -67,6 +75,8 @@ public class MoJobEditServlet extends BasePageServlet {
             return existing;
         }
         JobPosting blank = new JobPosting();
+        blank.setModuleCode(TarsService.MO_COURSE_CODE);
+        blank.setTitle(TarsService.MO_COURSE_TITLE + " TA");
         blank.setStatus("Open");
         return blank;
     }

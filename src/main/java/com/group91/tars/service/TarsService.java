@@ -45,6 +45,9 @@ public class TarsService {
     public static final String ROLE_TA = "TA";
     public static final String ROLE_MO = "MO";
     public static final String ROLE_ADMIN = "ADMIN";
+    public static final String MO_COURSE_CODE = "EBU6304";
+    public static final String MO_COURSE_TITLE = "Software Engineering";
+    public static final String MO_COURSE_LABEL = "EBU6304 - Software Engineering";
     public static final int MAX_APPLICATIONS = 3;
     public static final int MAX_ACCEPTED_JOBS = 3;
     public static final long MAX_CV_FILE_SIZE = 10L * 1024L * 1024L;
@@ -64,6 +67,14 @@ public class TarsService {
      */
     public static TarsService getInstance() {
         return INSTANCE;
+    }
+
+    /**
+     * Validates that the given module code is EBU6304. Used by MoJobEditServlet
+     * to reject any attempt to submit a different course code.
+     */
+    public boolean isValidMoCourseCode(String moduleCode) {
+        return MO_COURSE_CODE.equals(moduleCode);
     }
 
     /**
