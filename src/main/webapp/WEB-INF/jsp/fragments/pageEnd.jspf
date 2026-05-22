@@ -1,3 +1,4 @@
+        <%@ include file="helpModal.jspf" %>
         <button class="scroll-fab" type="button" data-scroll-fab aria-label="<%= i18n.t("scroll.down") %>">
             <span class="scroll-fab-icon" data-scroll-icon>&#8595;</span>
         </button>
