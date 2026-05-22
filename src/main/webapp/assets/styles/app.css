@@ -637,6 +637,28 @@ body.nav-collapsed .brand-copy {
   grid-column: span 2;
 }
 
+.form-display-field {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  padding: 12px 14px;
+  background: #eef2f9;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  font-size: 15px;
+}
+
+.form-display-label {
+  font-weight: 600;
+  color: var(--blue-strong);
+  align-self: center;
+}
+
+.form-display-value {
+  color: #1b2742;
+  font-weight: 500;
+}
+
 input,
 textarea,
 select {

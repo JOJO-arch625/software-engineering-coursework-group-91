@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Handles applicant review at {@code /mo/review}. GET shows the split-panel
- * review interface; POST processes accept/reject/under-review decisions.
+ * Handles applicant review at {@code /mo/review}. GET shows all EBU6304
+ * applicants in a unified list; POST processes status updates.
+ * Only EBU6304 - Software Engineering jobs are visible to the MO.
  */
 @WebServlet("/mo/review")
 public class MoReviewServlet extends BasePageServlet {
@@ -26,15 +27,12 @@ public class MoReviewServlet extends BasePageServlet {
             return;
         }
         preparePage(request, "review", "MO Flow", "Applicant Review");
-        List<JobPosting> moJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
-        JobPosting selectedJob = resolveJob(request, moJobs);
-        List<ApplicationRecord> applications = selectedJob == null
-            ? new ArrayList<ApplicationRecord>()
-            : service.getApplicationsForJob(selectedJob.getId());
-        ApplicationRecord selectedApplication = resolveApplication(request, applications);
+        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        List<JobPosting> moJobs = filterEbU6304(allMoJobs);
+        List<ApplicationRecord> allApplications = collectEbU6304Applications(moJobs);
+        ApplicationRecord selectedApplication = resolveApplication(request, allApplications);
         request.setAttribute("moJobs", moJobs);
-        request.setAttribute("selectedJob", selectedJob);
-        request.setAttribute("applications", applications);
+        request.setAttribute("allApplications", allApplications);
         request.setAttribute("selectedApplication", selectedApplication);
         request.setAttribute("selectedApplicant", selectedApplication == null ? null : service.getProfileById(selectedApplication.getTaId()));
         request.setAttribute("aiTodos", service.getAiTodoNotes());
@@ -42,56 +40,61 @@ public class MoReviewServlet extends BasePageServlet {
     }
 
     @Override
-protected void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws IOException {
-    if (!requireRole(request, response, TarsService.ROLE_MO)) {
-        return;
-    }
-
-    String action = request.getParameter("action");
-    OperationResult result;
-    if ("bulkShortlist".equals(action)) {
-        if (!canReviewJob(request)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+        if (!requireRole(request, response, TarsService.ROLE_MO)) {
             return;
         }
-        result = service.bulkShortlistApplications(
-            request.getParameter("jobId"),
-            request.getParameter("notes")
-        );
-    } else {
-        if (!canReviewApplication(request)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
-            return;
+
+        String action = request.getParameter("action");
+        OperationResult result;
+        if ("bulkShortlist".equals(action)) {
+            if (!canReviewJob(request)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            result = service.bulkShortlistApplications(
+                request.getParameter("jobId"),
+                request.getParameter("notes")
+            );
+        } else {
+            String applicationId = request.getParameter("applicationId");
+            String jobId = request.getParameter("jobId");
+            if (!canReviewApplication(applicationId, jobId, request)) {
+                response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+            result = service.updateApplicationStatus(
+                applicationId,
+                request.getParameter("status"),
+                request.getParameter("notes")
+            );
         }
-        result = service.updateApplicationStatus(
-            request.getParameter("applicationId"),
-            request.getParameter("status"),
-            request.getParameter("notes")
-        );
+
+        if (result.isSuccess()) {
+            flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
+        } else {
+            flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
+        }
+        redirect(request, response, "/mo/review");
     }
 
-    if (result.isSuccess()) {
-        flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
-    } else {
-        flashI18n(request, "error", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.not-found");
-    }
-    String appId = request.getParameter("applicationId");
-    String redirectTarget = "/mo/review?jobId=" + request.getParameter("jobId")
-        + (appId == null || appId.trim().isEmpty() ? "" : "&appId=" + appId);
-    redirect(request, response, redirectTarget);
-}
-
-    private JobPosting resolveJob(HttpServletRequest request, List<JobPosting> moJobs) {
-        String jobId = request.getParameter("jobId");
-        if (jobId != null) {
-            for (JobPosting job : moJobs) {
-                if (jobId.equals(job.getId())) {
-                    return job;
-                }
+    private List<JobPosting> filterEbU6304(List<JobPosting> jobs) {
+        List<JobPosting> filtered = new ArrayList<JobPosting>();
+        for (JobPosting job : jobs) {
+            if (TarsService.MO_COURSE_CODE.equals(job.getModuleCode())) {
+                filtered.add(job);
             }
         }
-        return moJobs.isEmpty() ? null : moJobs.get(0);
+        return filtered;
+    }
+
+    private List<ApplicationRecord> collectEbU6304Applications(List<JobPosting> ebU6304Jobs) {
+        List<ApplicationRecord> all = new ArrayList<ApplicationRecord>();
+        for (JobPosting job : ebU6304Jobs) {
+            all.addAll(service.getApplicationsForJob(job.getId()));
+        }
+        return all;
     }
 
     private ApplicationRecord resolveApplication(HttpServletRequest request, List<ApplicationRecord> applications) {
@@ -106,14 +109,13 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         return applications.isEmpty() ? null : applications.get(0);
     }
 
-    private boolean canReviewApplication(HttpServletRequest request) {
-        String jobId = request.getParameter("jobId");
-        String applicationId = request.getParameter("applicationId");
-        if (jobId == null || applicationId == null) {
+    private boolean canReviewApplication(String applicationId, String jobId, HttpServletRequest request) {
+        if (applicationId == null) {
             return false;
         }
-        for (JobPosting job : service.getJobsForMo(getCurrentUser(request).getLinkedId())) {
-            if (!jobId.equals(job.getId())) {
+        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        for (JobPosting job : filterEbU6304(allMoJobs)) {
+            if (jobId != null && !jobId.equals(job.getId())) {
                 continue;
             }
             for (ApplicationRecord application : service.getApplicationsForJob(job.getId())) {
@@ -124,16 +126,18 @@ protected void doPost(HttpServletRequest request, HttpServletResponse response)
         }
         return false;
     }
-  private boolean canReviewJob(HttpServletRequest request) {
-    String jobId = request.getParameter("jobId");
-    if (jobId == null) {
+
+    private boolean canReviewJob(HttpServletRequest request) {
+        String jobId = request.getParameter("jobId");
+        if (jobId == null) {
+            return false;
+        }
+        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        for (JobPosting job : filterEbU6304(allMoJobs)) {
+            if (jobId.equals(job.getId())) {
+                return true;
+            }
+        }
         return false;
     }
-    for (JobPosting job : service.getJobsForMo(getCurrentUser(request).getLinkedId())) {
-        if (jobId.equals(job.getId())) {
-            return true;
-        }
-    }
-    return false;
-}
 }

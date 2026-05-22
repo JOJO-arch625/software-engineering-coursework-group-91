@@ -11,6 +11,7 @@
         <article class="panel">
             <div class="panel-header">
                 <h4><%= i18n.t("mo.job.editor.your-postings") %></h4>
+                <p class="muted" style="margin: 4px 0 0;"><%= TarsService.MO_COURSE_LABEL %></p>
             </div>
             <% if (myJobs == null || myJobs.isEmpty()) { %>
             <div class="alert info"><%= i18n.t("mo.dashboard.no-applications") %></div>
@@ -19,7 +20,6 @@
                 <table>
                     <thead>
                     <tr>
-                        <th><%= i18n.t("mo.job.editor.module-code") %></th>
                         <th><%= i18n.t("mo.job.editor.job-title") %></th>
                         <th><%= i18n.t("mo.dashboard.status") %></th>
                         <th><%= i18n.t("search.applicants") %></th>
@@ -29,7 +29,6 @@
                     <tbody>
                     <% for (JobPosting j : myJobs) { %>
                     <tr>
-                        <td><strong><%= j.getModuleCode() %></strong></td>
                         <td><%= j.getTitle() %></td>
                         <td><span class="status-chip <%= "Open".equals(j.getStatus()) ? "status-open" : "status-rejected" %>"><%= i18n.t("status." + j.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                         <td><%= com.group91.tars.service.TarsService.getInstance().countApplicantsForJob(j.getId()) %></td>
@@ -54,10 +53,11 @@
                 <input type="hidden" name="action" value="save">
                 <input type="hidden" name="id" value="<%= job.getId() == null ? "" : job.getId() %>">
                 <input type="hidden" name="status" value="<%= job.getStatus() == null ? "Open" : job.getStatus() %>">
-                <label>
-                    <%= i18n.t("mo.job.editor.module-code") %>
-                    <input type="text" name="moduleCode" value="<%= job.getModuleCode() == null ? "" : job.getModuleCode() %>" required>
-                </label>
+                <input type="hidden" name="moduleCode" value="<%= TarsService.MO_COURSE_CODE %>">
+                <div class="form-display-field">
+                    <span class="form-display-label"><%= i18n.t("mo.job.editor.module-code") %></span>
+                <span class="form-display-value"><%= TarsService.MO_COURSE_LABEL %></span>
+                </div>
                 <label>
                     <%= i18n.t("mo.job.editor.job-title") %>
                     <input type="text" name="title" value="<%= job.getTitle() == null ? "" : job.getTitle() %>" required>
