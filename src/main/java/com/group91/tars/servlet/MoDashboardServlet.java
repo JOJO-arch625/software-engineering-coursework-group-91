@@ -28,9 +28,9 @@ public class MoDashboardServlet extends BasePageServlet {
         String moId = getCurrentUser(request).getLinkedId();
         List<JobPosting> jobs = service.getJobsForMo(moId);
         request.setAttribute("jobs", jobs);
-        request.setAttribute("openJobCount", service.countOpenJobs());
-        request.setAttribute("pendingCount", service.countPendingApplications());
-        request.setAttribute("applicantCount", service.countAllApplications());
+        request.setAttribute("openJobCount", service.countOpenJobsForMo(moId));
+        request.setAttribute("pendingCount", service.countPendingApplicationsForMo(moId));
+        request.setAttribute("applicantCount", service.countApplicationsForMo(moId));
 
         List<ApplicationRecord> allApplications = new ArrayList<ApplicationRecord>();
         for (JobPosting job : jobs) {
