@@ -1,68 +1,74 @@
 [
   {
     "id": "app-1",
-    "jobId": "job-1",
+    "jobId": "job-2",
     "taId": "ta-1",
     "priority": "Priority 1",
-    "status": "Submitted",
-    "notes": "I have experience in Java development and unit testing.",
-    "submittedAt": "2026-04-20 10:00",
-    "applicantSkills": "Java, JUnit, Maven, Agile",
-    "applicantDescription": "I have completed multiple Java projects and I am familiar with software testing practices. I can support lab sessions effectively."
+    "status": "Under Review",
+    "notes": "I can support digital systems lab sessions and help students debug exercises.",
+    "reviewerNotes": "MO reviewing VHDL experience.",
+    "submittedAt": "2026-03-24 10:00",
+    "applicantSkills": "Java, VHDL, Lab support",
+    "applicantDescription": "I can support digital systems lab sessions and help students debug exercises."
   },
   {
     "id": "app-2",
-    "jobId": "job-2",
+    "jobId": "job-3",
     "taId": "ta-1",
     "priority": "Priority 2",
-    "status": "Under Review",
-    "notes": "I have experience with UML and design patterns.",
-    "submittedAt": "2026-04-21 14:30",
-    "applicantSkills": "UML, Design Patterns, Documentation",
-    "applicantDescription": "I have worked on several software design projects using UML diagrams and design patterns. I can help students understand these concepts."
+    "status": "Rejected",
+    "notes": "I have Python experience and can help students with coursework notebooks.",
+    "reviewerNotes": "Role filled. Transparent rejection shown to TA.",
+    "submittedAt": "2026-03-23 18:30",
+    "applicantSkills": "Python, Java, Teaching support",
+    "applicantDescription": "I have Python experience and can help students with coursework notebooks."
   },
   {
     "id": "app-3",
     "jobId": "job-1",
     "taId": "ta-2",
     "priority": "Priority 1",
-    "status": "Submitted",
-    "notes": "Strong background in software engineering.",
-    "submittedAt": "2026-04-22 09:00",
-    "applicantSkills": "Java, Python, Git, Testing",
-    "applicantDescription": "I have experience in full-stack development and software testing. I am passionate about helping students learn software engineering practices."
+    "status": "Accepted",
+    "notes": "Accepted for weekly Java lab support.",
+    "reviewerNotes": "Accepted for weekly Java lab support.",
+    "submittedAt": "2026-03-22 09:00",
+    "applicantSkills": "Java, Python, Debugging",
+    "applicantDescription": "I have experience in programming labs and can help students debug Java code."
   },
   {
     "id": "app-4",
-    "jobId": "job-3",
-    "taId": "ta-2",
+    "jobId": "job-2",
+    "taId": "ta-3",
     "priority": "Priority 1",
-    "status": "Submitted",
-    "notes": "Experienced with Python and Git workflows.",
-    "submittedAt": "2026-04-22 11:00",
-    "applicantSkills": "Python, Git, GitHub, Code Review",
-    "applicantDescription": "I have contributed to open-source projects and have experience with Git workflows. I can help students with version control and code review."
+    "status": "Accepted",
+    "notes": "Accepted for digital systems support.",
+    "reviewerNotes": "Accepted for digital systems support.",
+    "submittedAt": "2026-03-22 09:10",
+    "applicantSkills": "VHDL, Boolean logic, Simulation",
+    "applicantDescription": "I have a strong digital logic background and can support waveform debugging."
   },
   {
     "id": "app-5",
-    "jobId": "job-2",
+    "jobId": "job-1",
     "taId": "ta-3",
     "priority": "Priority 2",
-    "status": "Submitted",
-    "notes": "Good understanding of software design.",
-    "submittedAt": "2026-04-22 15:00",
-    "applicantSkills": "UML, Software Architecture, Documentation",
-    "applicantDescription": "I have taken advanced software engineering courses and have practical experience with software design documentation."
+    "status": "Accepted",
+    "notes": "Accepted for additional OOP sessions.",
+    "reviewerNotes": "Accepted for additional OOP sessions.",
+    "submittedAt": "2026-03-23 14:20",
+    "applicantSkills": "Java, Student support",
+    "applicantDescription": "I can help with object-oriented programming concepts and lab support."
   },
   {
     "id": "app-6",
     "jobId": "job-3",
     "taId": "ta-3",
     "priority": "Priority 3",
-    "status": "Submitted",
-    "notes": "Available for coursework support.",
-    "submittedAt": "2026-04-23 10:00",
-    "applicantSkills": "Python, Git, Debugging",
-    "applicantDescription": "I can help students debug their code and understand Python programming concepts. I am available during weekday afternoons."
+    "status": "Accepted",
+    "notes": "Accepted before the role was closed.",
+    "reviewerNotes": "Accepted before the role was closed.",
+    "submittedAt": "2026-03-21 11:45",
+    "applicantSkills": "Python, plotting, notebooks",
+    "applicantDescription": "I can support Python notebook workflows and analytics exercises."
   }
 ]

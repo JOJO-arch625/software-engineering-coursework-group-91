@@ -1,7 +1,8 @@
-<%@ page import="com.group91.tars.model.TAProfile,java.util.List" %>
+<%@ page import="com.group91.tars.model.TAProfile,com.group91.tars.model.JobRecommendation,java.util.List" %>
 <%
     TAProfile profile = (TAProfile) request.getAttribute("profile");
     List<String> notifications = (List<String>) request.getAttribute("notifications");
+    List<JobRecommendation> recommendations = (List<JobRecommendation>) request.getAttribute("recommendations");
     Integer applicationTotal = (Integer) request.getAttribute("topMetricTwoValue");
     Integer acceptedTotal = (Integer) request.getAttribute("topMetricThreeValue");
 %>
@@ -37,6 +38,35 @@
     </div>
 
     <div class="grid one-col">
+        <article class="panel">
+            <div class="panel-header">
+                <div>
+                    <h4><%= i18n.t("ta.dashboard.recommendations") %></h4>
+                    <p><%= i18n.t("ta.dashboard.recommendations-desc") %></p>
+                </div>
+                <span class="pill pill-warning"><%= i18n.t("ta.dashboard.ai-reference") %></span>
+            </div>
+            <% if (recommendations == null || recommendations.isEmpty()) { %>
+            <p class="muted"><%= i18n.t("ta.dashboard.no-recommendations") %></p>
+            <% } else { %>
+            <div class="recommendation-list">
+                <% for (JobRecommendation recommendation : recommendations) { %>
+                <article class="recommendation-item">
+                    <div>
+                        <p class="eyebrow"><%= recommendation.getJob().getModuleCode() %></p>
+                        <h5><%= recommendation.getJob().getTitle() %></h5>
+                        <p class="muted"><%= recommendation.getJob().getDeadline() %> - <%= recommendation.getJob().getWorkload() %></p>
+                    </div>
+                    <strong><%= recommendation.getMatchRate() %>%</strong>
+                    <p><%= i18n.t("ta.dashboard.match-detail", recommendation.getMatchedCount(), recommendation.getTotalRequiredCount(), recommendation.getMatchRate()) %></p>
+                    <p class="muted"><%= recommendation.getMatchedSkills().isEmpty() ? "-" : String.join(", ", recommendation.getMatchedSkills()) %></p>
+                    <a class="secondary-button" href="<%= request.getContextPath() %>/ta/job?id=<%= recommendation.getJob().getId() %>"><%= i18n.t("common.view-detail") %></a>
+                </article>
+                <% } %>
+            </div>
+            <% } %>
+        </article>
+
         <article class="panel">
             <div class="panel-header">
                 <h4><%= i18n.t("ta.dashboard.quick-actions") %></h4>

@@ -8,14 +8,6 @@
     "linkedId": "ta-1"
   },
   {
-    "id": "acc-ta-2",
-    "username": "1",
-    "password": "123",
-    "displayName": "lidarou",
-    "role": "TA",
-    "linkedId": "ta-2"  
-  },
-  {
     "id": "acc-mo-1",
     "username": "mo.demo",
     "password": "MoDemo123",

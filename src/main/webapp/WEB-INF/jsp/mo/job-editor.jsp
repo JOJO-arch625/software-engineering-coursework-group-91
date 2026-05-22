@@ -79,6 +79,10 @@
                     <input type="text" name="workload" value="<%= job.getWorkload() == null ? "" : job.getWorkload() %>" required>
                 </label>
                 <label>
+                    <%= i18n.t("mo.job.editor.weekly-hours") %>
+                    <input type="number" name="weeklyHours" min="1" value="<%= job.getWeeklyHours() <= 0 ? "" : job.getWeeklyHours() %>" required>
+                </label>
+                <label>
                     <%= i18n.t("mo.job.editor.deadline") %>
                     <input type="date" name="deadline" value="<%= job.getDeadline() == null ? "" : job.getDeadline() %>" required>
                 </label>

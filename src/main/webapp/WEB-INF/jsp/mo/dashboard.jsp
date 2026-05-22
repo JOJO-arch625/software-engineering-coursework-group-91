@@ -53,7 +53,8 @@
                     TAProfile applicant = pageService.getProfileById(app.getTaId());
                     String statusClass = "Submitted".equals(app.getStatus()) ? "status-open"
                         : ("Under Review".equals(app.getStatus()) ? "status-review"
-                        : ("Accepted".equals(app.getStatus()) ? "status-accepted" : "status-rejected"));
+                        : ("Shortlisted".equals(app.getStatus()) ? "status-shortlisted"
+                        : ("Accepted".equals(app.getStatus()) ? "status-accepted" : "status-rejected")));
                     int fitScore = job == null ? 0 : pageService.calculateFitScore(app.getTaId(), job.getId());
                     String skills = app.getApplicantSkills() == null || app.getApplicantSkills().isEmpty()
                         ? (applicant == null ? "0" : applicant.getSkills()) : app.getApplicantSkills();

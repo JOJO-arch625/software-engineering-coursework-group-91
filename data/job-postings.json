@@ -2,49 +2,40 @@
   {
     "id": "job-1",
     "moId": "mo-1",
-    "moduleCode": "EBU6304",
-    "title": "Software Engineering TA - Lab Support",
-    "skills": "Java, Software Testing, Agile",
-    "requirements": "Familiar with software development lifecycle, unit testing, and agile methodologies.",
+    "moduleCode": "EIE3320",
+    "title": "Object-Oriented Programming TA",
+    "skills": "Java, OOP, debugging",
+    "requirements": "Strong Java syntax, classes, arrays, exception handling, and lab support communication.",
     "workload": "6 hours / week",
-    "deadline": "2026-05-10",
-    "status": "Closed",
-    "description": "Support weekly software engineering labs and guide students through Java exercises and testing practices."
+    "weeklyHours": 6,
+    "deadline": "2026-12-10",
+    "status": "Open",
+    "description": "Support weekly labs and guide students through Java exercises."
   },
   {
     "id": "job-2",
     "moId": "mo-1",
-    "moduleCode": "EBU6304",
-    "title": "Software Engineering TA - Tutorial Support",
-    "skills": "UML, Design Patterns, Documentation",
-    "requirements": "Understanding of UML diagrams, design patterns, and technical documentation.",
+    "moduleCode": "EIE2105",
+    "title": "Digital Systems TA",
+    "skills": "VHDL, Boolean logic, simulation",
+    "requirements": "Basic circuit design, VHDL syntax, waveform debugging, and hardware fundamentals.",
     "workload": "5 hours / week",
-    "deadline": "2026-05-11",
+    "weeklyHours": 5,
+    "deadline": "2026-12-11",
     "status": "Open",
-    "description": "Assist tutorial sessions for software design and help students with UML modelling exercises."
+    "description": "Assist digital systems lab sessions and hardware simulation support."
   },
   {
     "id": "job-3",
     "moId": "mo-1",
-    "moduleCode": "EBU6304",
-    "title": "Software Engineering TA - Coursework Support",
-    "skills": "Python, Git, Code Review",
-    "requirements": "Experience with version control, code review workflows, and Python development.",
+    "moduleCode": "ECS5001",
+    "title": "Data Analytics TA",
+    "skills": "Python, pandas, plotting",
+    "requirements": "Python basics, data processing, notebook workflows, and problem explanation skills.",
     "workload": "4 hours / week",
-    "deadline": "2026-05-09",
-    "status": "Open",
-    "description": "Help students with coursework projects, Git workflows, and code review sessions."
-  },
-  {
-    "id": "job-161450aa",
-    "moId": "mo-1",
-    "moduleCode": "TEST001",
-    "title": "Test Job",
-    "skills": "Java",
-    "requirements": "Testing",
-    "workload": "3 hours / week",
-    "deadline": "2026-12-31",
-    "status": "Open",
-    "description": "Test"
+    "weeklyHours": 4,
+    "deadline": "2026-05-01",
+    "status": "Closed",
+    "description": "Help students with Python notebooks and analytics exercises."
   }
 ]

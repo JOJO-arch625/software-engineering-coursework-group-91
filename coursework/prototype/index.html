@@ -233,6 +233,19 @@
               <ul class="timeline" id="ta-notification-list"></ul>
             </article>
           </div>
+
+          <div class="grid one-col">
+            <article class="panel">
+              <div class="panel-header">
+                <div>
+                  <h4>AI Job Recommendations</h4>
+                  <p class="muted">Top 5 open jobs with at least 60% skill match.</p>
+                </div>
+                <span class="pill pill-warning">AI recommendation is for reference only</span>
+              </div>
+              <div class="recommendation-list" id="ta-recommendation-list"></div>
+            </article>
+          </div>
         </section>
 
         <section class="view" id="ta-profile">
@@ -335,6 +348,14 @@
                 <div>
                   <dt>Expected workload</dt>
                   <dd id="detail-workload">6 hours / week</dd>
+                </div>
+                <div>
+                  <dt>Application deadline</dt>
+                  <dd id="detail-deadline">2026-03-26</dd>
+                </div>
+                <div>
+                  <dt>Responsible MO</dt>
+                  <dd id="detail-mo">Dr Alice Morgan</dd>
                 </div>
                 <div class="span-two">
                   <dt>Description</dt>
@@ -541,7 +562,9 @@
               <div class="panel-header">
                 <div>
                   <h4>Applicant Review</h4>
-                  <p class="muted">MO reviews profile, CV reference, and workload before a decision.</p>
+                  <p class="muted" id="review-job-context">
+                    MO reviews profile, CV reference, and workload before a decision.
+                  </p>
                 </div>
                 <span class="pill pill-neutral">Transparent decisions</span>
               </div>
@@ -569,13 +592,20 @@
                 <p class="muted" id="candidate-skills">Java, Python, VHDL</p>
                 <p id="candidate-cv">CV path: uploads/cv/YuyanchenLong_CV.pdf</p>
                 <p id="candidate-workload">Current accepted jobs: 2 / 3</p>
+                <p><strong>TA motivation:</strong> <span id="candidate-motivation">I have relevant lab experience.</span></p>
+                <label>
+                  MO review notes
+                  <textarea id="candidate-reviewer-notes" rows="4">MO reviewing VHDL experience.</textarea>
+                </label>
               </div>
               <div class="button-row">
                 <button class="secondary-button" id="mark-review-button">Mark under review</button>
+                <button class="secondary-button" id="shortlist-button">Mark shortlisted</button>
+                <button class="secondary-button" id="bulk-shortlist-button">Bulk shortlist current job</button>
                 <button class="primary-button" id="accept-button">Accept applicant</button>
                 <button class="ghost-button" id="reject-button">Reject applicant</button>
               </div>
-              <div class="alert success hidden" id="review-success">
+              <div class="alert success hidden" id="review-feedback">
                 Applicant status updated. TA dashboard and applications view now reflect the decision.
               </div>
             </article>
@@ -625,11 +655,18 @@
           <div class="grid two-col">
             <article class="panel">
               <div class="panel-header">
-                <h4>Workload Overview</h4>
-                <span class="pill pill-neutral">Threshold: 3 accepted jobs</span>
+                <div>
+                  <h4>Workload Overview</h4>
+                  <p class="muted">Search by TA ID or name.</p>
+                </div>
+                <span class="pill pill-neutral">Threshold: 10 weekly hours</span>
               </div>
+              <label>
+                Search TA
+                <input id="admin-search-input" type="search" placeholder="TA ID or name" />
+              </label>
               <div class="alert danger" id="admin-overload-banner">
-                1 TA has reached the workload threshold. Review allocation before confirming more offers.
+                1 TA is above 10 weekly hours. Review allocation before confirming more offers.
               </div>
               <div class="table-shell">
                 <table>
@@ -638,6 +675,7 @@
                       <th>TA</th>
                       <th>Accepted modules</th>
                       <th>Count</th>
+                      <th>Weekly hours</th>
                       <th>Workload status</th>
                     </tr>
                   </thead>

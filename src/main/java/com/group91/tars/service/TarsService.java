@@ -1,12 +1,19 @@
 package com.group91.tars.service;
 
 import com.group91.tars.model.ApplicationRecord;
+import com.group91.tars.model.JobRecommendation;
 import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.Notification;
 import com.group91.tars.model.OperationResult;
 import com.group91.tars.model.TAProfile;
 import com.group91.tars.model.UserAccount;
 import com.group91.tars.model.WorkloadSummary;
+import com.group91.tars.model.ai.AiCandidateSummary;
+import com.group91.tars.model.ai.AiChatMemory;
+import com.group91.tars.model.ai.AiFitResult;
+import com.group91.tars.model.ai.AiWorkloadAdvice;
+import com.group91.tars.service.ai.AiAgentService;
+import com.group91.tars.service.ai.tool.ToolCallingResult;
 import com.group91.tars.storage.JsonDataStore;
 
 import javax.servlet.http.Part;
@@ -19,9 +26,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -43,6 +52,7 @@ public class TarsService {
     private static final TarsService INSTANCE = new TarsService();
 
     private final JsonDataStore store = JsonDataStore.getInstance();
+    private final AiAgentService aiAgentService = AiAgentService.getInstance();
 
     private TarsService() {
     }
@@ -138,7 +148,8 @@ public class TarsService {
     }
 
     /**
-     * Returns all job postings sorted by module code in alphabetical order.
+     * Returns all job postings sorted by deadline ascending, with module code
+     * as a stable tie breaker.
      *
      * @return a sorted list of all JobPosting records
      */
@@ -146,10 +157,26 @@ public class TarsService {
         List<JobPosting> jobs = store.loadJobs();
         Collections.sort(jobs, new Comparator<JobPosting>() {
             public int compare(JobPosting left, JobPosting right) {
-                return left.getModuleCode().compareToIgnoreCase(right.getModuleCode());
+                int deadlineCompare = safeText(left.getDeadline()).compareToIgnoreCase(safeText(right.getDeadline()));
+                if (deadlineCompare != 0) {
+                    return deadlineCompare;
+                }
+                return safeText(left.getModuleCode()).compareToIgnoreCase(safeText(right.getModuleCode()));
             }
         });
         return jobs;
+    }
+
+    public String getMoDisplayName(String moId) {
+        if (isBlank(moId)) {
+            return "-";
+        }
+        for (UserAccount account : store.loadAccounts()) {
+            if (moId.equals(account.getLinkedId()) || moId.equals(account.getId())) {
+                return account.getDisplayName();
+            }
+        }
+        return moId;
     }
 
     /**
@@ -331,7 +358,8 @@ public class TarsService {
     public int countPendingApplications() {
         int pending = 0;
         for (ApplicationRecord application : store.loadApplications()) {
-            if ("Submitted".equals(application.getStatus()) || "Under Review".equals(application.getStatus())) {
+            if ("Submitted".equals(application.getStatus()) || "Under Review".equals(application.getStatus())
+                || "Shortlisted".equals(application.getStatus())) {
                 pending++;
             }
         }
@@ -564,6 +592,7 @@ public class TarsService {
         application.setPriority(isBlank(priority) ? "Priority 3" : priority);
         application.setStatus("Submitted");
         application.setNotes(isBlank(notes) ? "TA application submitted." : notes.trim());
+        application.setReviewerNotes("");
         application.setApplicantSkills(isBlank(applicantSkills) ? "" : applicantSkills.trim());
         application.setApplicantDescription(isBlank(applicantDescription) ? "" : applicantDescription.trim());
         application.setSubmittedAt(new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.ENGLISH).format(new Date()));
@@ -611,6 +640,12 @@ public class TarsService {
         if (isBlank(draft.getModuleCode()) || isBlank(draft.getTitle()) || isBlank(draft.getSkills())
             || isBlank(draft.getRequirements()) || isBlank(draft.getWorkload()) || isBlank(draft.getDeadline())) {
             return OperationResult.failure("flash.job.validation", "Please complete all required job posting fields.");
+        }
+        if (draft.getWeeklyHours() <= 0) {
+            draft.setWeeklyHours(parseWeeklyHours(draft.getWorkload()));
+        }
+        if (draft.getWeeklyHours() <= 0) {
+            return OperationResult.failure("flash.job.validation", "Please enter a positive weekly workload.");
         }
 
         boolean isExistingJob = false;
@@ -682,11 +717,14 @@ public class TarsService {
      * an overload notification is also sent.
      *
      * @param applicationId the application record identifier to update
-     * @param status        the new status value (Submitted, Under Review, Accepted, Rejected)
+     * @param status        the new status value (Submitted, Under Review, Shortlisted, Accepted, Rejected)
      * @param notes         optional review notes from the MO; if blank, a default note is generated
      * @return an OperationResult with success=true if updated, or success=false with an error message
      */
     public OperationResult updateApplicationStatus(String applicationId, String status, String notes) {
+        if (!isValidApplicationStatus(status)) {
+            return OperationResult.failure("flash.review.invalid-status", "Invalid application status.");
+        }
         List<ApplicationRecord> applications = store.loadApplications();
         for (ApplicationRecord application : applications) {
             if (application.getId().equals(applicationId)) {
@@ -695,7 +733,7 @@ public class TarsService {
                     return OperationResult.failure("flash.review.overload", "Acceptance would exceed the TA workload cap.");
                 }
                 application.setStatus(status);
-                application.setNotes(isBlank(notes) ? buildDefaultStatusNote(status) : notes.trim());
+                application.setReviewerNotes(isBlank(notes) ? buildDefaultStatusNote(status) : notes.trim());
                 store.saveApplications(applications);
 
                 JobPosting job = getJobById(application.getJobId());
@@ -716,11 +754,32 @@ public class TarsService {
         return OperationResult.failure("flash.review.not-found", "Application record not found.");
     }
 
+    public OperationResult bulkShortlistApplications(String jobId, String reviewerNotes) {
+        List<ApplicationRecord> applications = store.loadApplications();
+        int updatedCount = 0;
+        for (ApplicationRecord application : applications) {
+            if (jobId.equals(application.getJobId())
+                && !"Accepted".equals(application.getStatus())
+                && !"Rejected".equals(application.getStatus())) {
+                application.setStatus("Shortlisted");
+                application.setReviewerNotes(isBlank(reviewerNotes)
+                    ? buildDefaultStatusNote("Shortlisted")
+                    : reviewerNotes.trim());
+                updatedCount++;
+                addNotification(application.getTaId(), "status",
+                    "Your application for " + getJobTitle(application.getJobId()) + " has been Shortlisted.",
+                    "/ta/applications");
+            }
+        }
+        store.saveApplications(applications);
+        return OperationResult.success("flash.review.bulk-shortlisted",
+            updatedCount + " applicant record(s) marked Shortlisted.");
+    }
+
     /**
-     * Computes workload summaries for all TAs in the system.
-     * Each summary includes the TA's name, accepted module codes,
-     * accepted job count, and an overload flag based on the maximum
-     * accepted jobs threshold.
+     * Computes workload summaries for all TAs in the system. Each summary
+     * includes the TA's name, accepted module codes, accepted job count, total
+     * weekly hours, and an overload flag when weekly hours exceed 10.
      *
      * @return a list of WorkloadSummary objects, one per TA profile
      */
@@ -744,15 +803,31 @@ public class TarsService {
             JobPosting job = getJobById(application.getJobId());
             if (job != null) {
                 summary.getAcceptedModules().add(job.getModuleCode());
+                summary.setTotalWeeklyHours(summary.getTotalWeeklyHours() + getWeeklyHoursForJob(job));
             }
         }
 
         for (WorkloadSummary summary : summaries.values()) {
             summary.setAcceptedCount(summary.getAcceptedModules().size());
-            summary.setOverloadFlag(summary.getAcceptedCount() >= MAX_ACCEPTED_JOBS);
+            summary.setOverloadFlag(summary.getTotalWeeklyHours() > 10);
         }
 
         return new ArrayList<WorkloadSummary>(summaries.values());
+    }
+
+    public List<WorkloadSummary> getWorkloadSummaries(String query) {
+        List<WorkloadSummary> summaries = getWorkloadSummaries();
+        if (isBlank(query)) {
+            return summaries;
+        }
+        String lowerQuery = query.toLowerCase(Locale.ENGLISH);
+        List<WorkloadSummary> filtered = new ArrayList<WorkloadSummary>();
+        for (WorkloadSummary summary : summaries) {
+            if (matchesSearch(summary.getTaId(), lowerQuery) || matchesSearch(summary.getTaName(), lowerQuery)) {
+                filtered.add(summary);
+            }
+        }
+        return filtered;
     }
 
     /**
@@ -777,10 +852,52 @@ public class TarsService {
      */
     public List<String> getAiTodoNotes() {
         List<String> todoNotes = new ArrayList<String>();
-        todoNotes.add("AI skill-fit scoring is now available on job detail and review pages.");
-        todoNotes.add("Missing-skill suggestions are shown before TA submission.");
-        todoNotes.add("Workload balancing advice is available on Admin and MO dashboards.");
+        todoNotes.add("AI agents can provide TA fit advice and hiring support summaries.");
+        todoNotes.add("PDF CV text is analysed when a PDF CV is available.");
+        todoNotes.add("Local rule fallback is used when LLM mode is disabled or unavailable.");
+        todoNotes.add("AI output is advisory only and never accepts or rejects applications automatically.");
         return todoNotes;
+    }
+
+    public List<JobRecommendation> getRecommendedJobsForTa(String taId) {
+        TAProfile profile = getProfileById(taId);
+        List<JobRecommendation> recommendations = new ArrayList<JobRecommendation>();
+        if (profile == null) {
+            return recommendations;
+        }
+        Set<String> taSkills = normalizeSkillSet(profile.getSkills());
+        for (JobPosting job : getOpenJobs()) {
+            List<String> requiredSkills = new ArrayList<String>(normalizeSkillSet(job.getSkills()));
+            if (requiredSkills.isEmpty()) {
+                continue;
+            }
+            List<String> matchedSkills = new ArrayList<String>();
+            for (String requiredSkill : requiredSkills) {
+                if (taSkills.contains(requiredSkill)) {
+                    matchedSkills.add(requiredSkill);
+                }
+            }
+            int matchRate = (int) Math.round((matchedSkills.size() * 100.0) / requiredSkills.size());
+            if (matchRate >= 60) {
+                JobRecommendation recommendation = new JobRecommendation();
+                recommendation.setJob(job);
+                recommendation.setMatchedSkills(matchedSkills);
+                recommendation.setMatchedCount(matchedSkills.size());
+                recommendation.setTotalRequiredCount(requiredSkills.size());
+                recommendation.setMatchRate(matchRate);
+                recommendations.add(recommendation);
+            }
+        }
+        Collections.sort(recommendations, new Comparator<JobRecommendation>() {
+            public int compare(JobRecommendation left, JobRecommendation right) {
+                int rateCompare = right.getMatchRate() - left.getMatchRate();
+                if (rateCompare != 0) {
+                    return rateCompare;
+                }
+                return safeText(left.getJob().getDeadline()).compareToIgnoreCase(safeText(right.getJob().getDeadline()));
+            }
+        });
+        return recommendations.size() > 5 ? new ArrayList<JobRecommendation>(recommendations.subList(0, 5)) : recommendations;
     }
 
     /**
@@ -964,6 +1081,102 @@ public class TarsService {
     }
 
     /**
+     * Returns advisory AI fit guidance for a TA/job pair.
+     *
+     * @param taId  the TA profile identifier
+     * @param jobId the job posting identifier
+     * @return an advisory AI fit result
+     */
+    public AiFitResult getTaFitAdvice(String taId, String jobId) {
+        return getTaFitAdvice(taId, jobId, null);
+    }
+
+    /**
+     * Returns advisory AI fit guidance for a TA/job pair with user-scoped tool permissions.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param currentUser the authenticated user for tool permission checks
+     * @return an advisory AI fit result
+     */
+    public AiFitResult getTaFitAdvice(String taId, String jobId, UserAccount currentUser) {
+        if (aiAgentService.isToolCallingEnabled()) {
+            return aiAgentService.adviseTaFitWithTools(taId, jobId, currentUser);
+        }
+        TAProfile profile = getProfileById(taId);
+        JobPosting job = getJobById(jobId);
+        return aiAgentService.adviseTaFit(profile, job, countAcceptedJobsForTa(taId));
+    }
+
+    /**
+     * Returns advisory AI hiring support for a selected candidate.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param application the selected application record
+     * @return an advisory AI candidate summary
+     */
+    public AiCandidateSummary getCandidateSummary(String taId, String jobId, ApplicationRecord application) {
+        return getCandidateSummary(taId, jobId, application, null);
+    }
+
+    /**
+     * Returns advisory AI hiring support for a selected candidate with user-scoped tool permissions.
+     *
+     * @param taId        the TA profile identifier
+     * @param jobId       the job posting identifier
+     * @param application the selected application record
+     * @param currentUser the authenticated user for tool permission checks
+     * @return an advisory AI candidate summary
+     */
+    public AiCandidateSummary getCandidateSummary(String taId, String jobId, ApplicationRecord application,
+                                                  UserAccount currentUser) {
+        if (aiAgentService.isToolCallingEnabled()) {
+            return aiAgentService.summarizeCandidateWithTools(
+                taId,
+                jobId,
+                application == null ? null : application.getId(),
+                currentUser
+            );
+        }
+        TAProfile profile = getProfileById(taId);
+        JobPosting job = getJobById(jobId);
+        return aiAgentService.summarizeCandidate(profile, job, application, countAcceptedJobsForTa(taId));
+    }
+
+    /**
+     * Returns advisory AI workload notes for the admin workload dashboard.
+     *
+     * @return structured workload advice for each TA
+     */
+    public List<AiWorkloadAdvice> getAiWorkloadAdvice() {
+        return aiAgentService.adviseWorkload(getWorkloadSummaries());
+    }
+
+    /**
+     * Runs the interactive tool-calling AI chat workspace.
+     *
+     * @param userMessage the user's natural language request
+     * @param currentUser the authenticated user for permission-scoped tools
+     * @return structured chat result with tool trace and final JSON
+     */
+    public ToolCallingResult chatWithAiAgent(String userMessage, UserAccount currentUser) {
+        return aiAgentService.chat(userMessage, currentUser);
+    }
+
+    /**
+     * Runs the interactive tool-calling AI chat workspace with session memory.
+     *
+     * @param userMessage the user's natural language request
+     * @param currentUser the authenticated user for permission-scoped tools
+     * @param memory short-term session memory for resolving follow-up references
+     * @return structured chat result with tool trace and final JSON
+     */
+    public ToolCallingResult chatWithAiAgent(String userMessage, UserAccount currentUser, AiChatMemory memory) {
+        return aiAgentService.chat(userMessage, currentUser, memory);
+    }
+
+    /**
      * Calculates a skill fit score (0-100) between a TA's declared skills
      * and a job posting's required skills. The score is computed as:
      * (number of matched job skills / total job skills) * 100.
@@ -1048,31 +1261,16 @@ public class TarsService {
      */
     public List<String> getWorkloadBalancingAdvice() {
         List<String> advice = new ArrayList<String>();
-        List<WorkloadSummary> summaries = getWorkloadSummaries();
-        List<WorkloadSummary> overloaded = new ArrayList<WorkloadSummary>();
-        List<WorkloadSummary> available = new ArrayList<WorkloadSummary>();
-        for (WorkloadSummary summary : summaries) {
-            if (summary.isOverloadFlag()) {
-                overloaded.add(summary);
-            } else if (summary.getAcceptedCount() < MAX_ACCEPTED_JOBS) {
-                available.add(summary);
+        List<AiWorkloadAdvice> aiAdvice = getAiWorkloadAdvice();
+        boolean hasRisk = false;
+        for (AiWorkloadAdvice item : aiAdvice) {
+            if ("at_cap".equals(item.getWorkloadRisk()) || "caution".equals(item.getWorkloadRisk())) {
+                hasRisk = true;
+                advice.add(item.getTaName() + ": " + item.getAdvice());
             }
         }
-        if (overloaded.isEmpty()) {
+        if (!hasRisk) {
             advice.add("No workload balancing issues detected. All TAs are within acceptable limits.");
-            return advice;
-        }
-        for (WorkloadSummary over : overloaded) {
-            advice.add(over.getTaName() + " is at the workload cap (" + over.getAcceptedCount() + "/" + MAX_ACCEPTED_JOBS + ") with modules: " + String.join(", ", over.getAcceptedModules()) + ".");
-            if (!available.isEmpty()) {
-                List<String> suggestions = new ArrayList<String>();
-                for (WorkloadSummary avail : available) {
-                    suggestions.add(avail.getTaName() + " (" + avail.getAcceptedCount() + "/" + MAX_ACCEPTED_JOBS + ")");
-                }
-                advice.add("Consider redistributing future assignments to: " + String.join(", ", suggestions) + ".");
-            } else {
-                advice.add("No TAs currently have capacity for redistribution. Consider hiring additional TAs.");
-            }
         }
         return advice;
     }
@@ -1116,6 +1314,9 @@ public class TarsService {
      * @return the number of applications with "Accepted" status for the specified TA
      */
     private int countAcceptedJobsForTa(String taId) {
+        if (isBlank(taId)) {
+            return 0;
+        }
         int count = 0;
         for (ApplicationRecord application : store.loadApplications()) {
             if (taId.equals(application.getTaId()) && "Accepted".equals(application.getStatus())) {
@@ -1123,6 +1324,58 @@ public class TarsService {
             }
         }
         return count;
+    }
+
+    private int getWeeklyHoursForJob(JobPosting job) {
+        if (job == null) {
+            return 0;
+        }
+        if (job.getWeeklyHours() > 0) {
+            return job.getWeeklyHours();
+        }
+        return parseWeeklyHours(job.getWorkload());
+    }
+
+    private int parseWeeklyHours(String workload) {
+        if (isBlank(workload)) {
+            return 0;
+        }
+        java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("(\\d+)").matcher(workload);
+        if (!matcher.find()) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(matcher.group(1));
+        } catch (NumberFormatException exception) {
+            return 0;
+        }
+    }
+
+    private boolean isValidApplicationStatus(String status) {
+        return "Submitted".equals(status)
+            || "Under Review".equals(status)
+            || "Shortlisted".equals(status)
+            || "Accepted".equals(status)
+            || "Rejected".equals(status);
+    }
+
+    private Set<String> normalizeSkillSet(String skills) {
+        Set<String> normalized = new LinkedHashSet<String>();
+        if (isBlank(skills)) {
+            return normalized;
+        }
+        String normalizedText = skills.toLowerCase(Locale.ENGLISH).replace("object-oriented programming", "oop");
+        String[] tokens = normalizedText.split("[^a-z0-9+#]+");
+        for (String token : tokens) {
+            if (!isBlank(token)) {
+                normalized.add(token.trim());
+            }
+        }
+        return normalized;
+    }
+
+    private String safeText(String value) {
+        return value == null ? "" : value;
     }
 
     /**
@@ -1264,6 +1517,9 @@ public class TarsService {
         }
         if ("Under Review".equals(status)) {
             return "MO is reviewing skills and workload.";
+        }
+        if ("Shortlisted".equals(status)) {
+            return "Shortlisted for final MO comparison.";
         }
         return "Status updated by MO.";
     }
