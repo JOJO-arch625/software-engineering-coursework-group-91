@@ -27,9 +27,9 @@ public class MoReviewServlet extends BasePageServlet {
             return;
         }
         preparePage(request, "review", "MO Flow", "Applicant Review");
-        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
-        List<JobPosting> moJobs = filterEbU6304(allMoJobs);
-        List<ApplicationRecord> allApplications = collectEbU6304Applications(moJobs);
+        String moId = getCurrentUser(request).getLinkedId();
+        List<JobPosting> moJobs = service.getJobsForMo(moId);
+        List<ApplicationRecord> allApplications = collectMoApplications(moJobs);
         ApplicationRecord selectedApplication = resolveApplication(request, allApplications);
         request.setAttribute("moJobs", moJobs);
         request.setAttribute("allApplications", allApplications);
@@ -79,19 +79,9 @@ public class MoReviewServlet extends BasePageServlet {
         redirect(request, response, "/mo/review");
     }
 
-    private List<JobPosting> filterEbU6304(List<JobPosting> jobs) {
-        List<JobPosting> filtered = new ArrayList<JobPosting>();
-        for (JobPosting job : jobs) {
-            if (TarsService.MO_COURSE_CODE.equals(job.getModuleCode())) {
-                filtered.add(job);
-            }
-        }
-        return filtered;
-    }
-
-    private List<ApplicationRecord> collectEbU6304Applications(List<JobPosting> ebU6304Jobs) {
+    private List<ApplicationRecord> collectMoApplications(List<JobPosting> moJobs) {
         List<ApplicationRecord> all = new ArrayList<ApplicationRecord>();
-        for (JobPosting job : ebU6304Jobs) {
+        for (JobPosting job : moJobs) {
             all.addAll(service.getApplicationsForJob(job.getId()));
         }
         return all;
@@ -113,8 +103,8 @@ public class MoReviewServlet extends BasePageServlet {
         if (applicationId == null) {
             return false;
         }
-        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
-        for (JobPosting job : filterEbU6304(allMoJobs)) {
+        List<JobPosting> moJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        for (JobPosting job : moJobs) {
             if (jobId != null && !jobId.equals(job.getId())) {
                 continue;
             }
@@ -132,8 +122,8 @@ public class MoReviewServlet extends BasePageServlet {
         if (jobId == null) {
             return false;
         }
-        List<JobPosting> allMoJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
-        for (JobPosting job : filterEbU6304(allMoJobs)) {
+        List<JobPosting> moJobs = service.getJobsForMo(getCurrentUser(request).getLinkedId());
+        for (JobPosting job : moJobs) {
             if (jobId.equals(job.getId())) {
                 return true;
             }

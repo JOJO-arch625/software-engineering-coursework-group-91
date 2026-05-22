@@ -6,43 +6,43 @@
     "message": "Your application for Software Engineering TA is now Under Review.",
     "link": "/ta/applications",
     "read": true,
-    "createdAt": "2026-03-24 10:05"
+    "createdAt": "2026-05-20 10:05"
   },
   {
     "id": "notif-2",
-    "userId": "ta-1",
+    "userId": "ta-2",
     "category": "status",
-    "message": "Your application for Software Engineering TA has been Rejected.",
+    "message": "Your application for Software Engineering TA is now Under Review.",
     "link": "/ta/applications",
     "read": true,
-    "createdAt": "2026-03-23 19:00"
+    "createdAt": "2026-05-20 11:05"
   },
   {
     "id": "notif-3",
-    "userId": "ta-2",
+    "userId": "ta-3",
     "category": "status",
-    "message": "Your application for Software Engineering TA has been Accepted.",
+    "message": "Your application for Software Engineering TA has been Shortlisted.",
+    "link": "/ta/applications",
+    "read": false,
+    "createdAt": "2026-05-21 09:00"
+  },
+  {
+    "id": "notif-4",
+    "userId": "ta-1",
+    "category": "status",
+    "message": "Your application for Object-Oriented Programming TA has been Accepted.",
     "link": "/ta/applications",
     "read": true,
     "createdAt": "2026-03-22 09:30"
   },
   {
-    "id": "notif-4",
-    "userId": "ta-3",
-    "category": "status",
-    "message": "Your application for Digital Systems TA has been Accepted.",
-    "link": "/ta/applications",
-    "read": true,
-    "createdAt": "2026-03-22 09:40"
-  },
-  {
     "id": "notif-5",
-    "userId": "ta-3",
+    "userId": "ta-2",
     "category": "status",
-    "message": "Your application for Software Engineering TA has been Accepted.",
+    "message": "Your application for Data Analytics TA has been Accepted.",
     "link": "/ta/applications",
     "read": true,
-    "createdAt": "2026-03-23 14:50"
+    "createdAt": "2026-03-23 10:30"
   },
   {
     "id": "notif-6",
@@ -51,34 +51,34 @@
     "message": "You have reached the workload cap of 3 accepted jobs.",
     "link": "/ta/applications",
     "read": false,
-    "createdAt": "2026-03-23 15:00"
+    "createdAt": "2026-05-22 10:00"
   },
   {
     "id": "notif-7",
     "userId": "mo-1",
     "category": "review",
     "message": "New applicant for Software Engineering TA: Yuyanchen Long.",
-    "link": "/mo/review?jobId\u003djob-2",
+    "link": "/mo/review?appId=app-1",
     "read": true,
-    "createdAt": "2026-03-24 10:00"
+    "createdAt": "2026-05-20 10:00"
   },
   {
     "id": "notif-8",
     "userId": "mo-1",
     "category": "review",
-    "message": "New applicant for Software Engineering TA: Ming Li.",
-    "link": "/mo/review?jobId\u003djob-1",
+    "message": "New applicant for Lab Support TA: Ming Li.",
+    "link": "/mo/review?appId=app-2",
     "read": true,
-    "createdAt": "2026-03-22 09:00"
+    "createdAt": "2026-05-21 14:30"
   },
   {
     "id": "notif-9",
     "userId": "mo-1",
-    "category": "deadline",
-    "message": "Software Engineering TA posting deadline has passed.",
-    "link": "/mo/jobs/edit?id\u003djob-3",
+    "category": "review",
+    "message": "New applicant for Tutorial TA: Siyu Chen.",
+    "link": "/mo/review?appId=app-3",
     "read": true,
-    "createdAt": "2026-04-09 23:59"
+    "createdAt": "2026-05-22 09:00"
   },
   {
     "id": "notif-10",
@@ -87,51 +87,6 @@
     "message": "Siyu Chen has reached the workload cap of 3 accepted jobs.",
     "link": "/admin/workload",
     "read": false,
-    "createdAt": "2026-03-23 15:00"
-  },
-  {
-    "id": "notif-3645718342116500",
-    "userId": "ta-1",
-    "category": "status",
-    "message": "Your application for Digital Systems TA has been Accepted.",
-    "link": "/ta/applications",
-    "read": true,
-    "createdAt": "2026-04-22 17:14"
-  },
-  {
-    "id": "notif-37615382788400",
-    "userId": "ta-1",
-    "category": "status",
-    "message": "Your application for Software Engineering TA has been Under Review.",
-    "link": "/ta/applications",
-    "read": true,
-    "createdAt": "2026-05-03 21:07"
-  },
-  {
-    "id": "notif-20724031650600",
-    "userId": "ta-1",
-    "category": "status",
-    "message": "Your application for Data Analytics TA has been Accepted.",
-    "link": "/ta/applications",
-    "read": false,
-    "createdAt": "2026-05-22 22:30"
-  },
-  {
-    "id": "notif-20740459795200",
-    "userId": "ta-1",
-    "category": "status",
-    "message": "Your application for Digital Systems TA has been Accepted.",
-    "link": "/ta/applications",
-    "read": true,
-    "createdAt": "2026-05-22 22:31"
-  },
-  {
-    "id": "notif-20745059723900",
-    "userId": "ta-1",
-    "category": "status",
-    "message": "Your application for Digital Systems TA has been Accepted.",
-    "link": "/ta/applications",
-    "read": false,
-    "createdAt": "2026-05-22 22:31"
+    "createdAt": "2026-05-22 10:00"
   }
 ]

@@ -220,15 +220,19 @@ public class TarsService {
     }
 
     /**
-     * Returns all job postings created by a specific Module Organiser.
+     * Returns all job postings for a specific Module Organiser.
+     * MO users are restricted to only EBU6304 - Software Engineering jobs,
+     * regardless of their moId. Other roles see all jobs matching the moId.
      *
      * @param moId the MO identifier to filter by
-     * @return a list of JobPosting records owned by the specified MO
+     * @return a list of JobPosting records owned by the specified MO and course
      */
     public List<JobPosting> getJobsForMo(String moId) {
         List<JobPosting> moJobs = new ArrayList<JobPosting>();
         for (JobPosting job : getAllJobs()) {
-            if (moId.equals(job.getMoId())) {
+            boolean isMoOwned = moId.equals(job.getMoId());
+            boolean isEbU6304 = MO_COURSE_CODE.equals(job.getModuleCode());
+            if (isMoOwned && isEbU6304) {
                 moJobs.add(job);
             }
         }
@@ -359,6 +363,68 @@ public class TarsService {
      */
     public int countOpenJobs() {
         return getOpenJobs().size();
+    }
+
+    /**
+     * Counts the number of open jobs for a specific MO.
+     * Only counts jobs where moId matches and moduleCode is EBU6304.
+     *
+     * @param moId the MO identifier
+     * @return the count of open EBU6304 jobs for this MO
+     */
+    public int countOpenJobsForMo(String moId) {
+        int count = 0;
+        for (JobPosting job : getJobsForMo(moId)) {
+            if ("Open".equals(job.getStatus())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Counts the number of applications in "Submitted" or "Under Review" status
+     * for jobs belonging to a specific MO (EBU6304 only).
+     *
+     * @param moId the MO identifier
+     * @return the count of pending applications for this MO
+     */
+    public int countPendingApplicationsForMo(String moId) {
+        int pending = 0;
+        Set<String> moJobIds = new LinkedHashSet<String>();
+        for (JobPosting job : getJobsForMo(moId)) {
+            moJobIds.add(job.getId());
+        }
+        for (ApplicationRecord application : store.loadApplications()) {
+            if (moJobIds.contains(application.getJobId())) {
+                if ("Submitted".equals(application.getStatus()) || "Under Review".equals(application.getStatus())
+                    || "Shortlisted".equals(application.getStatus())) {
+                    pending++;
+                }
+            }
+        }
+        return pending;
+    }
+
+    /**
+     * Counts the total number of applications for jobs belonging to
+     * a specific MO (EBU6304 only).
+     *
+     * @param moId the MO identifier
+     * @return the total application count for this MO
+     */
+    public int countApplicationsForMo(String moId) {
+        Set<String> moJobIds = new LinkedHashSet<String>();
+        for (JobPosting job : getJobsForMo(moId)) {
+            moJobIds.add(job.getId());
+        }
+        int count = 0;
+        for (ApplicationRecord application : store.loadApplications()) {
+            if (moJobIds.contains(application.getJobId())) {
+                count++;
+            }
+        }
+        return count;
     }
 
     /**
