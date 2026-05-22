@@ -1,0 +1,260 @@
+<div class="help-backdrop hidden" data-help-backdrop aria-hidden="true">
+    <div class="help-dialog panel" role="dialog" aria-modal="true" aria-labelledby="help-dialog-title">
+        <div class="panel-header help-dialog-header">
+            <div>
+                <p class="eyebrow"><%= i18n.t("help.eyebrow") %></p>
+                <h4 id="help-dialog-title"><%= i18n.t("help.title") %></h4>
+                <p class="muted"><%= i18n.t("help.intro") %></p>
+            </div>
+            <button class="ghost-button help-close-button" type="button" data-help-close aria-label="<%= i18n.t("common.close") %>"><%= i18n.t("common.close") %></button>
+        </div>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.general") %></h5>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.general.li1") %></li>
+                <li><%= i18n.t("help.general.li2") %></li>
+                <li><%= i18n.t("help.general.li3") %></li>
+                <li><%= i18n.t("help.general.li4") %></li>
+                <li><%= i18n.t("help.general.li5") %></li>
+                <li><%= i18n.t("help.general.li6") %></li>
+            </ul>
+        </section>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.ui") %></h5>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.ui.li1") %></li>
+                <li><%= i18n.t("help.ui.li2") %></li>
+                <li><%= i18n.t("help.ui.li3") %></li>
+                <li><%= i18n.t("help.ui.li4") %></li>
+                <li><%= i18n.t("help.ui.li5") %></li>
+                <li><%= i18n.t("help.ui.li6") %></li>
+                <li><%= i18n.t("help.ui.li7") %></li>
+            </ul>
+        </section>
+
+        <div class="help-role-grid">
+            <article class="help-role-card accent-blue">
+                <p class="eyebrow"><%= i18n.t("help.ta.eyebrow") %></p>
+                <h4><%= i18n.t("help.ta.heading") %></h4>
+                <p class="help-credentials"><%= i18n.t("help.ta.credentials") %></p>
+                <p class="help-subheading"><%= i18n.t("help.ta.nav-title") %></p>
+                <ul class="help-steps help-compact">
+                    <li><%= i18n.t("help.ta.nav1") %></li>
+                    <li><%= i18n.t("help.ta.nav2") %></li>
+                    <li><%= i18n.t("help.ta.nav3") %></li>
+                    <li><%= i18n.t("help.ta.nav4") %></li>
+                    <li><%= i18n.t("help.ta.nav5") %></li>
+                    <li><%= i18n.t("help.ta.nav6") %></li>
+                    <li><%= i18n.t("help.ta.nav7") %></li>
+                </ul>
+                <p class="help-subheading"><%= i18n.t("help.ta.flow-title") %></p>
+                <ol class="help-steps">
+                    <li><%= i18n.t("help.ta.step1") %></li>
+                    <li><%= i18n.t("help.ta.step2") %></li>
+                    <li><%= i18n.t("help.ta.step3") %></li>
+                    <li><%= i18n.t("help.ta.step4") %></li>
+                    <li><%= i18n.t("help.ta.step5") %></li>
+                    <li><%= i18n.t("help.ta.step6") %></li>
+                    <li><%= i18n.t("help.ta.step7") %></li>
+                    <li><%= i18n.t("help.ta.step8") %></li>
+                    <li><%= i18n.t("help.ta.step9") %></li>
+                    <li><%= i18n.t("help.ta.step10") %></li>
+                    <li><%= i18n.t("help.ta.step11") %></li>
+                    <li><%= i18n.t("help.ta.step12") %></li>
+                </ol>
+            </article>
+            <article class="help-role-card accent-amber">
+                <p class="eyebrow"><%= i18n.t("help.mo.eyebrow") %></p>
+                <h4><%= i18n.t("help.mo.heading") %></h4>
+                <p class="help-credentials"><%= i18n.t("help.mo.credentials") %></p>
+                <p class="help-subheading"><%= i18n.t("help.mo.nav-title") %></p>
+                <ul class="help-steps help-compact">
+                    <li><%= i18n.t("help.mo.nav1") %></li>
+                    <li><%= i18n.t("help.mo.nav2") %></li>
+                    <li><%= i18n.t("help.mo.nav3") %></li>
+                    <li><%= i18n.t("help.mo.nav4") %></li>
+                    <li><%= i18n.t("help.mo.nav5") %></li>
+                    <li><%= i18n.t("help.mo.nav6") %></li>
+                </ul>
+                <p class="help-subheading"><%= i18n.t("help.mo.flow-title") %></p>
+                <ol class="help-steps">
+                    <li><%= i18n.t("help.mo.step1") %></li>
+                    <li><%= i18n.t("help.mo.step2") %></li>
+                    <li><%= i18n.t("help.mo.step3") %></li>
+                    <li><%= i18n.t("help.mo.step4") %></li>
+                    <li><%= i18n.t("help.mo.step5") %></li>
+                    <li><%= i18n.t("help.mo.step6") %></li>
+                    <li><%= i18n.t("help.mo.step7") %></li>
+                    <li><%= i18n.t("help.mo.step8") %></li>
+                    <li><%= i18n.t("help.mo.step9") %></li>
+                    <li><%= i18n.t("help.mo.step10") %></li>
+                    <li><%= i18n.t("help.mo.step11") %></li>
+                </ol>
+            </article>
+            <article class="help-role-card accent-green">
+                <p class="eyebrow"><%= i18n.t("help.admin.eyebrow") %></p>
+                <h4><%= i18n.t("help.admin.heading") %></h4>
+                <p class="help-credentials"><%= i18n.t("help.admin.credentials") %></p>
+                <p class="help-subheading"><%= i18n.t("help.admin.nav-title") %></p>
+                <ul class="help-steps help-compact">
+                    <li><%= i18n.t("help.admin.nav1") %></li>
+                    <li><%= i18n.t("help.admin.nav2") %></li>
+                    <li><%= i18n.t("help.admin.nav3") %></li>
+                    <li><%= i18n.t("help.admin.nav4") %></li>
+                    <li><%= i18n.t("help.admin.nav5") %></li>
+                </ul>
+                <p class="help-subheading"><%= i18n.t("help.admin.flow-title") %></p>
+                <ol class="help-steps">
+                    <li><%= i18n.t("help.admin.step1") %></li>
+                    <li><%= i18n.t("help.admin.step2") %></li>
+                    <li><%= i18n.t("help.admin.step3") %></li>
+                    <li><%= i18n.t("help.admin.step4") %></li>
+                    <li><%= i18n.t("help.admin.step5") %></li>
+                    <li><%= i18n.t("help.admin.step6") %></li>
+                    <li><%= i18n.t("help.admin.step7") %></li>
+                    <li><%= i18n.t("help.admin.step8") %></li>
+                    <li><%= i18n.t("help.admin.step9") %></li>
+                </ol>
+            </article>
+        </div>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.rules") %></h5>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.rules.li1") %></li>
+                <li><%= i18n.t("help.rules.li2") %></li>
+                <li><%= i18n.t("help.rules.li3") %></li>
+                <li><%= i18n.t("help.rules.li4") %></li>
+                <li><%= i18n.t("help.rules.li5") %></li>
+                <li><%= i18n.t("help.rules.li6") %></li>
+                <li><%= i18n.t("help.rules.li7") %></li>
+                <li><%= i18n.t("help.rules.li8") %></li>
+                <li><%= i18n.t("help.rules.li9") %></li>
+                <li><%= i18n.t("help.rules.li10") %></li>
+            </ul>
+        </section>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.routes") %></h5>
+            <div class="help-route-grid">
+                <div>
+                    <p class="help-subheading"><%= i18n.t("help.routes.common-title") %></p>
+                    <ul class="help-steps help-compact">
+                        <li><%= i18n.t("help.routes.common1") %></li>
+                        <li><%= i18n.t("help.routes.common2") %></li>
+                        <li><%= i18n.t("help.routes.common3") %></li>
+                        <li><%= i18n.t("help.routes.common4") %></li>
+                        <li><%= i18n.t("help.routes.common5") %></li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="help-subheading"><%= i18n.t("help.routes.ta-title") %></p>
+                    <ul class="help-steps help-compact">
+                        <li><%= i18n.t("help.routes.ta1") %></li>
+                        <li><%= i18n.t("help.routes.ta2") %></li>
+                        <li><%= i18n.t("help.routes.ta3") %></li>
+                        <li><%= i18n.t("help.routes.ta4") %></li>
+                        <li><%= i18n.t("help.routes.ta5") %></li>
+                        <li><%= i18n.t("help.routes.ta6") %></li>
+                    </ul>
+                    <p class="help-subheading"><%= i18n.t("help.routes.mo-title") %></p>
+                    <ul class="help-steps help-compact">
+                        <li><%= i18n.t("help.routes.mo1") %></li>
+                        <li><%= i18n.t("help.routes.mo2") %></li>
+                        <li><%= i18n.t("help.routes.mo3") %></li>
+                    </ul>
+                    <p class="help-subheading"><%= i18n.t("help.routes.admin-title") %></p>
+                    <ul class="help-steps help-compact">
+                        <li><%= i18n.t("help.routes.admin1") %></li>
+                        <li><%= i18n.t("help.routes.admin2") %></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.optional") %></h5>
+            <p class="help-subheading"><%= i18n.t("help.optional.ai-title") %></p>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.optional.ai1") %></li>
+                <li><%= i18n.t("help.optional.ai2") %></li>
+                <li><%= i18n.t("help.optional.ai3") %></li>
+                <li><%= i18n.t("help.optional.ai4") %></li>
+                <li><%= i18n.t("help.optional.ai5") %></li>
+                <li><%= i18n.t("help.optional.ai6") %></li>
+            </ul>
+            <p class="help-subheading"><%= i18n.t("help.optional.search-title") %></p>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.optional.search1") %></li>
+                <li><%= i18n.t("help.optional.search2") %></li>
+                <li><%= i18n.t("help.optional.search3") %></li>
+                <li><%= i18n.t("help.optional.search4") %></li>
+            </ul>
+            <p class="help-subheading"><%= i18n.t("help.optional.inbox-title") %></p>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.optional.inbox1") %></li>
+                <li><%= i18n.t("help.optional.inbox2") %></li>
+                <li><%= i18n.t("help.optional.inbox3") %></li>
+                <li><%= i18n.t("help.optional.inbox4") %></li>
+            </ul>
+        </section>
+
+        <section class="help-section">
+            <h5 class="help-section-title"><%= i18n.t("help.section.data") %></h5>
+            <ul class="help-steps">
+                <li><%= i18n.t("help.data.li1") %></li>
+                <li><%= i18n.t("help.data.li2") %></li>
+                <li><%= i18n.t("help.data.li3") %></li>
+                <li><%= i18n.t("help.data.li4") %></li>
+                <li><%= i18n.t("help.data.li5") %></li>
+            </ul>
+        </section>
+
+        <p class="muted help-footnote"><%= i18n.t("help.footnote") %></p>
+    </div>
+</div>
+<script>
+    (function () {
+        var openBtn = document.querySelector("[data-help-open]");
+        var backdrop = document.querySelector("[data-help-backdrop]");
+        var closeBtn = document.querySelector("[data-help-close]");
+        if (!openBtn || !backdrop) {
+            return;
+        }
+
+        function setHelpOpen(isOpen) {
+            backdrop.classList.toggle("hidden", !isOpen);
+            backdrop.setAttribute("aria-hidden", isOpen ? "false" : "true");
+            document.body.classList.toggle("help-open", isOpen);
+            if (isOpen && closeBtn) {
+                closeBtn.focus();
+            } else if (!isOpen) {
+                openBtn.focus();
+            }
+        }
+
+        openBtn.addEventListener("click", function () {
+            setHelpOpen(true);
+        });
+
+        if (closeBtn) {
+            closeBtn.addEventListener("click", function () {
+                setHelpOpen(false);
+            });
+        }
+
+        backdrop.addEventListener("click", function (event) {
+            if (event.target === backdrop) {
+                setHelpOpen(false);
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && !backdrop.classList.contains("hidden")) {
+                setHelpOpen(false);
+            }
+        });
+    })();
+</script>
