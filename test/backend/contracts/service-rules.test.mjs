@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readProjectFile } from "../../helpers/projectFiles.mjs";
 
 export default function registerServiceRuleTests(runner) {
-  runner.suite("后端契约测试：服务层核心规则", ({ before, test }) => {
+  runner.suite("Backend contract tests: service core rules", ({ before, test }) => {
     let source;
 
     before(async () => {
@@ -18,12 +18,12 @@ export default function registerServiceRuleTests(runner) {
       );
     });
 
-    test("申请上限和录取上限常量保持为 3", () => {
+    test("application and accepted job caps stay at 3", () => {
       assert.match(source, /MAX_APPLICATIONS\s*=\s*3/);
       assert.match(source, /MAX_ACCEPTED_JOBS\s*=\s*3/);
     });
 
-    test("角色主页跳转包含 TA、MO、ADMIN 三种分流", () => {
+    test("role home routing covers TA, MO, and Admin", () => {
       assert.match(source, /ROLE_MO/);
       assert.match(source, /ROLE_ADMIN/);
       assert.match(source, /return "\/mo\/dashboard";/);
@@ -31,19 +31,30 @@ export default function registerServiceRuleTests(runner) {
       assert.match(source, /return "\/ta\/dashboard";/);
     });
 
-    test("提交申请逻辑会阻止关闭岗位、重复申请和超过三次申请", () => {
+    test("application submission blocks closed jobs, duplicates, and over-cap submissions", () => {
       assert.match(source, /!"Open"\.equals\(job\.getStatus\(\)\)/);
       assert.match(source, /countApplicationsForTa\(taId\) >= MAX_APPLICATIONS/);
       assert.match(source, /You have already applied for this job\./);
     });
 
-    test("录取更新逻辑会阻止 TA 超过 workload 上限", () => {
+    test("acceptance update blocks TAs over the accepted job cap", () => {
       assert.match(source, /"Accepted"\.equals\(status\)/);
       assert.match(source, /countAcceptedJobsForTa\(application\.getTaId\(\)\) >= MAX_ACCEPTED_JOBS/);
       assert.match(source, /Acceptance would exceed the TA workload cap\./);
     });
 
-    test("通知逻辑会提示 TA 剩余可申请岗位数量", () => {
+    test("Stage 2 core rules are implemented in the service layer", () => {
+      assert.match(source, /left\.getDeadline\(\)/);
+      assert.match(source, /"Shortlisted"\.equals\(status\)/);
+      assert.match(source, /setReviewerNotes/);
+      assert.match(source, /getRecommendedJobsForTa/);
+      assert.match(source, /getWorkloadSummaries\(String query\)/);
+      assert.match(source, /getTotalWeeklyHours/);
+      assert.match(source, /> 10/);
+      assert.match(source, /Pattern\.compile\("\(\\\\d\+\)"\)/);
+    });
+
+    test("notification logic tells TAs how many applications remain", () => {
       assert.match(source, /You can still apply for /);
       assert.match(source, /MAX_APPLICATIONS - countApplicationsForTa\(taId\)/);
     });

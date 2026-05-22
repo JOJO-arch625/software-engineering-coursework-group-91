@@ -27,13 +27,17 @@
                 <% for (ApplicationRecord record : applications) {
                     String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
                         : ("Under Review".equals(record.getStatus()) ? "status-review"
-                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected"));
+                        : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
+                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                 %>
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong><br><span class="muted"><%= pageService.getJobTitle(record.getJobId()) %></span></td>
                     <td><%= record.getPriority() %></td>
                     <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
-                    <td><%= record.getNotes() %></td>
+                    <td>
+                        <strong><%= i18n.t("ta.applications.motivation") %>:</strong> <%= record.getNotes() == null ? "" : record.getNotes() %><br>
+                        <span class="muted"><strong><%= i18n.t("ta.applications.reviewer-notes") %>:</strong> <%= record.getReviewerNotes() == null || record.getReviewerNotes().trim().isEmpty() ? i18n.t("ta.applications.no-reviewer-notes") : record.getReviewerNotes() %></span>
+                    </td>
                 </tr>
                 <% } %>
                 </tbody>

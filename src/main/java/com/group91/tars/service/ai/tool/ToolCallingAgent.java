@@ -17,9 +17,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ToolCallingAgent {
-    private static final int MAX_TOOL_STEPS = 10;
+    private static final int MAX_TOOL_STEPS = 16;
     private static final Pattern TA_ID_PATTERN = Pattern.compile("\\bta-\\d+\\b", Pattern.CASE_INSENSITIVE);
     private static final Pattern JOB_ID_PATTERN = Pattern.compile("\\bjob-\\d+\\b", Pattern.CASE_INSENSITIVE);
+    private static final Pattern MODULE_CODE_PATTERN = Pattern.compile("\\b[A-Z]{2,}\\d{4}\\b", Pattern.CASE_INSENSITIVE);
 
     private final LlmClient llmClient;
     private final AgentToolRegistry toolRegistry;
@@ -52,7 +53,12 @@ public class ToolCallingAgent {
                     JsonObject result = response.has("result") && response.get("result").isJsonObject()
                         ? response.getAsJsonObject("result")
                         : new JsonObject();
-                    completeFinalJson(result, observations);
+                    JsonObject missingRequiredTool = finalGuardToolCall(task, context, observations, result);
+                    if (missingRequiredTool != null) {
+                        executeToolCall(missingRequiredTool, observations, trace);
+                        continue;
+                    }
+                    completeFinalJson(task, context, result, observations);
                     result.addProperty("sourceMode", "llm_tool");
                     return ToolCallingResult.finalResult(result, trace);
                 }
@@ -100,26 +106,67 @@ public class ToolCallingAgent {
     }
 
     private JsonObject nextRequiredToolCall(String task, JsonObject context, List<JsonObject> observations) {
-        String taId = resolveId(task, context, "taId", "linkedId", TA_ID_PATTERN);
-        String jobId = resolveId(task, context, "jobId", null, JOB_ID_PATTERN);
+        String taId = resolveTaId(task, context, observations);
+        String jobId = resolveJobId(task, context, observations);
         boolean fitQuestion = asksAboutFit(task);
         boolean cvQuestion = asksAboutCv(task) || fitQuestion;
         boolean jobDiscoveryQuestion = asksAboutJobDiscovery(task);
+        boolean applicantQuestion = asksAboutApplicants(task);
+        boolean jobInfoQuestion = asksAboutJobInfo(task);
         boolean workloadQuestion = asksAboutWorkload(task) || jobDiscoveryQuestion;
+        boolean taRole = isRole(context, "TA");
+        boolean moRole = isRole(context, "MO");
+        boolean adminRole = isRole(context, "ADMIN");
+        boolean cvOnlyQuestion = asksAboutCv(task)
+            && !hasExplicitJobReference(task)
+            && !applicantQuestion
+            && !jobDiscoveryQuestion
+            && !asksAboutWorkload(task);
 
-        if (taId != null && !hasObservation(observations, "get_ta_profile")) {
+        if (cvOnlyQuestion) {
+            fitQuestion = false;
+            jobInfoQuestion = false;
+            workloadQuestion = false;
+            jobId = null;
+        }
+
+        if (taId != null && !hasToolObservationForArgument(observations, "get_ta_profile", "taId", taId)) {
             return toolCall("get_ta_profile", "taId", taId);
         }
-        if (jobDiscoveryQuestion && !hasObservation(observations, "list_open_jobs")) {
+        if (taRole && jobDiscoveryQuestion && !hasObservation(observations, "list_open_jobs")) {
             return emptyToolCall("list_open_jobs");
         }
-        if (jobId != null && !hasObservation(observations, "get_job_posting")) {
+        if ((moRole || adminRole) && (applicantQuestion || jobInfoQuestion)
+            && (jobId == null || hasExplicitJobReference(task))
+            && !hasObservation(observations, "list_managed_jobs")) {
+            return emptyToolCall("list_managed_jobs");
+        }
+
+        jobId = cvOnlyQuestion ? null : resolveJobId(task, context, observations);
+        JsonObject applicantListCall = requiredApplicantListToolCall(task, context, observations, jobId);
+        if (applicantListCall != null) {
+            return applicantListCall;
+        }
+        if (jobId != null && (jobInfoQuestion || applicantQuestion || fitQuestion)
+            && !hasToolObservationForArgument(observations, "get_job_posting", "jobId", jobId)) {
             return toolCall("get_job_posting", "jobId", jobId);
         }
-        if (taId != null && cvQuestion && !hasObservation(observations, "extract_cv_text")) {
+        if (jobId != null && applicantQuestion) {
+            String nextApplicantTaId = nextApplicantWithoutCvObservation(observations, jobId);
+            if (nextApplicantTaId != null) {
+                return toolCall("extract_cv_text", "taId", nextApplicantTaId);
+            }
+        }
+        if ((moRole || adminRole) && applicantQuestion && jobId == null) {
+            String nextManagedJobId = nextManagedJobWithoutApplicants(observations);
+            if (nextManagedJobId != null) {
+                return toolCall("list_job_applicants", "jobId", nextManagedJobId);
+            }
+        }
+        if (taId != null && cvQuestion && !hasToolObservationForArgument(observations, "extract_cv_text", "taId", taId)) {
             return toolCall("extract_cv_text", "taId", taId);
         }
-        if (taId != null && jobId != null && fitQuestion && !hasObservation(observations, "calculate_fit_score")) {
+        if (taId != null && jobId != null && fitQuestion && !hasFitObservationForJob(observations, jobId)) {
             return fitScoreToolCall(taId, jobId, observations);
         }
         if (taId != null && jobDiscoveryQuestion && fitQuestion) {
@@ -128,10 +175,37 @@ public class ToolCallingAgent {
                 return fitScoreToolCall(taId, nextOpenJobId, observations);
             }
         }
-        if (taId != null && workloadQuestion && !hasObservation(observations, "get_workload_status")) {
+        if (taId != null && workloadQuestion && !hasToolObservationForArgument(observations, "get_workload_status", "taId", taId)) {
             return toolCall("get_workload_status", "taId", taId);
         }
         return null;
+    }
+
+    private String resolveTaId(String task, JsonObject context, List<JsonObject> observations) {
+        String direct = resolveIdFromContextOrTask(task, context, "taId", null, TA_ID_PATTERN);
+        if (direct != null) {
+            return direct;
+        }
+        if (isRole(context, "TA")) {
+            String linkedId = getString(context, "linkedId", null);
+            if (linkedId != null && TA_ID_PATTERN.matcher(linkedId).matches()) {
+                return linkedId.toLowerCase();
+            }
+        }
+        String byName = resolveTaIdFromApplicantLists(task, observations);
+        if (byName != null) {
+            return byName;
+        }
+        byName = resolveTaIdFromLatestToolTrace(task, context);
+        if (byName != null) {
+            return byName;
+        }
+        if (hasExplicitPersonReference(task)) {
+            return null;
+        }
+        String fromMemory = memoryText(context);
+        Matcher matcher = TA_ID_PATTERN.matcher(fromMemory);
+        return matcher.find() ? matcher.group().toLowerCase() : null;
     }
 
     private boolean asksAboutFit(String task) {
@@ -146,10 +220,10 @@ public class ToolCallingAgent {
             || lower.contains("analyze")
             || lower.contains("analysis")
             || lower.contains("match")
-            || lower.contains("适合")
-            || lower.contains("匹配")
-            || lower.contains("技能")
-            || lower.contains("分析");
+            || lower.contains("\u9002\u5408")
+            || lower.contains("\u5339\u914d")
+            || lower.contains("\u6280\u80fd")
+            || lower.contains("\u5206\u6790");
     }
 
     private boolean asksAboutCv(String task) {
@@ -158,8 +232,8 @@ public class ToolCallingAgent {
             || lower.contains("resume")
             || lower.contains("evidence")
             || lower.contains("pdf")
-            || lower.contains("简历")
-            || lower.contains("证据");
+            || lower.contains("\u7b80\u5386")
+            || lower.contains("\u8bc1\u636e");
     }
 
     private boolean asksAboutWorkload(String task) {
@@ -169,11 +243,11 @@ public class ToolCallingAgent {
             || lower.contains("capacity")
             || lower.contains("accepted job")
             || lower.contains("apply limit")
-            || lower.contains("工作量")
-            || lower.contains("负荷")
-            || lower.contains("风险")
-            || lower.contains("还能申请")
-            || lower.contains("申请几个");
+            || lower.contains("\u5de5\u4f5c\u91cf")
+            || lower.contains("\u8d1f\u8377")
+            || lower.contains("\u98ce\u9669")
+            || lower.contains("\u8fd8\u80fd\u7533\u8bf7")
+            || lower.contains("\u7533\u8bf7\u51e0\u4e2a");
     }
 
     private boolean asksAboutJobDiscovery(String task) {
@@ -188,21 +262,336 @@ public class ToolCallingAgent {
             || lower.contains("job fit")
             || lower.contains("apply for")
             || lower.contains("my profile")
-            || lower.contains("岗位")
-            || lower.contains("开放岗位")
-            || lower.contains("申请")
-            || lower.contains("推荐")
-            || lower.contains("我的资料")
-            || lower.contains("我的技能")
-            || lower.contains("适合我")
-            || lower.contains("匹配我");
+            || lower.contains("\u5c97\u4f4d")
+            || lower.contains("\u5f00\u653e\u5c97\u4f4d")
+            || lower.contains("\u7533\u8bf7")
+            || lower.contains("\u63a8\u8350")
+            || lower.contains("\u6211\u7684\u8d44\u6599")
+            || lower.contains("\u6211\u7684\u6280\u80fd")
+            || lower.contains("\u9002\u5408\u6211")
+            || lower.contains("\u5339\u914d\u6211");
+    }
+
+    private boolean asksAboutApplicants(String task) {
+        String lower = normalizeTask(task);
+        return lower.contains("applicant")
+            || lower.contains("applicants")
+            || lower.contains("candidate")
+            || lower.contains("candidates")
+            || lower.contains("shortlist")
+            || lower.contains("application")
+            || lower.contains("accepted")
+            || lower.contains("hired")
+            || lower.contains("assigned")
+            || lower.contains("selected")
+            || lower.contains("who")
+            || lower.contains("basic information")
+            || lower.contains("basic info")
+            || lower.contains("list")
+            || lower.contains("\u7533\u8bf7\u4eba")
+            || lower.contains("\u5019\u9009\u4eba")
+            || lower.contains("\u7533\u8bf7\u8005")
+            || lower.contains("\u7533\u8bf7\u5217\u8868")
+            || lower.contains("\u63a8\u8350\u540d\u5355")
+            || lower.contains("\u7b5b\u9009")
+            || lower.contains("\u5f55\u7528")
+            || lower.contains("\u5df2\u5f55\u7528")
+            || lower.contains("\u5f55\u53d6")
+            || lower.contains("\u51e0\u4e2a\u4eba")
+            || lower.contains("\u5206\u522b\u662f\u8c01")
+            || lower.contains("\u8c01")
+            || lower.contains("\u57fa\u672c\u4fe1\u606f")
+            || lower.contains("\u5217\u51fa")
+            || lower.contains("\u540d\u5355")
+            || lower.contains("\u4eba\u5458");
+    }
+
+    private boolean asksAboutJobInfo(String task) {
+        String lower = normalizeTask(task);
+        return lower.contains("information")
+            || lower.contains("info")
+            || lower.contains("detail")
+            || lower.contains("details")
+            || lower.contains("posting")
+            || lower.contains("module")
+            || lower.contains("course")
+            || lower.contains("job")
+            || lower.contains("ta")
+            || lower.contains("\u4fe1\u606f")
+            || lower.contains("\u8be6\u60c5")
+            || lower.contains("\u8bfe\u7a0b")
+            || lower.contains("\u5c97\u4f4d")
+            || lower.contains("\u52a9\u6559");
     }
 
     private String normalizeTask(String task) {
         return task == null ? "" : task.toLowerCase();
     }
 
+    private boolean isRole(JsonObject context, String role) {
+        return role.equalsIgnoreCase(getString(context, "role", ""));
+    }
+
+    private boolean hasExplicitJobReference(String task) {
+        String lower = normalizeTask(task);
+        return JOB_ID_PATTERN.matcher(task == null ? "" : task).find()
+            || MODULE_CODE_PATTERN.matcher(task == null ? "" : task).find()
+            || lower.contains(" ta")
+            || lower.contains("digital systems")
+            || lower.contains("data analytics")
+            || lower.contains("object-oriented")
+            || lower.contains("object oriented")
+            || lower.contains("\u52a9\u6559");
+    }
+
+    private boolean hasExplicitPersonReference(String task) {
+        String value = task == null ? "" : task;
+        String lower = normalizeTask(value);
+        return TA_ID_PATTERN.matcher(value).find()
+            || lower.contains("siyu")
+            || lower.contains("chen")
+            || lower.contains("yuyanchen")
+            || lower.contains("ming")
+            || lower.contains("lidarou")
+            || lower.contains("\u7b80\u5386")
+            || lower.contains("cv")
+            || lower.contains("resume");
+    }
+
+    private String resolveTaIdFromApplicantLists(String task, List<JsonObject> observations) {
+        String taskText = normalizeName(task);
+        for (JsonObject observation : observations) {
+            String taId = resolveTaIdFromToolObservation(taskText, observation);
+            if (taId != null) {
+                return taId;
+            }
+        }
+        return null;
+    }
+
+    private String resolveTaIdFromLatestToolTrace(String task, JsonObject context) {
+        if (context == null || !context.has("latestToolTrace") || !context.get("latestToolTrace").isJsonArray()) {
+            return null;
+        }
+        String taskText = normalizeName(task);
+        JsonArray trace = context.getAsJsonArray("latestToolTrace");
+        for (JsonElement element : trace) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            String taId = resolveTaIdFromToolObservation(taskText, element.getAsJsonObject());
+            if (taId != null) {
+                return taId;
+            }
+        }
+        return null;
+    }
+
+    private String resolveTaIdFromToolObservation(String taskText, JsonObject observation) {
+        if (observation == null) {
+            return null;
+        }
+        if (!observation.has("data") || !observation.get("data").isJsonObject()) {
+            return null;
+        }
+        JsonObject data = observation.getAsJsonObject("data");
+        if ("get_ta_profile".equals(getString(observation, "tool", ""))) {
+            String taId = getString(data, "taId", null);
+            if (taId != null && (nameMatchesTask(taskText, getString(data, "fullName", ""))
+                || nameMatchesTask(taskText, taId))) {
+                return taId.toLowerCase();
+            }
+            return null;
+        }
+        if (!"list_job_applicants".equals(getString(observation, "tool", ""))) {
+            return null;
+        }
+        if (!data.has("applicants") || !data.get("applicants").isJsonArray()) {
+            return null;
+        }
+        JsonArray applicants = data.getAsJsonArray("applicants");
+        for (JsonElement element : applicants) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject applicant = element.getAsJsonObject();
+            String taId = getString(applicant, "taId", null);
+            if (taId == null) {
+                continue;
+            }
+            if (nameMatchesTask(taskText, getString(applicant, "fullName", ""))
+                || nameMatchesTask(taskText, taId)) {
+                return taId.toLowerCase();
+            }
+        }
+        return null;
+    }
+
+    private boolean nameMatchesTask(String taskText, String name) {
+        String normalizedName = normalizeName(name);
+        if (normalizedName.isEmpty()) {
+            return false;
+        }
+        if (taskText.contains(normalizedName)) {
+            return true;
+        }
+        String[] parts = normalizedName.split(" ");
+        int matched = 0;
+        for (String part : parts) {
+            if (part.length() < 2) {
+                continue;
+            }
+            if (taskText.contains(part)) {
+                matched++;
+            }
+        }
+        return matched > 0 && matched == meaningfulNamePartCount(parts);
+    }
+
+    private int meaningfulNamePartCount(String[] parts) {
+        int count = 0;
+        for (String part : parts) {
+            if (part.length() >= 2) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private String normalizeName(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.toLowerCase()
+            .replaceAll("[^a-z0-9\\u4e00-\\u9fa5]+", " ")
+            .replaceAll("\\s+", " ")
+            .trim();
+    }
+
+    private String resolveJobId(String task, JsonObject context, List<JsonObject> observations) {
+        String direct = resolveIdFromContextOrTask(task, context, "jobId", null, JOB_ID_PATTERN);
+        if (direct != null) {
+            return direct;
+        }
+        String fromManagedJobs = resolveJobIdFromJobs(task, context, observations, "list_managed_jobs");
+        if (fromManagedJobs != null) {
+            return fromManagedJobs;
+        }
+        String fromOpenJobs = resolveJobIdFromJobs(task, context, observations, "list_open_jobs");
+        if (fromOpenJobs != null) {
+            return fromOpenJobs;
+        }
+        String fromObservedJobPosting = resolveJobIdFromJobPosting(task, observations);
+        if (fromObservedJobPosting != null) {
+            return fromObservedJobPosting;
+        }
+        if (hasExplicitJobReference(task)) {
+            return null;
+        }
+        String fromMemory = memoryText(context);
+        Matcher matcher = JOB_ID_PATTERN.matcher(fromMemory);
+        return matcher.find() ? matcher.group().toLowerCase() : null;
+    }
+
+    private String resolveJobIdFromJobs(
+        String task,
+        JsonObject context,
+        List<JsonObject> observations,
+        String toolName
+    ) {
+        JsonObject data = dataForTool(observations, toolName);
+        if (data == null || !data.has("jobs") || !data.get("jobs").isJsonArray()) {
+            return null;
+        }
+        String taskText = normalizeTask(task == null ? "" : task);
+        JsonArray jobs = data.getAsJsonArray("jobs");
+        if (hasExplicitJobReference(task)) {
+            String fromCurrentTask = resolveJobIdFromJobArray(taskText, jobs);
+            if (fromCurrentTask != null) {
+                return fromCurrentTask;
+            }
+            return null;
+        }
+        String referenceText = normalizeTask(taskText + " " + memoryText(context));
+        return resolveJobIdFromJobArray(referenceText, jobs);
+    }
+
+    private String resolveJobIdFromJobArray(String referenceText, JsonArray jobs) {
+        for (JsonElement element : jobs) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject job = element.getAsJsonObject();
+            if (jobMatchesReference(referenceText, job)) {
+                return getString(job, "jobId", null);
+            }
+        }
+        return null;
+    }
+
+    private boolean jobMatchesReference(String referenceText, JsonObject job) {
+        String moduleCode = normalizeTask(getString(job, "moduleCode", ""));
+        String title = normalizeTask(getString(job, "title", ""));
+        String jobId = normalizeTask(getString(job, "jobId", ""));
+        if (!jobId.isEmpty() && referenceText.contains(jobId)) {
+            return true;
+        }
+        if (!moduleCode.isEmpty() && referenceText.contains(moduleCode)) {
+            return true;
+        }
+        if (!title.isEmpty() && referenceText.contains(title)) {
+            return true;
+        }
+        int matchedTitleWords = 0;
+        for (String word : title.split("[^a-z0-9]+")) {
+            if (word.length() < 3 || "the".equals(word)) {
+                continue;
+            }
+            if (referenceText.contains(word)) {
+                matchedTitleWords++;
+            }
+        }
+        return matchedTitleWords >= 2;
+    }
+
+    private String resolveJobIdFromJobPosting(String task, List<JsonObject> observations) {
+        String taskText = normalizeTask(task == null ? "" : task);
+        for (JsonObject observation : observations) {
+            if (observation == null || !"get_job_posting".equals(getString(observation, "tool", ""))) {
+                continue;
+            }
+            if (!observation.has("data") || !observation.get("data").isJsonObject()) {
+                continue;
+            }
+            JsonObject job = observation.getAsJsonObject("data");
+            String jobId = getString(job, "jobId", null);
+            if (jobId == null) {
+                continue;
+            }
+            if (!hasExplicitJobReference(task) || jobMatchesReference(taskText, job)) {
+                return jobId;
+            }
+        }
+        return null;
+    }
+
     private String resolveId(
+        String task,
+        JsonObject context,
+        String primaryContextKey,
+        String fallbackContextKey,
+        Pattern pattern
+    ) {
+        String fromContextOrTask = resolveIdFromContextOrTask(task, context, primaryContextKey, fallbackContextKey, pattern);
+        if (fromContextOrTask != null) {
+            return fromContextOrTask;
+        }
+        String fromMemory = memoryText(context);
+        Matcher matcher = pattern.matcher(fromMemory);
+        return matcher.find() ? matcher.group().toLowerCase() : null;
+    }
+
+    private String resolveIdFromContextOrTask(
         String task,
         JsonObject context,
         String primaryContextKey,
@@ -220,9 +609,7 @@ public class ToolCallingAgent {
         if (matcher.find()) {
             return matcher.group().toLowerCase();
         }
-        String fromMemory = memoryText(context);
-        matcher = pattern.matcher(fromMemory);
-        return matcher.find() ? matcher.group().toLowerCase() : null;
+        return null;
     }
 
     private String memoryText(JsonObject context) {
@@ -252,7 +639,7 @@ public class ToolCallingAgent {
         JsonObject arguments = new JsonObject();
         arguments.addProperty("taId", taId);
         arguments.addProperty("jobId", jobId);
-        String cvText = cvTextFromObservation(observations);
+        String cvText = cvTextFromObservation(observations, taId);
         if (!cvText.isEmpty()) {
             arguments.addProperty("cvText", cvText);
         }
@@ -303,6 +690,41 @@ public class ToolCallingAgent {
         return call;
     }
 
+    private JsonObject finalGuardToolCall(
+        String task,
+        JsonObject context,
+        List<JsonObject> observations,
+        JsonObject pendingResult
+    ) {
+        String jobId = resolveJobId(task, context, observations);
+        JsonObject applicantListCall = requiredApplicantListToolCall(task, context, observations, jobId);
+        if (applicantListCall != null) {
+            return applicantListCall;
+        }
+        String analysis = getString(pendingResult, "analysis", "");
+        boolean mentionsMissingApplicantTool = normalizeTask(analysis).contains("list_job_applicants")
+            || normalizeTask(analysis).contains("applicant data");
+        return mentionsMissingApplicantTool && jobId != null && !hasApplicantsObservationForJob(observations, jobId)
+            ? toolCall("list_job_applicants", "jobId", jobId)
+            : null;
+    }
+
+    private JsonObject requiredApplicantListToolCall(
+        String task,
+        JsonObject context,
+        List<JsonObject> observations,
+        String jobId
+    ) {
+        boolean scopedReviewer = isRole(context, "MO") || isRole(context, "ADMIN");
+        if (!scopedReviewer || jobId == null || !asksAboutApplicants(task)) {
+            return null;
+        }
+        if (hasApplicantsObservationForJob(observations, jobId)) {
+            return null;
+        }
+        return toolCall("list_job_applicants", "jobId", jobId);
+    }
+
     private boolean hasObservation(List<JsonObject> observations, String toolName) {
         for (JsonObject observation : observations) {
             if (observation != null && toolName.equals(getString(observation, "tool", ""))) {
@@ -312,8 +734,73 @@ public class ToolCallingAgent {
         return false;
     }
 
-    private String cvTextFromObservation(List<JsonObject> observations) {
-        JsonObject cv = dataForTool(observations, "extract_cv_text");
+    private boolean hasToolObservationForArgument(
+        List<JsonObject> observations,
+        String toolName,
+        String argumentName,
+        String argumentValue
+    ) {
+        for (JsonObject observation : observations) {
+            if (observation == null || !toolName.equals(getString(observation, "tool", ""))) {
+                continue;
+            }
+            if (!observation.has("arguments") || !observation.get("arguments").isJsonObject()) {
+                continue;
+            }
+            JsonObject arguments = observation.getAsJsonObject("arguments");
+            if (argumentValue.equalsIgnoreCase(getString(arguments, argumentName, ""))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasApplicantsObservationForJob(List<JsonObject> observations, String jobId) {
+        return hasToolObservationForArgument(observations, "list_job_applicants", "jobId", jobId);
+    }
+
+    private String nextManagedJobWithoutApplicants(List<JsonObject> observations) {
+        JsonObject managedJobs = dataForTool(observations, "list_managed_jobs");
+        if (managedJobs == null || !managedJobs.has("jobs") || !managedJobs.get("jobs").isJsonArray()) {
+            return null;
+        }
+        JsonArray jobs = managedJobs.getAsJsonArray("jobs");
+        for (JsonElement element : jobs) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            String jobId = getString(element.getAsJsonObject(), "jobId", null);
+            if (jobId != null && !hasApplicantsObservationForJob(observations, jobId)) {
+                return jobId;
+            }
+        }
+        return null;
+    }
+
+    private String nextApplicantWithoutCvObservation(List<JsonObject> observations, String jobId) {
+        JsonObject applicantsData = dataForTool(observations, "list_job_applicants", "jobId", jobId);
+        if (applicantsData == null || !applicantsData.has("applicants")
+            || !applicantsData.get("applicants").isJsonArray()) {
+            return null;
+        }
+        JsonArray applicants = applicantsData.getAsJsonArray("applicants");
+        for (JsonElement element : applicants) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject applicant = element.getAsJsonObject();
+            String taId = getString(applicant, "taId", null);
+            if (taId != null && !hasToolObservationForArgument(observations, "extract_cv_text", "taId", taId)) {
+                return taId;
+            }
+        }
+        return null;
+    }
+
+    private String cvTextFromObservation(List<JsonObject> observations, String taId) {
+        JsonObject cv = taId == null
+            ? dataForTool(observations, "extract_cv_text")
+            : dataForTool(observations, "extract_cv_text", "taId", taId);
         return cv == null ? "" : getString(cv, "text", "");
     }
 
@@ -339,9 +826,19 @@ public class ToolCallingAgent {
     }
 
     private String buildPrompt(String task, JsonObject context, List<JsonObject> observations) {
+        boolean cvOnlyQuestion = asksAboutCv(task)
+            && !hasExplicitJobReference(task)
+            && !asksAboutApplicants(task)
+            && !asksAboutJobDiscovery(task)
+            && !asksAboutWorkload(task);
         return "Task:\n" + task + "\n\n"
             + "Context:\n" + gson.toJson(context == null ? new JsonObject() : context) + "\n\n"
             + "Role instruction:\n" + getString(context, "roleInstruction", "Use role-scoped recruitment assistance.") + "\n\n"
+            + "Current-task guardrail:\n"
+            + (cvOnlyQuestion
+                ? "This is a CV-only question. Use only current TA profile/CV observations. "
+                    + "Do not discuss job fit, job postings, shortlist decisions, or workload unless the current observations include those tools.\n\n"
+                : "Use current observations as the primary source of truth. Do not import job/TA facts from memory unless needed to resolve a pronoun or omitted ID.\n\n")
             + "Available tools:\n" + gson.toJson(toolRegistry.describeTools()) + "\n\n"
             + "Previous observations:\n" + gson.toJson(observations) + "\n\n"
             + "Recent conversation memory:\n" + gson.toJson(context == null ? new JsonObject() : context.get("recentMessages")) + "\n\n"
@@ -456,10 +953,22 @@ public class ToolCallingAgent {
         return wrapped;
     }
 
-    private void completeFinalJson(JsonObject result, List<JsonObject> observations) {
+    private void completeFinalJson(
+        String task,
+        JsonObject context,
+        JsonObject result,
+        List<JsonObject> observations
+    ) {
         if (result == null || observations == null) {
             return;
         }
+        String targetTaId = resolveTaId(task, context, observations);
+        boolean cvOnlyQuestion = asksAboutCv(task)
+            && !hasExplicitJobReference(task)
+            && !asksAboutApplicants(task)
+            && !asksAboutJobDiscovery(task)
+            && !asksAboutWorkload(task);
+        String targetJobId = cvOnlyQuestion ? null : resolveJobId(task, context, observations);
         JsonArray jobFitScores = buildJobFitScores(observations);
         if (jobFitScores.size() > 1) {
             result.remove("score");
@@ -473,25 +982,31 @@ public class ToolCallingAgent {
             addAuthoritative(result, "missingSkills", fit.get("missingSkills"));
         }
 
-        JsonObject workload = dataForTool(observations, "get_workload_status");
+        JsonObject workload = targetTaId == null
+            ? dataForTool(observations, "get_workload_status")
+            : dataForTool(observations, "get_workload_status", "taId", targetTaId);
         if (workload != null) {
             addAuthoritative(result, "acceptedJobs", workload.get("acceptedJobs"));
             addAuthoritative(result, "workloadRisk", workload.get("risk"));
             addAuthoritative(result, "workloadMessage", workload.get("message"));
         }
 
-        JsonObject cv = dataForTool(observations, "extract_cv_text");
+        JsonObject cv = targetTaId == null
+            ? dataForTool(observations, "extract_cv_text")
+            : dataForTool(observations, "extract_cv_text", "taId", targetTaId);
         if (cv != null && !hasText(result, "cvEvidence")) {
             result.addProperty("cvEvidence", buildCvEvidence(cv));
         }
 
-        result.add("evidenceAttribution", buildEvidenceAttribution(observations));
+        result.add("evidenceAttribution", buildEvidenceAttribution(observations, targetTaId, targetJobId));
     }
 
-    private JsonObject buildEvidenceAttribution(List<JsonObject> observations) {
+    private JsonObject buildEvidenceAttribution(List<JsonObject> observations, String targetTaId, String targetJobId) {
         JsonObject attribution = new JsonObject();
 
-        JsonObject profile = dataForTool(observations, "get_ta_profile");
+        JsonObject profile = targetTaId == null
+            ? dataForTool(observations, "get_ta_profile")
+            : dataForTool(observations, "get_ta_profile", "taId", targetTaId);
         if (profile != null) {
             JsonObject profileEvidence = new JsonObject();
             addIfPresent(profileEvidence, "taId", profile.get("taId"));
@@ -502,7 +1017,9 @@ public class ToolCallingAgent {
             attribution.add("profileEvidence", profileEvidence);
         }
 
-        JsonObject job = dataForTool(observations, "get_job_posting");
+        JsonObject job = targetJobId == null
+            ? dataForTool(observations, "get_job_posting")
+            : dataForTool(observations, "get_job_posting", "jobId", targetJobId);
         if (job != null) {
             JsonObject jobEvidence = new JsonObject();
             addIfPresent(jobEvidence, "jobId", job.get("jobId"));
@@ -522,7 +1039,22 @@ public class ToolCallingAgent {
             attribution.add("openJobEvidence", openJobEvidence);
         }
 
-        JsonObject cv = dataForTool(observations, "extract_cv_text");
+        JsonObject managedJobs = dataForTool(observations, "list_managed_jobs");
+        if (managedJobs != null) {
+            JsonObject managedJobEvidence = new JsonObject();
+            addIfPresent(managedJobEvidence, "count", managedJobs.get("count"));
+            addIfPresent(managedJobEvidence, "jobs", managedJobs.get("jobs"));
+            attribution.add("managedJobEvidence", managedJobEvidence);
+        }
+
+        JsonArray applicantEvidence = buildApplicantEvidence(observations);
+        if (applicantEvidence.size() > 0) {
+            attribution.add("applicantEvidence", applicantEvidence);
+        }
+
+        JsonObject cv = targetTaId == null
+            ? dataForTool(observations, "extract_cv_text")
+            : dataForTool(observations, "extract_cv_text", "taId", targetTaId);
         if (cv != null) {
             JsonObject cvEvidence = new JsonObject();
             addIfPresent(cvEvidence, "available", cv.get("available"));
@@ -544,7 +1076,9 @@ public class ToolCallingAgent {
             attribution.add("fitScoreEvidence", fitEvidence);
         }
 
-        JsonObject workload = dataForTool(observations, "get_workload_status");
+        JsonObject workload = targetTaId == null
+            ? dataForTool(observations, "get_workload_status")
+            : dataForTool(observations, "get_workload_status", "taId", targetTaId);
         if (workload != null) {
             JsonObject workloadEvidence = new JsonObject();
             addIfPresent(workloadEvidence, "acceptedJobs", workload.get("acceptedJobs"));
@@ -554,6 +1088,24 @@ public class ToolCallingAgent {
         }
 
         return attribution;
+    }
+
+    private JsonArray buildApplicantEvidence(List<JsonObject> observations) {
+        JsonArray array = new JsonArray();
+        for (JsonObject observation : observations) {
+            if (observation == null || !"list_job_applicants".equals(getString(observation, "tool", ""))) {
+                continue;
+            }
+            if (!observation.has("data") || !observation.get("data").isJsonObject()) {
+                continue;
+            }
+            JsonObject data = observation.getAsJsonObject("data");
+            JsonObject item = new JsonObject();
+            addIfPresent(item, "jobId", data.get("jobId"));
+            addIfPresent(item, "applicants", data.get("applicants"));
+            array.add(item);
+        }
+        return array;
     }
 
     private JsonArray buildJobFitScores(List<JsonObject> observations) {
@@ -597,6 +1149,35 @@ public class ToolCallingAgent {
     private JsonObject dataForTool(List<JsonObject> observations, String toolName) {
         for (JsonObject observation : observations) {
             if (observation == null || !toolName.equals(getString(observation, "tool", ""))) {
+                continue;
+            }
+            if (observation.has("success")
+                && !observation.get("success").isJsonNull()
+                && !observation.get("success").getAsBoolean()) {
+                continue;
+            }
+            if (observation.has("data") && observation.get("data").isJsonObject()) {
+                return observation.getAsJsonObject("data");
+            }
+        }
+        return null;
+    }
+
+    private JsonObject dataForTool(
+        List<JsonObject> observations,
+        String toolName,
+        String argumentName,
+        String argumentValue
+    ) {
+        for (JsonObject observation : observations) {
+            if (observation == null || !toolName.equals(getString(observation, "tool", ""))) {
+                continue;
+            }
+            if (!observation.has("arguments") || !observation.get("arguments").isJsonObject()) {
+                continue;
+            }
+            JsonObject arguments = observation.getAsJsonObject("arguments");
+            if (!argumentValue.equalsIgnoreCase(getString(arguments, argumentName, ""))) {
                 continue;
             }
             if (observation.has("success")

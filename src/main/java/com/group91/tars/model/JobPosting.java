@@ -22,6 +22,8 @@ public class JobPosting {
     private String requirements;
     /** Weekly workload description (e.g. "6 hours / week"). */
     private String workload;
+    /** Numeric weekly workload in hours. Used by Admin workload summaries. */
+    private int weeklyHours;
     /** Application deadline in yyyy-MM-dd format. Must be a future date when creating a new posting. */
     private String deadline;
     /** Posting status: "Open" or "Closed". Expired postings are auto-closed by the system. */
@@ -83,6 +85,14 @@ public class JobPosting {
 
     public void setWorkload(String workload) {
         this.workload = workload;
+    }
+
+    public int getWeeklyHours() {
+        return weeklyHours;
+    }
+
+    public void setWeeklyHours(int weeklyHours) {
+        this.weeklyHours = weeklyHours;
     }
 
     public String getDeadline() {

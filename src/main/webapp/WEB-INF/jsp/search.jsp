@@ -100,7 +100,8 @@
                 <% for (ApplicationRecord record : applicationResults) {
                     String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
                         : ("Under Review".equals(record.getStatus()) ? "status-review"
-                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected"));
+                        : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
+                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                 %>
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong></td>
@@ -172,7 +173,8 @@
                 <% for (ApplicationRecord record : applicationResults) {
                     String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
                         : ("Under Review".equals(record.getStatus()) ? "status-review"
-                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected"));
+                        : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
+                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                     TAProfile applicant = pageService.getProfileById(record.getTaId());
                 %>
                 <tr>
@@ -267,7 +269,8 @@
                 <% for (ApplicationRecord record : applicationResults) {
                     String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
                         : ("Under Review".equals(record.getStatus()) ? "status-review"
-                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected"));
+                        : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
+                        : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                     TAProfile applicant = pageService.getProfileById(record.getTaId());
                 %>
                 <tr>

@@ -1,6 +1,7 @@
 <%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiCandidateSummary,com.group91.tars.service.TarsService,com.group91.tars.web.AiPresentation" %>
 <%
     JobPosting selectedJob = (JobPosting) request.getAttribute("selectedJob");
+    List<JobPosting> moJobs = (List<JobPosting>) request.getAttribute("moJobs");
     List<ApplicationRecord> applications = (List<ApplicationRecord>) request.getAttribute("applications");
     ApplicationRecord selectedApplication = (ApplicationRecord) request.getAttribute("selectedApplication");
     TAProfile selectedApplicant = (TAProfile) request.getAttribute("selectedApplicant");
@@ -14,6 +15,25 @@
                 <h4><%= i18n.t("mo.review.heading") %><%= selectedJob == null ? "" : " - " + selectedJob.getTitle() %></h4>
                 <p><%= i18n.t("mo.review.description") %></p>
             </div>
+            <% if (moJobs != null && !moJobs.isEmpty()) { %>
+            <div class="review-job-switcher" aria-label="MO job postings">
+                <% for (JobPosting jobOption : moJobs) {
+                    boolean isCurrentJob = selectedJob != null && jobOption.getId().equals(selectedJob.getId());
+                    int applicantCount = pageService.countApplicantsForJob(jobOption.getId());
+                %>
+                <a class="review-job-chip <%= isCurrentJob ? "active" : "" %>"
+                   href="<%= request.getContextPath() %>/mo/review?jobId=<%= jobOption.getId() %>">
+                    <strong><%= jobOption.getModuleCode() %></strong>
+                    <span><%= jobOption.getTitle() %></span>
+                    <em><%= applicantCount %> applicants</em>
+                </a>
+                <% } %>
+            </div>
+            <% } %>
+            <p class="muted review-list-caption">
+                Showing <%= applications == null ? 0 : applications.size() %> applicants for
+                <strong><%= selectedJob == null ? "no selected posting" : selectedJob.getModuleCode() + " " + selectedJob.getTitle() %></strong>.
+            </p>
             <div class="table-shell">
                 <table>
                     <thead>
@@ -22,6 +42,7 @@
                         <th><%= i18n.t("mo.review.priority") %></th>
                         <th><%= i18n.t("mo.review.ai-fit") %></th>
                         <th><%= i18n.t("mo.review.accepted") %></th>
+                        <th>CV</th>
                         <th><%= i18n.t("mo.review.status") %></th>
                     </tr>
                     </thead>
@@ -30,15 +51,24 @@
                         TAProfile applicant = pageService.getProfileById(record.getTaId());
                         String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
                             : ("Under Review".equals(record.getStatus()) ? "status-review"
-                            : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected"));
+                            : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
+                            : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                         int fitScore = selectedJob == null ? 0 : pageService.calculateFitScore(record.getTaId(), selectedJob.getId());
                         boolean isSelected = selectedApplication != null && record.getId().equals(selectedApplication.getId());
+                        boolean hasApplicantCv = applicant != null && applicant.getCvPath() != null && !applicant.getCvPath().trim().isEmpty();
                     %>
                     <tr style="<%= isSelected ? "background: rgba(0,180,216,0.08);" : "" %>">
                         <td><a class="table-link" href="<%= request.getContextPath() %>/mo/review?jobId=<%= selectedJob == null ? "" : selectedJob.getId() %>&appId=<%= record.getId() %>"><%= applicant == null ? record.getTaId() : applicant.getFullName() %></a></td>
                         <td><%= record.getPriority() %></td>
                         <td><strong><%= fitScore %>%</strong></td>
                         <td><%= pageService.countAcceptedJobsForTaPublic(record.getTaId()) %> / 3</td>
+                        <td>
+                            <% if (hasApplicantCv) { %>
+                            <a class="table-link" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= record.getTaId() %>">View CV</a>
+                            <% } else { %>
+                            <span class="muted">No CV</span>
+                            <% } %>
+                        </td>
                         <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     </tr>
                     <% } %>
@@ -67,6 +97,15 @@
                 String candidateSourceLabel = AiPresentation.sourceLabel(i18n, candidateSourceMode);
             %>
             <h4 style="margin-bottom: 10px;"><%= selectedApplicant.getFullName() %></h4>
+            <div class="ai-evidence-box" style="margin-bottom: 12px;">
+                <strong>Applicant CV attachment</strong>
+                <% if (selectedHasCv) { %>
+                <p class="file-name"><%= selectedCvPath %></p>
+                <a class="secondary-button" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= selectedApplicant.getId() %>">Open CV</a>
+                <% } else { %>
+                <p>No CV has been uploaded for this applicant.</p>
+                <% } %>
+            </div>
             <div class="ai-score-shell" style="margin-bottom: 12px;">
                 <span class="ai-score-label"><%= i18n.t("mo.review.fit-score") %></span>
                 <strong><%= selectedFitScore %>%</strong>
@@ -125,6 +164,10 @@
                     <dt><%= i18n.t("mo.review.motivation-note") %></dt>
                     <dd><%= selectedApplication.getNotes() == null ? "0" : selectedApplication.getNotes() %></dd>
                 </div>
+                <div class="span-two">
+                    <dt><%= i18n.t("mo.review.reviewer-notes") %></dt>
+                    <dd><%= selectedApplication.getReviewerNotes() == null || selectedApplication.getReviewerNotes().trim().isEmpty() ? i18n.t("ta.applications.no-reviewer-notes") : selectedApplication.getReviewerNotes() %></dd>
+                </div>
                 <div>
                     <dt><%= i18n.t("mo.review.student-number") %></dt>
                     <dd><%= selectedApplicant.getStudentNumber() %></dd>
@@ -147,13 +190,21 @@
                 <input type="hidden" name="applicationId" value="<%= selectedApplication.getId() %>">
                 <label class="span-two">
                     <%= i18n.t("mo.review.review-note") %>
-                    <textarea name="notes"><%= selectedApplication.getNotes() == null ? "" : selectedApplication.getNotes() %></textarea>
+                    <textarea name="notes"><%= selectedApplication.getReviewerNotes() == null ? "" : selectedApplication.getReviewerNotes() %></textarea>
                 </label>
                 <div class="button-row span-two">
                     <button class="secondary-button" type="submit" name="status" value="Under Review"><%= i18n.t("mo.review.mark-under-review") %></button>
+                    <button class="secondary-button" type="submit" name="status" value="Shortlisted"><%= i18n.t("mo.review.shortlist") %></button>
                     <button class="primary-button" type="submit" name="status" value="Accepted"><%= i18n.t("mo.review.accept") %></button>
                     <button class="ghost-button" type="submit" name="status" value="Rejected"><%= i18n.t("mo.review.reject") %></button>
                 </div>
+            </form>
+            <form method="post" action="<%= request.getContextPath() %>/mo/review" style="margin-top: 12px;">
+                <input type="hidden" name="action" value="bulkShortlist">
+                <input type="hidden" name="jobId" value="<%= selectedJob == null ? "" : selectedJob.getId() %>">
+                <input type="hidden" name="applicationId" value="<%= selectedApplication.getId() %>">
+                <input type="hidden" name="notes" value="<%= i18n.t("mo.review.bulk-shortlisted-note") %>">
+                <button class="secondary-button" type="submit"><%= i18n.t("mo.review.bulk-shortlist") %></button>
             </form>
             <% } %>
         </article>

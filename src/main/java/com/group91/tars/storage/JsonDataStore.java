@@ -8,6 +8,10 @@ import com.group91.tars.model.JobPosting;
 import com.group91.tars.model.Notification;
 import com.group91.tars.model.TAProfile;
 import com.group91.tars.model.UserAccount;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -163,7 +167,7 @@ public class JsonDataStore {
         List<TAProfile> profiles = new ArrayList<TAProfile>();
         profiles.add(createProfile("ta-1", "Yuyanchen Long", "231224653",
             "yuyanchen.long@bupt.edu.cn", "+86 188 0000 0000",
-            "Java, Python, VHDL, Object-Oriented Programming",
+            "Java, Python, VHDL, Object-Oriented Programming, debugging",
             "Available on Tuesday afternoon, Thursday evening, and Friday morning.",
             "uploads/cv/YuyanchenLong_CV.pdf"));
         profiles.add(createProfile("ta-2", "Ming Li", "231224601",
@@ -188,15 +192,15 @@ public class JsonDataStore {
         List<JobPosting> jobs = new ArrayList<JobPosting>();
         jobs.add(createJob("job-1", "mo-1", "EIE3320", "Object-Oriented Programming TA",
             "Java, OOP, debugging", "Strong Java syntax, classes, arrays, exception handling, and lab support communication.",
-            "6 hours / week", "2026-12-10", "Open",
+            "6 hours / week", 6, "2026-12-10", "Open",
             "Support weekly labs and guide students through Java exercises."));
         jobs.add(createJob("job-2", "mo-1", "EIE2105", "Digital Systems TA",
             "VHDL, Boolean logic, simulation", "Basic circuit design, VHDL syntax, waveform debugging, and hardware fundamentals.",
-            "5 hours / week", "2026-12-11", "Open",
+            "5 hours / week", 5, "2026-12-11", "Open",
             "Assist digital systems lab sessions and hardware simulation support."));
         jobs.add(createJob("job-3", "mo-1", "ECS5001", "Data Analytics TA",
             "Python, pandas, plotting", "Python basics, data processing, notebook workflows, and problem explanation skills.",
-            "4 hours / week", "2026-05-01", "Closed",
+            "4 hours / week", 4, "2026-05-01", "Closed",
             "Help students with Python notebooks and analytics exercises."));
 
         writeList(jobsFile, jobs);
@@ -209,16 +213,22 @@ public class JsonDataStore {
 
         List<ApplicationRecord> applications = new ArrayList<ApplicationRecord>();
         applications.add(createApplication("app-1", "job-2", "ta-1", "Priority 1", "Under Review",
+            "I can support digital systems lab sessions and help students debug exercises.",
             "MO reviewing VHDL experience.", "2026-03-24 10:00"));
         applications.add(createApplication("app-2", "job-3", "ta-1", "Priority 2", "Rejected",
+            "I have Python experience and can help students with coursework notebooks.",
             "Role filled. Transparent rejection shown to TA.", "2026-03-23 18:30"));
         applications.add(createApplication("app-3", "job-1", "ta-2", "Priority 1", "Accepted",
+            "I have experience in programming labs and can help students debug Java code.",
             "Accepted for weekly Java lab support.", "2026-03-22 09:00"));
         applications.add(createApplication("app-4", "job-2", "ta-3", "Priority 1", "Accepted",
+            "I have a strong digital logic background and can support waveform debugging.",
             "Accepted for digital systems support.", "2026-03-22 09:10"));
         applications.add(createApplication("app-5", "job-1", "ta-3", "Priority 2", "Accepted",
+            "I can help with object-oriented programming concepts and lab support.",
             "Accepted for additional OOP sessions.", "2026-03-23 14:20"));
         applications.add(createApplication("app-6", "job-3", "ta-3", "Priority 3", "Accepted",
+            "I can support Python notebook workflows and analytics exercises.",
             "Accepted before the role was closed.", "2026-03-21 11:45"));
 
         writeList(applicationsFile, applications);
@@ -244,9 +254,83 @@ public class JsonDataStore {
 
     private void createPlaceholderCv(String fileName) throws IOException {
         Path path = uploadDirectory.resolve(fileName);
-        if (!Files.exists(path)) {
-            Files.write(path, ("Placeholder CV for demo use: " + fileName).getBytes(StandardCharsets.UTF_8));
+        if (!Files.exists(path) || isLegacyPlaceholderCv(path)) {
+            writeSamplePdfCv(path, fileName);
         }
+    }
+
+    private boolean isLegacyPlaceholderCv(Path path) throws IOException {
+        if (!Files.exists(path) || Files.size(path) > 256) {
+            return false;
+        }
+        String content = new String(Files.readAllBytes(path), StandardCharsets.UTF_8);
+        return content.startsWith("Placeholder CV for demo use:");
+    }
+
+    private void writeSamplePdfCv(Path path, String fileName) throws IOException {
+        PDDocument document = new PDDocument();
+        try {
+            PDPage page = new PDPage();
+            document.addPage(page);
+            PDPageContentStream stream = new PDPageContentStream(document, page);
+            try {
+                stream.beginText();
+                stream.setFont(PDType1Font.HELVETICA_BOLD, 14);
+                stream.newLineAtOffset(56, 730);
+                stream.showText(sampleCvTitle(fileName));
+                stream.setFont(PDType1Font.HELVETICA, 11);
+                stream.setLeading(16);
+                for (String line : sampleCvLines(fileName)) {
+                    stream.newLine();
+                    stream.showText(line);
+                }
+                stream.endText();
+            } finally {
+                stream.close();
+            }
+            document.save(path.toFile());
+        } finally {
+            document.close();
+        }
+    }
+
+    private String sampleCvTitle(String fileName) {
+        if ("SiyuChen_CV.pdf".equals(fileName)) {
+            return "Siyu Chen - Teaching Assistant CV";
+        }
+        if ("MingLi_CV.pdf".equals(fileName)) {
+            return "Ming Li - Teaching Assistant CV";
+        }
+        return "Yuyanchen Long - Teaching Assistant CV";
+    }
+
+    private String[] sampleCvLines(String fileName) {
+        if ("SiyuChen_CV.pdf".equals(fileName)) {
+            return new String[] {
+                "Profile: Digital systems and analytics teaching assistant candidate.",
+                "Skills: Digital logic, VHDL basics, simulation, waveform debugging, Python notebooks.",
+                "Lab support: Guided students through circuit simulation and Boolean logic exercises.",
+                "Analytics support: Helped peers with pandas data processing and plotting workflows.",
+                "Teaching: Patient student support, troubleshooting, and step-by-step explanations.",
+                "Availability: Monday morning and Thursday afternoon."
+            };
+        }
+        if ("MingLi_CV.pdf".equals(fileName)) {
+            return new String[] {
+                "Profile: Programming lab support candidate.",
+                "Skills: Python, data structures, Java basics, debugging, lab communication.",
+                "Experience: Helped students understand arrays, loops, and notebook workflows.",
+                "Teaching: Supported small-group programming exercises and troubleshooting.",
+                "Availability: Wednesday afternoon and Friday afternoon."
+            };
+        }
+        return new String[] {
+            "Profile: Software and digital systems teaching assistant candidate.",
+            "Skills: Java, Python, VHDL, object-oriented programming, lab support.",
+            "Experience: Supported coursework discussions and debugging exercises.",
+            "Teaching: Explains programming concepts clearly and works well with students.",
+            "Availability: Tuesday afternoon, Thursday evening, and Friday morning."
+        };
     }
 
     private TAProfile createProfile(String id, String fullName, String studentNumber, String email,
@@ -264,7 +348,7 @@ public class JsonDataStore {
     }
 
     private JobPosting createJob(String id, String moId, String moduleCode, String title, String skills,
-                                 String requirements, String workload, String deadline, String status,
+                                 String requirements, String workload, int weeklyHours, String deadline, String status,
                                  String description) {
         JobPosting job = new JobPosting();
         job.setId(id);
@@ -274,6 +358,7 @@ public class JsonDataStore {
         job.setSkills(skills);
         job.setRequirements(requirements);
         job.setWorkload(workload);
+        job.setWeeklyHours(weeklyHours);
         job.setDeadline(deadline);
         job.setStatus(status);
         job.setDescription(description);
@@ -281,7 +366,7 @@ public class JsonDataStore {
     }
 
     private ApplicationRecord createApplication(String id, String jobId, String taId, String priority,
-                                                String status, String notes, String submittedAt) {
+                                                String status, String notes, String reviewerNotes, String submittedAt) {
         ApplicationRecord application = new ApplicationRecord();
         application.setId(id);
         application.setJobId(jobId);
@@ -289,6 +374,7 @@ public class JsonDataStore {
         application.setPriority(priority);
         application.setStatus(status);
         application.setNotes(notes);
+        application.setReviewerNotes(reviewerNotes);
         application.setSubmittedAt(submittedAt);
         return application;
     }

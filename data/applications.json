@@ -5,7 +5,8 @@
     "taId": "ta-1",
     "priority": "Priority 1",
     "status": "Under Review",
-    "notes": "MO reviewing VHDL experience.",
+    "notes": "I can support digital systems lab sessions and help students debug exercises.",
+    "reviewerNotes": "MO reviewing VHDL experience.",
     "submittedAt": "2026-03-24 10:00",
     "applicantSkills": "Java, VHDL, Lab support",
     "applicantDescription": "I can support digital systems lab sessions and help students debug exercises."
@@ -16,7 +17,8 @@
     "taId": "ta-1",
     "priority": "Priority 2",
     "status": "Rejected",
-    "notes": "Role filled. Transparent rejection shown to TA.",
+    "notes": "I have Python experience and can help students with coursework notebooks.",
+    "reviewerNotes": "Role filled. Transparent rejection shown to TA.",
     "submittedAt": "2026-03-23 18:30",
     "applicantSkills": "Python, Java, Teaching support",
     "applicantDescription": "I have Python experience and can help students with coursework notebooks."
@@ -28,6 +30,7 @@
     "priority": "Priority 1",
     "status": "Accepted",
     "notes": "Accepted for weekly Java lab support.",
+    "reviewerNotes": "Accepted for weekly Java lab support.",
     "submittedAt": "2026-03-22 09:00",
     "applicantSkills": "Java, Python, Debugging",
     "applicantDescription": "I have experience in programming labs and can help students debug Java code."
@@ -39,6 +42,7 @@
     "priority": "Priority 1",
     "status": "Accepted",
     "notes": "Accepted for digital systems support.",
+    "reviewerNotes": "Accepted for digital systems support.",
     "submittedAt": "2026-03-22 09:10",
     "applicantSkills": "VHDL, Boolean logic, Simulation",
     "applicantDescription": "I have a strong digital logic background and can support waveform debugging."
@@ -50,6 +54,7 @@
     "priority": "Priority 2",
     "status": "Accepted",
     "notes": "Accepted for additional OOP sessions.",
+    "reviewerNotes": "Accepted for additional OOP sessions.",
     "submittedAt": "2026-03-23 14:20",
     "applicantSkills": "Java, Student support",
     "applicantDescription": "I can help with object-oriented programming concepts and lab support."
@@ -61,6 +66,7 @@
     "priority": "Priority 3",
     "status": "Accepted",
     "notes": "Accepted before the role was closed.",
+    "reviewerNotes": "Accepted before the role was closed.",
     "submittedAt": "2026-03-21 11:45",
     "applicantSkills": "Python, plotting, notebooks",
     "applicantDescription": "I can support Python notebook workflows and analytics exercises."

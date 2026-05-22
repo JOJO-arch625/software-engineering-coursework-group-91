@@ -21,7 +21,9 @@ public class AdminWorkloadServlet extends BasePageServlet {
             return;
         }
         preparePage(request, "admin-dashboard", "Admin Flow", "Admin Workload Dashboard");
-        request.setAttribute("summaries", service.getWorkloadSummaries());
+        String query = request.getParameter("q");
+        request.setAttribute("query", query == null ? "" : query);
+        request.setAttribute("summaries", service.getWorkloadSummaries(query));
         request.setAttribute("overloadCount", service.countOverloadSummaries());
         forward(request, response, "/WEB-INF/jsp/admin/workload.jsp");
     }

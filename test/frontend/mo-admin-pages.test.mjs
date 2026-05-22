@@ -36,6 +36,8 @@ export default function registerMoAndAdminPageTests(runner) {
       assertContainsText(html, "Selected Applicant Detail");
       assertContainsText(html, "Yuyanchen Long");
       assertContainsText(html, "Mark under review");
+      assertContainsText(html, "Mark shortlisted");
+      assertContainsText(html, "Bulk shortlist current job");
       assertContainsText(html, "Accept applicant");
     });
 
@@ -48,7 +50,9 @@ export default function registerMoAndAdminPageTests(runner) {
       assert.equal(response.status, 200);
       assertTitle(html, "Admin Workload Dashboard | TA Recruitment System");
       assertContainsText(html, "Workload Overview");
-      assertContainsText(html, "Threshold: 3 accepted jobs");
+      assertContainsText(html, "Threshold: 10 weekly hours");
+      assertContainsText(html, "Weekly Hours");
+      assertContainsText(html, "Search TA");
       assertContainsText(html, "Overload risk");
       assertContainsText(html, "Siyu Chen");
     });
