@@ -3,6 +3,7 @@ package com.group91.tars.servlet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.group91.tars.i18n.I18n;
 import com.group91.tars.model.UserAccount;
 import com.group91.tars.model.ai.AiChatMemory;
 import com.group91.tars.service.ai.tool.ToolCallingResult;
@@ -30,13 +31,14 @@ public class AiAssistServlet extends BasePageServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
         if (isChatRequest(request)) {
-            writeChatHealth(response);
+            writeChatHealth(request, response);
             return;
         }
         if (!requireAuthenticated(request, response)) {
             return;
         }
-        preparePage(request, "ai-assist", "Optional", "AI Assist Concept");
+        I18n i18n = resolveI18n(request);
+        preparePage(request, "ai-assist", i18n.t("view.tag.optional"), i18n.t("nav.ai-assist"));
         AiChatMemory memory = getMemory(request, getCurrentUser(request));
         request.setAttribute("aiChatMessagesJson", asScriptJson(memory.toMessagesJson().toString()));
         request.setAttribute("aiChatTraceJson", asScriptJson(memory.toToolTraceJson().toString()));
@@ -62,11 +64,12 @@ public class AiAssistServlet extends BasePageServlet {
             JsonObject error = new JsonObject();
             error.addProperty("success", false);
             error.addProperty("sourceMode", "error");
-            error.addProperty("errorMessage", "Please log in before using the AI Agent Workspace.");
+            error.addProperty("errorMessage", resolveI18n(request).t("ai.assist.api.auth-required"));
             response.getWriter().write(gson.toJson(error));
             return;
         }
 
+        I18n i18n = resolveI18n(request);
         AiChatMemory memory = getMemory(request, currentUser);
         if (isClearRequest(request)) {
             memory.clear();
@@ -74,7 +77,7 @@ public class AiAssistServlet extends BasePageServlet {
             JsonObject cleared = new JsonObject();
             cleared.addProperty("success", true);
             cleared.addProperty("sourceMode", "local");
-            cleared.addProperty("message", "AI chat memory cleared.");
+            cleared.addProperty("message", i18n.t("ai.assist.api.cleared"));
             cleared.add("messages", memory.toMessagesJson());
             cleared.add("toolTrace", memory.toToolTraceJson());
             cleared.add("finalJson", memory.toFinalJson());
@@ -91,7 +94,7 @@ public class AiAssistServlet extends BasePageServlet {
             JsonObject error = new JsonObject();
             error.addProperty("success", false);
             error.addProperty("sourceMode", "error");
-            error.addProperty("errorMessage", "Invalid JSON request body.");
+            error.addProperty("errorMessage", i18n.t("ai.assist.api.invalid-json"));
             response.getWriter().write(gson.toJson(error));
             return;
         }
@@ -104,13 +107,18 @@ public class AiAssistServlet extends BasePageServlet {
             JsonObject error = new JsonObject();
             error.addProperty("success", false);
             error.addProperty("sourceMode", "error");
-            error.addProperty("errorMessage", "Message is required.");
+            error.addProperty("errorMessage", i18n.t("ai.assist.api.message-required"));
             response.getWriter().write(gson.toJson(error));
             return;
         }
 
         memory.addMessage("user", message);
         ToolCallingResult result = service.chatWithAiAgent(message, currentUser, memory);
+        if (!result.isSuccess() && isToolCallingDisabledMessage(result.getErrorMessage())) {
+            String localized = i18n.t("ai.assist.api.tool-calling-disabled");
+            result.setErrorMessage(localized);
+            result.setReply(localized);
+        }
         memory.addMessage("assistant", result.getReply());
         memory.setLatestToolTrace(result.getToolTrace());
         memory.setLatestFinalJson(result.getFinalJson());
@@ -139,13 +147,13 @@ public class AiAssistServlet extends BasePageServlet {
         return memory;
     }
 
-    private void writeChatHealth(HttpServletResponse response) throws IOException {
+    private void writeChatHealth(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());
         response.setContentType("application/json");
         JsonObject status = new JsonObject();
         status.addProperty("success", true);
         status.addProperty("sourceMode", "local");
-        status.addProperty("message", "AI assist chat endpoint is available.");
+        status.addProperty("message", resolveI18n(request).t("ai.assist.api.health"));
         response.getWriter().write(gson.toJson(status));
     }
 
@@ -164,5 +172,9 @@ public class AiAssistServlet extends BasePageServlet {
             return "{}";
         }
         return json.replace("</", "<\\/");
+    }
+
+    private boolean isToolCallingDisabledMessage(String message) {
+        return message != null && message.startsWith("Tool-calling chat requires");
     }
 }
