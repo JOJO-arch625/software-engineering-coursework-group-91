@@ -21,13 +21,16 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -45,6 +48,10 @@ public class TarsService {
     public static final int MAX_APPLICATIONS = 3;
     public static final int MAX_ACCEPTED_JOBS = 3;
     public static final long MAX_CV_FILE_SIZE = 10L * 1024L * 1024L;
+
+    private static final Set<String> ALLOWED_APPLICATION_STATUSES = Collections.unmodifiableSet(new HashSet<String>(
+        Arrays.asList("Submitted", "Under Review", "Accepted", "Rejected")
+    ));
 
     private static final TarsService INSTANCE = new TarsService();
 
@@ -202,6 +209,49 @@ public class TarsService {
             }
         }
         return moJobs;
+    }
+
+    /**
+     * Returns true when the job exists and is owned by the given MO.
+     *
+     * @param jobId the job posting identifier
+     * @param moId  the MO identifier
+     * @return true if the job belongs to the MO
+     */
+    public boolean isJobOwnedByMo(String jobId, String moId) {
+        if (isBlank(jobId) || isBlank(moId)) {
+            return false;
+        }
+        JobPosting job = getJobById(jobId);
+        return job != null && moId.equals(job.getMoId());
+    }
+
+    /**
+     * Returns true when the linked TA account exists for the supplied profile id.
+     *
+     * @param taId the TA profile identifier
+     * @return true if a TA account is registered for this profile id
+     */
+    public boolean isRegisteredTa(String taId) {
+        if (isBlank(taId)) {
+            return false;
+        }
+        for (UserAccount account : store.loadAccounts()) {
+            if (ROLE_TA.equals(account.getRole()) && taId.equals(account.getLinkedId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns true when the supplied application status is allowed.
+     *
+     * @param status the requested status value
+     * @return true if the status is supported
+     */
+    public boolean isAllowedApplicationStatus(String status) {
+        return status != null && ALLOWED_APPLICATION_STATUSES.contains(status);
     }
 
     /**
@@ -409,6 +459,10 @@ public class TarsService {
      * @return an OperationResult with success=true if saved, or success=false with an error message if validation fails
      */
     public OperationResult saveTaProfile(String taId, TAProfile updatedProfile) {
+        if (!isRegisteredTa(taId)) {
+            return OperationResult.failure("flash.auth.no-permission",
+                "You can only update your own TA profile.");
+        }
         if (isBlank(updatedProfile.getFullName())
             || isBlank(updatedProfile.getStudentNumber())
             || isBlank(updatedProfile.getEmail())
@@ -475,6 +529,10 @@ public class TarsService {
      * @return an OperationResult with success=true if uploaded, or success=false with an error message
      */
     public OperationResult uploadTaCv(String taId, Part part) {
+        if (!isRegisteredTa(taId)) {
+            return OperationResult.failure("flash.auth.no-permission",
+                "You can only upload a CV to your own TA profile.");
+        }
         if (part == null || part.getSize() == 0) {
             return OperationResult.failure("flash.cv.no-file", "Please choose a CV file before uploading.");
         }
@@ -548,6 +606,10 @@ public class TarsService {
      * @return an OperationResult with success=true if submitted, or success=false with an error message
      */
     public OperationResult submitTaApplication(String taId, String jobId, String priority, String notes, String applicantSkills, String applicantDescription) {
+        if (!isRegisteredTa(taId)) {
+            return OperationResult.failure("flash.auth.no-permission",
+                "You can only submit applications for your own TA account.");
+        }
         JobPosting job = getJobById(jobId);
         if (job == null) {
             return OperationResult.failure("flash.job.not-found", "The selected job posting does not exist.");
@@ -621,13 +683,15 @@ public class TarsService {
         }
 
         boolean isExistingJob = false;
+        JobPosting ownedExisting = null;
         if (!isBlank(draft.getId())) {
-            for (JobPosting existing : store.loadJobs()) {
-                if (draft.getId().equals(existing.getId())) {
-                    isExistingJob = true;
-                    break;
-                }
-            }
+            ownedExisting = getJobById(draft.getId());
+            isExistingJob = ownedExisting != null;
+        }
+
+        if (isExistingJob && !moId.equals(ownedExisting.getMoId())) {
+            return OperationResult.failure("flash.auth.no-permission",
+                "You can only edit job postings that belong to your MO account.");
         }
 
         if (!isExistingJob && !isValidFutureDeadline(draft.getDeadline())) {
@@ -669,6 +733,21 @@ public class TarsService {
      * @return an OperationResult with success=true if closed, or success=false if the job was not found
      */
     public OperationResult closeJobPosting(String jobId) {
+        return closeJobPosting(jobId, null);
+    }
+
+    /**
+     * Closes a job posting when it belongs to the requesting MO.
+     *
+     * @param jobId the job posting identifier to close
+     * @param moId  the MO identifier performing the action; required for ownership checks
+     * @return an OperationResult with success=true if closed, or success=false if not found or unauthorized
+     */
+    public OperationResult closeJobPosting(String jobId, String moId) {
+        if (isBlank(moId) || !isJobOwnedByMo(jobId, moId)) {
+            return OperationResult.failure("flash.auth.no-permission",
+                "You can only close job postings that belong to your MO account.");
+        }
         List<JobPosting> jobs = store.loadJobs();
         for (JobPosting job : jobs) {
             if (job.getId().equals(jobId)) {
@@ -694,9 +773,31 @@ public class TarsService {
      * @return an OperationResult with success=true if updated, or success=false with an error message
      */
     public OperationResult updateApplicationStatus(String applicationId, String status, String notes) {
+        return updateApplicationStatus(applicationId, status, notes, null);
+    }
+
+    /**
+     * Updates the status of an application record after validating status values and MO ownership.
+     *
+     * @param applicationId the application record identifier to update
+     * @param status        the new status value (Submitted, Under Review, Accepted, Rejected)
+     * @param notes         optional review notes from the MO
+     * @param moId          the MO identifier performing the review; when provided, ownership is enforced
+     * @return an OperationResult with success=true if updated, or success=false with an error message
+     */
+    public OperationResult updateApplicationStatus(String applicationId, String status, String notes, String moId) {
+        if (!isAllowedApplicationStatus(status)) {
+            return OperationResult.failure("flash.review.invalid-status",
+                "Unsupported application status. Use Submitted, Under Review, Accepted, or Rejected.");
+        }
+
         List<ApplicationRecord> applications = store.loadApplications();
         for (ApplicationRecord application : applications) {
             if (application.getId().equals(applicationId)) {
+                if (!isBlank(moId) && !isJobOwnedByMo(application.getJobId(), moId)) {
+                    return OperationResult.failure("flash.auth.no-permission",
+                        "You can only review applications for your own job postings.");
+                }
                 if ("Accepted".equals(status) && countAcceptedJobsForTa(application.getTaId()) >= MAX_ACCEPTED_JOBS
                     && !"Accepted".equals(application.getStatus())) {
                     return OperationResult.failure("flash.review.overload", "Acceptance would exceed the TA workload cap.");

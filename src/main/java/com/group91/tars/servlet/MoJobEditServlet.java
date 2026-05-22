@@ -37,7 +37,7 @@ public class MoJobEditServlet extends BasePageServlet {
         String action = request.getParameter("action");
         OperationResult result;
         if ("close".equals(action)) {
-            result = service.closeJobPosting(request.getParameter("id"));
+            result = service.closeJobPosting(request.getParameter("id"), getCurrentUser(request).getLinkedId());
         } else {
             JobPosting draft = new JobPosting();
             draft.setId(request.getParameter("id"));
@@ -61,10 +61,19 @@ public class MoJobEditServlet extends BasePageServlet {
 
     private JobPosting resolveDraft(HttpServletRequest request) {
         String id = request.getParameter("id");
+        String moId = getCurrentUser(request).getLinkedId();
         JobPosting existing = id == null ? null : service.getJobById(id);
         if (existing != null) {
-            return existing;
+            if (service.isJobOwnedByMo(existing.getId(), moId)) {
+                return existing;
+            }
+            flashI18n(request, "error", "flash.auth.no-permission");
+            return newBlankJob();
         }
+        return newBlankJob();
+    }
+
+    private JobPosting newBlankJob() {
         JobPosting blank = new JobPosting();
         blank.setStatus("Open");
         return blank;

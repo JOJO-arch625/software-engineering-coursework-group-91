@@ -5,11 +5,12 @@ import registerMoAndAdminPageTests from "./frontend/mo-admin-pages.test.mjs";
 
 import { registerMoWorkflowTests } from "./frontend/mo-workflow.test.mjs";
 import { registerAdminOverloadTests } from "./frontend/admin-overload.test.mjs";
-import { registerSecurityNegativeTests } from "./frontend/security-negative-tests.mjs";
+import { registerSecurityNegativeTests } from "./frontend/security-negative-tests.test.mjs";
 
 import { registerTaProfileTests } from "./frontend/ta-profile.test.mjs";
 import { registerTaApplicationRulesTests } from "./frontend/ta-application-rules.test.mjs";
 import { registerLogoutTests } from "./frontend/logout.test.mjs";
+import { registerSearchInboxTests } from "./frontend/search-inbox.test.mjs";
 
 const runner = new MiniTestRunner();
 const verbose = process.argv.includes("--verbose");
@@ -25,6 +26,7 @@ registerSecurityNegativeTests(runner);
 registerTaProfileTests(runner);
 registerTaApplicationRulesTests(runner);
 registerLogoutTests(runner);
+registerSearchInboxTests(runner);
 
 const success = await runner.run({ verbose });
 process.exitCode = success ? 0 : 1;

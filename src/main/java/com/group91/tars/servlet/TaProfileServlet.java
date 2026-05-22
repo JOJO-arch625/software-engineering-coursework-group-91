@@ -36,6 +36,11 @@ public class TaProfileServlet extends BasePageServlet {
         if (!requireRole(request, response, TarsService.ROLE_TA)) {
             return;
         }
+        if (isForeignTaId(request)) {
+            flashI18n(request, "error", "flash.auth.no-permission");
+            redirect(request, response, "/ta/profile");
+            return;
+        }
         String action = request.getParameter("action");
         OperationResult result;
         if ("uploadCv".equals(action)) {
@@ -64,5 +69,12 @@ public class TaProfileServlet extends BasePageServlet {
 
     private boolean isSafeReturnPath(String value) {
         return value != null && value.startsWith("/") && !value.startsWith("//") && !value.contains("://");
+    }
+
+    private boolean isForeignTaId(HttpServletRequest request) {
+        String postedTaId = request.getParameter("taId");
+        return postedTaId != null
+            && !postedTaId.trim().isEmpty()
+            && !postedTaId.equals(getCurrentUser(request).getLinkedId());
     }
 }

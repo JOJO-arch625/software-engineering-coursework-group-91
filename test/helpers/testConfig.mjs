@@ -21,3 +21,11 @@ export const DEMO_ACCOUNTS = {
 export function buildUrl(pathname) {
   return new URL(pathname, DEFAULT_BASE_URL).toString();
 }
+
+/** Must match `page.title.suffix` in messages_en.properties */
+export const PAGE_TITLE_SUFFIX =
+  process.env.PAGE_TITLE_SUFFIX || "INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM";
+
+export function pageTitle(viewTitle) {
+  return `${viewTitle} | ${PAGE_TITLE_SUFFIX}`;
+}

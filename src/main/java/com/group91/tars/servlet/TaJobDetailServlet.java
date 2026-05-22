@@ -35,6 +35,11 @@ public class TaJobDetailServlet extends BasePageServlet {
         if (!requireRole(request, response, TarsService.ROLE_TA)) {
             return;
         }
+        if (isForeignTaId(request)) {
+            flashI18n(request, "error", "flash.auth.no-permission");
+            redirect(request, response, "/ta/jobs");
+            return;
+        }
         String jobId = request.getParameter("jobId");
         OperationResult result = service.submitTaApplication(
             getCurrentUser(request).getLinkedId(),
@@ -65,5 +70,12 @@ public class TaJobDetailServlet extends BasePageServlet {
             return service.getAllJobs().get(0);
         }
         return null;
+    }
+
+    private boolean isForeignTaId(HttpServletRequest request) {
+        String postedTaId = request.getParameter("taId");
+        return postedTaId != null
+            && !postedTaId.trim().isEmpty()
+            && !postedTaId.equals(getCurrentUser(request).getLinkedId());
     }
 }

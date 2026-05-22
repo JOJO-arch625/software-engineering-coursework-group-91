@@ -1,4 +1,4 @@
-<%@ page import="java.util.List,com.group91.tars.model.JobPosting,com.group91.tars.model.ai.AiFitResult,com.group91.tars.service.TarsService" %>
+<%@ page import="java.util.List,com.group91.tars.model.JobPosting,com.group91.tars.model.ai.AiFitResult,com.group91.tars.service.TarsService,com.group91.tars.web.AiPresentation" %>
 <%
     JobPosting job = (JobPosting) request.getAttribute("job");
     List<String> aiTodos = (List<String>) request.getAttribute("aiTodos");
@@ -17,9 +17,7 @@
         matchedSkills = aiFit.getMatchedSkills();
     }
     String aiSourceMode = aiFit == null ? "local" : aiFit.getSourceMode();
-    String aiSourceLabel = "llm_tool".equals(aiSourceMode) ? "tool-calling agent"
-        : ("llm".equals(aiSourceMode) ? "LLM agent"
-        : ("error".equals(aiSourceMode) ? "AI error state" : "local rule engine"));
+    String aiSourceLabel = AiPresentation.sourceLabel(i18n, aiSourceMode);
 %>
 <section class="view active">
     <% if (job == null) { %>

@@ -128,10 +128,30 @@ public class JsonDataStore {
     }
 
     private void writeList(Path path, Object data) {
-        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+        Path parent = path.getParent();
+        if (parent != null) {
+            try {
+                Files.createDirectories(parent);
+            } catch (IOException exception) {
+                throw new IllegalStateException("Unable to create data directory: " + parent, exception);
+            }
+        }
+
+        Path tempFile = path.resolveSibling(path.getFileName().toString() + ".tmp");
+        try (Writer writer = Files.newBufferedWriter(tempFile, StandardCharsets.UTF_8)) {
             gson.toJson(data, writer);
         } catch (IOException exception) {
             throw new IllegalStateException("Unable to write JSON file: " + path, exception);
+        }
+
+        try {
+            Files.move(tempFile, path, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (IOException atomicMoveFailure) {
+            try {
+                Files.move(tempFile, path, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException fallbackFailure) {
+                throw new IllegalStateException("Unable to commit JSON file: " + path, fallbackFailure);
+            }
         }
     }
 

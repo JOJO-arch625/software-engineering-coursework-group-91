@@ -1,4 +1,4 @@
-<%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiCandidateSummary,com.group91.tars.service.TarsService" %>
+<%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiCandidateSummary,com.group91.tars.service.TarsService,com.group91.tars.web.AiPresentation" %>
 <%
     JobPosting selectedJob = (JobPosting) request.getAttribute("selectedJob");
     List<ApplicationRecord> applications = (List<ApplicationRecord>) request.getAttribute("applications");
@@ -64,9 +64,7 @@
                 List<String> selectedMissingSkills = candidateSummary == null ? new java.util.ArrayList<String>() : candidateSummary.getMissingSkills();
                 List<String> selectedMatchedSkills = candidateSummary == null ? new java.util.ArrayList<String>() : candidateSummary.getMatchedSkills();
                 String candidateSourceMode = candidateSummary == null ? "local" : candidateSummary.getSourceMode();
-                String candidateSourceLabel = "llm_tool".equals(candidateSourceMode) ? "tool-calling agent"
-                    : ("llm".equals(candidateSourceMode) ? "LLM agent"
-                    : ("error".equals(candidateSourceMode) ? "AI error state" : "local rule engine"));
+                String candidateSourceLabel = AiPresentation.sourceLabel(i18n, candidateSourceMode);
             %>
             <h4 style="margin-bottom: 10px;"><%= selectedApplicant.getFullName() %></h4>
             <div class="ai-score-shell" style="margin-bottom: 12px;">

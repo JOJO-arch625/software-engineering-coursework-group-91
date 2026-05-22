@@ -48,7 +48,8 @@ public class MoReviewServlet extends BasePageServlet {
         OperationResult result = service.updateApplicationStatus(
             request.getParameter("applicationId"),
             request.getParameter("status"),
-            request.getParameter("notes")
+            request.getParameter("notes"),
+            getCurrentUser(request).getLinkedId()
         );
         if (result.isSuccess()) {
             flashI18n(request, "success", result.getMessageKey() != null ? result.getMessageKey() : "flash.review.updated");
@@ -60,15 +61,17 @@ public class MoReviewServlet extends BasePageServlet {
     }
 
     private JobPosting resolveJob(HttpServletRequest request) {
+        String moId = getCurrentUser(request).getLinkedId();
         String jobId = request.getParameter("jobId");
         if (jobId != null) {
-            JobPosting explicit = service.getJobById(jobId);
-            if (explicit != null) {
-                return explicit;
+            if (service.isJobOwnedByMo(jobId, moId)) {
+                return service.getJobById(jobId);
             }
+            flashI18n(request, "error", "flash.auth.no-permission");
         }
-        if (!service.getJobsForMo(getCurrentUser(request).getLinkedId()).isEmpty()) {
-            return service.getJobsForMo(getCurrentUser(request).getLinkedId()).get(0);
+        List<JobPosting> ownedJobs = service.getJobsForMo(moId);
+        if (!ownedJobs.isEmpty()) {
+            return ownedJobs.get(0);
         }
         return null;
     }

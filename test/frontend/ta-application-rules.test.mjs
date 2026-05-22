@@ -10,7 +10,7 @@ export function registerTaApplicationRulesTests(runner) {
     suite.before(async () => {
       client = new SessionClient();
       await client.ensureServerAvailable();
-      await client.login(DEMO_ACCOUNTS.ta.username, DEMO_ACCOUNTS.password);
+      await client.login(DEMO_ACCOUNTS.ta.username, DEMO_ACCOUNTS.ta.password);
     });
 
     suite.test("TA can view available jobs", async () => {
