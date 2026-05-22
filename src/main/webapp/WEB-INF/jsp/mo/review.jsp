@@ -1,4 +1,4 @@
-<%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.model.ai.AiCandidateSummary,com.group91.tars.service.TarsService" %>
+<%@ page import="java.util.List,com.group91.tars.model.ApplicationRecord,com.group91.tars.model.JobPosting,com.group91.tars.model.TAProfile,com.group91.tars.service.TarsService" %>
 <%
     JobPosting selectedJob = (JobPosting) request.getAttribute("selectedJob");
     List<JobPosting> moJobs = (List<JobPosting>) request.getAttribute("moJobs");
@@ -40,19 +40,13 @@
                     <tr>
                         <th><%= i18n.t("mo.review.applicant") %></th>
                         <th><%= i18n.t("mo.review.priority") %></th>
-                        <th><%= i18n.t("mo.review.ai-fit") %></th>
-                        <th><%= i18n.t("mo.review.accepted") %></th>
+                        <th>Skill Fit</th>
                         <th>CV</th>
-                        <th><%= i18n.t("mo.review.status") %></th>
                     </tr>
                     </thead>
                     <tbody>
                     <% for (ApplicationRecord record : applications) {
                         TAProfile applicant = pageService.getProfileById(record.getTaId());
-                        String statusClass = "Submitted".equals(record.getStatus()) ? "status-open"
-                            : ("Under Review".equals(record.getStatus()) ? "status-review"
-                            : ("Shortlisted".equals(record.getStatus()) ? "status-shortlisted"
-                            : ("Accepted".equals(record.getStatus()) ? "status-accepted" : "status-rejected")));
                         int fitScore = selectedJob == null ? 0 : pageService.calculateFitScore(record.getTaId(), selectedJob.getId());
                         boolean isSelected = selectedApplication != null && record.getId().equals(selectedApplication.getId());
                         boolean hasApplicantCv = applicant != null && applicant.getCvPath() != null && !applicant.getCvPath().trim().isEmpty();
@@ -61,7 +55,6 @@
                         <td><a class="table-link" href="<%= request.getContextPath() %>/mo/review?jobId=<%= selectedJob == null ? "" : selectedJob.getId() %>&appId=<%= record.getId() %>"><%= applicant == null ? record.getTaId() : applicant.getFullName() %></a></td>
                         <td><%= record.getPriority() %></td>
                         <td><strong><%= fitScore %>%</strong></td>
-                        <td><%= pageService.countAcceptedJobsForTaPublic(record.getTaId()) %> / 3</td>
                         <td>
                             <% if (hasApplicantCv) { %>
                             <a class="table-link" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= record.getTaId() %>">View CV</a>
@@ -69,7 +62,6 @@
                             <span class="muted">No CV</span>
                             <% } %>
                         </td>
-                        <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     </tr>
                     <% } %>
                     </tbody>
@@ -84,19 +76,23 @@
             <% if (selectedApplication == null || selectedApplicant == null) { %>
             <div class="alert info"><%= i18n.t("mo.review.select-applicant") %></div>
             <% } else {
-                AiCandidateSummary candidateSummary = selectedJob == null ? null : pageService.getCandidateSummary(
-                    selectedApplicant.getId(),
-                    selectedJob.getId(),
-                    selectedApplication,
-                    currentUser
-                );
-                int selectedFitScore = candidateSummary == null ? 0 : candidateSummary.getScore();
-                List<String> selectedMissingSkills = candidateSummary == null ? new java.util.ArrayList<String>() : candidateSummary.getMissingSkills();
-                List<String> selectedMatchedSkills = candidateSummary == null ? new java.util.ArrayList<String>() : candidateSummary.getMatchedSkills();
-                String candidateSourceMode = candidateSummary == null ? "local" : candidateSummary.getSourceMode();
-                String candidateSourceLabel = "llm_tool".equals(candidateSourceMode) ? "tool-calling agent"
-                    : ("llm".equals(candidateSourceMode) ? "LLM agent"
-                    : ("error".equals(candidateSourceMode) ? "AI error state" : "local rule engine"));
+                int profileFitScore = selectedJob == null || selectedApplicant == null
+                    ? 0
+                    : pageService.calculateFitScore(selectedApplicant.getId(), selectedJob.getId());
+                String[] jobSkillArr = selectedJob.getSkills() == null ? new String[0]
+                    : selectedJob.getSkills().toLowerCase(java.util.Locale.ENGLISH).split("[,;\\s]+");
+                String[] taSkillArr = selectedApplicant.getSkills() == null ? new String[0]
+                    : selectedApplicant.getSkills().toLowerCase(java.util.Locale.ENGLISH).split("[,;\\s]+");
+                java.util.List<String> profileMatched = new java.util.ArrayList<String>();
+                java.util.List<String> profileMissing = new java.util.ArrayList<String>();
+                for (String js : jobSkillArr) {
+                    if (js.trim().isEmpty()) continue;
+                    boolean found = false;
+                    for (String ts : taSkillArr) {
+                        if (js.equals(ts) || ts.contains(js) || js.contains(ts)) { found = true; break; }
+                    }
+                    if (found) profileMatched.add(js); else profileMissing.add(js);
+                }
                 String selectedCvPath = selectedApplicant.getCvPath();
                 boolean selectedHasCv = selectedCvPath != null && !selectedCvPath.trim().isEmpty();
             %>
@@ -110,47 +106,19 @@
                 <p>No CV has been uploaded for this applicant.</p>
                 <% } %>
             </div>
-            <div class="ai-score-shell" style="margin-bottom: 12px;">
-                <span class="ai-score-label"><%= i18n.t("mo.review.fit-score") %></span>
-                <strong><%= selectedFitScore %>%</strong>
+            <div class="ai-score-shell" style="margin-bottom: 6px;">
+                <span class="ai-score-label">Skill Fit</span>
+                <strong><%= profileFitScore %></strong>
             </div>
-            <% if (!selectedMissingSkills.isEmpty()) { %>
+            <% if (!profileMissing.isEmpty()) { %>
             <div class="alert danger" style="margin-top: 0; margin-bottom: 12px;">
-                <strong><%= i18n.t("mo.review.missing-skills") %>:</strong> <%= String.join(", ", selectedMissingSkills) %>
+                <strong><%= i18n.t("mo.review.missing-skills") %>:</strong> <%= String.join(", ", profileMissing) %>
             </div>
-            <% } else { %>
+            <% } else if (!profileMatched.isEmpty()) { %>
             <div class="alert success" style="margin-top: 0; margin-bottom: 12px;">
                 <%= i18n.t("mo.review.full-match") %>
             </div>
             <% } %>
-            <article class="ai-card" style="margin-bottom: 16px;">
-                <div class="panel-header">
-                    <h4>AI Candidate Summary</h4>
-                    <span class="ai-source-chip ai-source-<%= candidateSourceMode %>">
-                        Generated by <%= candidateSourceLabel %>
-                    </span>
-                </div>
-                <div class="ai-insights">
-                    <p><strong>Matched skills:</strong> <%= selectedMatchedSkills.isEmpty() ? "None detected" : String.join(", ", selectedMatchedSkills) %></p>
-                    <p><strong>Missing skills:</strong> <%= selectedMissingSkills.isEmpty() ? "None" : String.join(", ", selectedMissingSkills) %></p>
-                    <div class="ai-evidence-box">
-                        <strong>CV evidence</strong>
-                        <p><%= candidateSummary == null ? "CV evidence is unavailable." : candidateSummary.getCvEvidence() %></p>
-                    </div>
-                    <p><strong>Current accepted jobs:</strong> <%= candidateSummary == null ? pageService.countAcceptedJobsForTaPublic(selectedApplicant.getId()) : candidateSummary.getAcceptedJobs() %> / 3</p>
-                    <p><strong>Workload risk:</strong> <%= candidateSummary == null ? "low" : candidateSummary.getWorkloadRisk() %></p>
-                    <p><strong>Shortlist recommendation:</strong>
-                        <span class="status-chip shortlist-<%= candidateSummary == null ? "consider" : candidateSummary.getShortlistRecommendation().toLowerCase() %>">
-                            <%= candidateSummary == null ? "Consider" : candidateSummary.getShortlistRecommendation() %>
-                        </span>
-                    </p>
-                    <p><strong>Advice:</strong> <%= candidateSummary == null ? "Review manually before deciding." : candidateSummary.getAdvice() %></p>
-                    <% if (candidateSummary != null && candidateSummary.getErrorMessage() != null) { %>
-                    <p class="ai-source-error"><strong>Error:</strong> <%= candidateSummary.getErrorMessage() %></p>
-                    <% } %>
-                    <p class="ai-disclaimer">Human decision required. The AI must not automatically accept or reject applications.</p>
-                </div>
-            </article>
             <dl class="detail-grid">
                 <div>
                     <dt><%= i18n.t("mo.review.applicant-skills") %></dt>
