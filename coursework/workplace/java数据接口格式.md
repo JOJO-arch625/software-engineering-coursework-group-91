@@ -1,3 +1,12 @@
+# 常见参数前缀
+数据私有 private
+方法共有 public
+部分方法或者数据会呈现public static
+static 让这个数据或者方法不需要实例化类就能直接调用，比如比较优雅的create 等非传统的类实例化方法
+常见的类实例化，通过new classname（parameter），需要配套的构造函数，如果没有的话，只能通过set 方法一个一个赋值，很麻烦，所以有了create 工厂，以public static关键字修饰，封装了new+set赋值，使得可以直接
+classname class1 = classname.create(parameters)
+
+类的析构，定义的指针变量永远存在，只是内容会随着没有被指向而被gc自动回收，清空内存的最好方法是给变量悬空
 # 非常准确地说：
 **是的！这就是 Java 企业开发（特别是 Spring Boot / Web 项目）中最标准、最常用、最规范的代码风格！**
 

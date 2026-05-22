@@ -1,5 +1,23 @@
 # I18N 中英文切换功能实现文档
+## 业务逻辑
+"flash.profile.saved"
+        ↓
+BasePageServlet.flashI18n(...)
+        ↓
+I18n.t("flash.profile.saved")
+        ↓
+ResourceBundle.getString("flash.profile.saved")
+        ↓
+src/main/resources/i18n/messages_en.properties
+或
+src/main/resources/i18n/messages_zh.properties
 
+示例：
+return OperationResult.success(
+    "flash.profile.saved",
+    "Profile saved successfully."
+);
+flashI18n(request, "success", result.getMessageKey());
 ## 概述
 
 在 TARS 项目中实现了中英文界面切换功能，用户点击顶部栏的 **"中文"** / **"EN"** 按钮即可在两种语言之间切换。语言偏好保存在 session 中，跨页面持久。
