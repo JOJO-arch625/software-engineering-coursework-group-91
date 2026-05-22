@@ -48,6 +48,7 @@ public class I18n {
      */
     public I18n(Locale locale) {
         this.locale = locale;
+        ResourceBundle.clearCache(Thread.currentThread().getContextClassLoader());
         this.bundle = ResourceBundle.getBundle(BASE_NAME, locale, UTF8_CONTROL);
     }
 
