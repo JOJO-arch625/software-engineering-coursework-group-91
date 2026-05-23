@@ -1610,4 +1610,120 @@ public class TarsService {
     private boolean isBlank(String value) {
         return value == null || value.trim().isEmpty();
     }
+
+    // ==============================================================
+    // Test helper methods - expose private logic for unit testing
+    // ==============================================================
+
+    /**
+     * Returns true if the given role is an MO (Module Owner).
+     */
+    public boolean isMo(String role) {
+        return ROLE_MO.equals(role);
+    }
+
+    /**
+     * Returns true if the given role is an Admin.
+     */
+    public boolean isAdmin(String role) {
+        return ROLE_ADMIN.equals(role);
+    }
+
+    /**
+     * Returns true if the given role is a TA (Teaching Assistant).
+     */
+    public boolean isTa(String role) {
+        return ROLE_TA.equals(role);
+    }
+
+    /**
+     * Returns true if the given user is restricted to MO_COURSE_CODE data only.
+     */
+    public boolean isMoRestricted(UserAccount user) {
+        return user != null && isMo(user.getRole());
+    }
+
+    /**
+     * Returns true if the given user has unrestricted read access.
+     */
+    public boolean isUnrestrictedRead(UserAccount user) {
+        return user != null && (isAdmin(user.getRole()) || isTa(user.getRole()));
+    }
+
+    /**
+     * Returns true if the given job belongs to the MO's restricted course.
+     */
+    public boolean isMoOwnedJob(JobPosting job) {
+        return job != null && MO_COURSE_CODE.equals(job.getModuleCode());
+    }
+
+    /**
+     * Validates a BUPT email address (must end with @bupt.edu.cn). Exposed for tests.
+     */
+    public boolean isValidBuptEmailPublic(String email) {
+        if (isBlank(email)) {
+            return false;
+        }
+        return email.trim().toLowerCase(Locale.ENGLISH).endsWith("@bupt.edu.cn");
+    }
+
+    /**
+     * Checks whether a student number is already used by another TA. Exposed for tests.
+     */
+    public boolean isDuplicateStudentNumberPublic(String currentTaId, String studentNumber) {
+        if (isBlank(studentNumber)) {
+            return false;
+        }
+        for (TAProfile profile : store.loadProfiles()) {
+            if (!currentTaId.equals(profile.getId())
+                && studentNumber.trim().equals(profile.getStudentNumber())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Validates that a deadline string represents a future date. Exposed for tests.
+     */
+    public boolean isValidFutureDeadlinePublic(String deadline) {
+        if (isBlank(deadline)) {
+            return false;
+        }
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
+            dateFormat.setLenient(false);
+            Date deadlineDate = dateFormat.parse(deadline);
+            Date today = dateFormat.parse(dateFormat.format(new Date()));
+            return deadlineDate.after(today);
+        } catch (ParseException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Returns missing skills for a TA and job. Exposed for tests.
+     */
+    public List<String> getMissingSkillsPublic(String taId, String jobId) {
+        List<String> missing = new ArrayList<String>();
+        JobPosting job = getJobById(jobId);
+        TAProfile profile = getTaProfile(taId);
+        if (job == null || isBlank(job.getSkills())) {
+            return missing;
+        }
+        java.util.Set<String> requiredSkills = normalizeSkillSet(job.getSkills());
+        if (profile == null || isBlank(profile.getSkills())) {
+            for (String skill : requiredSkills) {
+                missing.add(skill);
+            }
+            return missing;
+        }
+        java.util.Set<String> taSkills = normalizeSkillSet(profile.getSkills());
+        for (String required : requiredSkills) {
+            if (!taSkills.contains(required)) {
+                missing.add(required);
+            }
+        }
+        return missing;
+    }
 }
