@@ -11,7 +11,7 @@
         <article class="panel">
             <div class="panel-header">
                 <h4><%= i18n.t("mo.job.editor.your-postings") %></h4>
-                <p class="muted" style="margin: 4px 0 0;"><%= TarsService.MO_COURSE_LABEL %></p>
+                <p class="muted" style="margin: 4px 0 0;"><%= i18n.t("course.mo.label") %></p>
             </div>
             <% if (myJobs == null || myJobs.isEmpty()) { %>
             <div class="alert info"><%= i18n.t("mo.dashboard.no-applications") %></div>
@@ -47,7 +47,7 @@
         <article class="panel">
             <div class="panel-header">
                 <h4><%= isEditing ? i18n.t("mo.job.editor.editing") : i18n.t("mo.job.editor.heading") %></h4>
-                <p><%= i18n.t("mo.job.editor.description") %></p>
+                <p><%= i18n.t("mo.job.editor.page-description") %></p>
             </div>
             <form method="post" action="<%= request.getContextPath() %>/mo/jobs/edit" class="form-grid">
                 <input type="hidden" name="action" value="save">
@@ -56,7 +56,7 @@
                 <input type="hidden" name="moduleCode" value="<%= TarsService.MO_COURSE_CODE %>">
                 <div class="form-display-field">
                     <span class="form-display-label"><%= i18n.t("mo.job.editor.module-code") %></span>
-                <span class="form-display-value"><%= TarsService.MO_COURSE_LABEL %></span>
+                <span class="form-display-value"><%= i18n.t("course.mo.label") %></span>
                 </div>
                 <label>
                     <%= i18n.t("mo.job.editor.job-title") %>

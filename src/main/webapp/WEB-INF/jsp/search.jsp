@@ -106,7 +106,7 @@
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong></td>
                     <td><%= pageService.getJobTitle(record.getJobId()) %></td>
-                    <td><%= record.getPriority() %></td>
+                    <td><%= i18n.td(record.getPriority()) %></td>
                     <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td><%= record.getNotes() %></td>
                 </tr>
@@ -180,7 +180,7 @@
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong><br><span class="muted"><%= pageService.getJobTitle(record.getJobId()) %></span></td>
                     <td><%= applicant == null ? record.getTaId() : applicant.getFullName() %></td>
-                    <td><%= record.getPriority() %></td>
+                    <td><%= i18n.td(record.getPriority()) %></td>
                     <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td><a class="secondary-button" href="<%= request.getContextPath() %>/mo/review?jobId=<%= record.getJobId() %>&appId=<%= record.getId() %>"><%= i18n.t("search.review") %></a></td>
                 </tr>

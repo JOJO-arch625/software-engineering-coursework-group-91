@@ -121,7 +121,7 @@
             </div>
             <ul class="feature-list">
                 <% for (String item : aiTodos) { %>
-                <li><%= item %></li>
+                <li><%= i18n.td(item) %></li>
                 <% } %>
             </ul>
         </article>
@@ -223,12 +223,14 @@
             List<AiWorkloadAdvice> workloadAdvice = pageService.getAiWorkloadAdvice();
         %>
         <div class="ai-role-grid">
-            <% for (AiWorkloadAdvice item : workloadAdvice) { %>
+            <% for (AiWorkloadAdvice item : workloadAdvice) {
+                String riskLabel = "at_cap".equals(item.getWorkloadRisk()) ? i18n.t("ai.assist.risk.at-cap") : ("caution".equals(item.getWorkloadRisk()) ? i18n.t("ai.assist.risk.caution") : i18n.t("ai.assist.risk.low"));
+            %>
             <div class="ai-evidence-box">
                 <strong><%= item.getTaName() %></strong>
                 <p><%= i18n.t("ai.assist.role.accepted-jobs", item.getAcceptedCount()) %></p>
-                <p><%= i18n.t("ai.assist.role.risk", item.getWorkloadRisk()) %></p>
-                <p><%= item.getAdvice() %></p>
+                <p><%= i18n.t("ai.assist.role.risk", riskLabel) %></p>
+                <p><%= i18n.td(item.getAdvice()) %></p>
             </div>
             <% } %>
         </div>
@@ -246,7 +248,7 @@
         }
         var form = workspace.querySelector("[data-agent-form]");
         var textarea = form.querySelector("textarea");
-        var initialPrompt = textarea.getAttribute("data-agent-initial") || "Ask about TA fit, job applicants, CV evidence, or workload risk.";
+        var initialPrompt = textarea.getAttribute("data-agent-initial") || "<%= i18n.t("ai.assist.chat.prompt.default") %>";
         var messages = workspace.querySelector("[data-agent-messages]");
         var trace = workspace.querySelector("[data-agent-trace]");
         var source = workspace.querySelector("[data-agent-source]");
@@ -268,7 +270,13 @@
             chatFailed: "<%= i18n.t("ai.assist.js.chat-failed") %>",
             running: "<%= i18n.t("ai.assist.trace.running") %>",
             idle: "<%= i18n.t("ai.assist.trace.idle") %>",
-            memory: "<%= i18n.t("ai.assist.trace.memory") %>"
+            memory: "<%= i18n.t("ai.assist.trace.memory") %>",
+            local: "<%= i18n.t("ai.assist.source.local") %>",
+            llm: "<%= i18n.t("ai.assist.source.llm") %>",
+            error: "<%= i18n.t("ai.assist.source.error") %>",
+            unknown: "<%= i18n.t("common.none") %>",
+            success: "<%= i18n.t("ai.assist.trace.success") %>",
+            failed: "<%= i18n.t("ai.assist.trace.failed") %>"
         };
 
         tabs.forEach(function (tab) {
@@ -304,13 +312,20 @@
                 var box = document.createElement("div");
                 box.className = "ai-evidence-box";
                 var title = document.createElement("strong");
-                title.textContent = item.tool + " - " + (item.success ? "success" : "failed");
+                title.textContent = item.tool + " - " + (item.success ? labels.success : labels.failed);
                 var detail = document.createElement("pre");
                 detail.textContent = JSON.stringify(item, null, 2);
                 box.appendChild(title);
                 box.appendChild(detail);
                 trace.appendChild(box);
             });
+        }
+
+        function sourceLabel(mode) {
+            if (mode === "local") return labels.local;
+            if (mode === "llm") return labels.llm;
+            if (mode === "error") return labels.error;
+            return mode || labels.unknown;
         }
 
         function renderHydratedMemory() {
@@ -325,7 +340,7 @@
             renderTrace(hydratedTrace || []);
             finalJson.textContent = JSON.stringify(hydratedFinalJson || {}, null, 2);
             var sourceMode = hydratedFinalJson && hydratedFinalJson.sourceMode ? hydratedFinalJson.sourceMode : "memory";
-            source.textContent = sourceMode === "memory" ? labels.memory : sourceMode;
+            source.textContent = sourceMode === "memory" ? labels.memory : sourceLabel(sourceMode);
             source.className = "ai-source-chip ai-source-" + (sourceMode === "memory" ? "local" : sourceMode === "error" ? "error" : "llm");
         }
 
@@ -406,13 +421,13 @@
                     }
                 });
             }).then(function (data) {
-                source.textContent = data.sourceMode || "unknown";
+                source.textContent = sourceLabel(data.sourceMode);
                 source.className = "ai-source-chip ai-source-" + (data.sourceMode === "error" ? "error" : "llm");
                 addMessage(data.success ? resolveAgentReply(data) : (data.errorMessage || labels.agentFailed), "agent-message-assistant");
                 renderTrace(data.toolTrace || []);
                 finalJson.textContent = JSON.stringify(data.finalJson || {}, null, 2);
             }).catch(function (error) {
-                source.textContent = "error";
+                source.textContent = labels.error;
                 source.className = "ai-source-chip ai-source-error";
                 addMessage(labels.chatFailed + ": " + error.message, "agent-message-assistant");
             });

@@ -31,7 +31,7 @@
             </div>
             <ul class="feature-list">
                 <% for (String item : notifications) { %>
-                <li><%= item %></li>
+                <li><%= i18n.td(item) %></li>
                 <% } %>
             </ul>
         </article>

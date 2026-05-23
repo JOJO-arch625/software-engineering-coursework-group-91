@@ -66,7 +66,7 @@
                     <td><a class="table-link" href="<%= request.getContextPath() %>/mo/review?jobId=<%= app.getJobId() %>&appId=<%= app.getId() %>"><%= applicant == null ? app.getTaId() : applicant.getFullName() %></a></td>
                     <td><%= job == null ? "0" : job.getTitle().replace("Software Engineering TA - ", "") %></td>
                     <td><span class="muted"><%= skills %></span></td>
-                    <td><%= app.getPriority() %></td>
+                    <td><%= i18n.td(app.getPriority()) %></td>
                     <td><strong><%= fitScore %>%</strong></td>
                     <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + app.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td><%= app.getSubmittedAt() == null ? "0" : app.getSubmittedAt() %></td>

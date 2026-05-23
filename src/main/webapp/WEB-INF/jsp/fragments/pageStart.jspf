@@ -22,6 +22,33 @@
     boolean isMo = "MO".equals(currentRole);
     boolean isAdmin = "ADMIN".equals(currentRole);
     String workspaceLabel = isTa ? i18n.t("topbar.workspace.ta") : (isMo ? i18n.t("topbar.workspace.mo") : (isAdmin ? i18n.t("topbar.workspace.admin") : i18n.t("topbar.workspace.guest")));
+    String localizedViewTitle = viewTitle;
+    String titleKey = "view.title." + currentView;
+    String translatedTitle = i18n.t(titleKey);
+    if (!translatedTitle.startsWith("!" + titleKey)) {
+        localizedViewTitle = translatedTitle;
+    }
+    String tagKey = null;
+    if ("gateway".equals(currentView)) {
+        tagKey = "view.tag.gateway";
+    } else if ("search".equals(currentView)) {
+        tagKey = "view.tag.search";
+    } else if ("inbox".equals(currentView)) {
+        tagKey = "view.tag.inbox";
+    } else if ("admin-dashboard".equals(currentView)) {
+        tagKey = "view.tag.admin-flow";
+    } else if (isMo) {
+        tagKey = "view.tag.mo-flow";
+    } else if (isTa) {
+        tagKey = "view.tag.ta-flow";
+    }
+    String localizedViewTag = viewTag;
+    if (tagKey != null) {
+        String translatedTag = i18n.t(tagKey);
+        if (!translatedTag.startsWith("!" + tagKey)) {
+            localizedViewTag = translatedTag;
+        }
+    }
     // Build lang toggle URL preserving existing query params
     String newLang = "zh".equals(lang) ? "en" : "zh";
     String qs = request.getQueryString();
@@ -43,7 +70,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= viewTitle %> | <%= i18n.t("page.title.suffix") %></title>
+    <title><%= localizedViewTitle %> | <%= i18n.t("page.title.suffix") %></title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260522b">
 </head>
 <body>
@@ -141,8 +168,8 @@
 
         <section class="summary-banner">
             <div>
-                <p class="eyebrow" id="view-tag"><%= viewTag %></p>
-                <h2 id="view-title"><%= viewTitle %></h2>
+                <p class="eyebrow" id="view-tag"><%= localizedViewTag %></p>
+                <h2 id="view-title"><%= localizedViewTitle %></h2>
             </div>
             <div class="status-strip">
                 <article class="status-card">

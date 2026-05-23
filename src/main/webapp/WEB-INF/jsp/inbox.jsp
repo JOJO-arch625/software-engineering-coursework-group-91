@@ -42,7 +42,7 @@
                         </div>
                         <span class="muted" style="font-size: 13px;"><%= notification.getCreatedAt() %></span>
                     </header>
-                    <p><%= notification.getMessage() %></p>
+                    <p><%= i18n.td(notification.getMessage()) %></p>
                     <div class="button-row">
                         <% if (notification.getLink() != null && !notification.getLink().isEmpty()) { %>
                         <a class="secondary-button" href="<%= request.getContextPath() %><%= notification.getLink() %>"><%= i18n.t("inbox.view-details") %></a>

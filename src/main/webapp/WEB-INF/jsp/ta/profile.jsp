@@ -51,8 +51,8 @@
             </div>
             <p class="file-name"><%= cvPath != null ? cvPath : i18n.t("ta.profile.cv-no-file") %></p>
             <div class="alert <%= hasPdfCv ? "success" : "info" %>" style="margin-top: 0; margin-bottom: 16px;">
-                <strong><%= hasPdfCv ? "AI analysis ready" : "AI analysis supports PDF only" %></strong><br>
-                PDF CVs can be used by the AI Fit Advisor to extract skill evidence. Only PDF content is analysed in this version.
+                <strong><%= hasPdfCv ? i18n.t("ta.profile.ai-ready") : i18n.t("ta.profile.ai-pdf-only") %></strong><br>
+                <%= i18n.t("ta.profile.ai-pdf-note") %>
             </div>
             <form method="post" action="<%= request.getContextPath() %>/ta/profile" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="uploadCv">

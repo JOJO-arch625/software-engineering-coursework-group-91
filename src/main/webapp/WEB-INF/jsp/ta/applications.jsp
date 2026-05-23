@@ -32,7 +32,7 @@
                 %>
                 <tr>
                     <td><strong><%= pageService.getJobModuleCode(record.getJobId()) %></strong><br><span class="muted"><%= pageService.getJobTitle(record.getJobId()) %></span></td>
-                    <td><%= record.getPriority() %></td>
+                    <td><%= i18n.td(record.getPriority()) %></td>
                     <td><span class="status-chip <%= statusClass %>"><%= i18n.t("status." + record.getStatus().toLowerCase().replace(" ", "-")) %></span></td>
                     <td>
                         <strong><%= i18n.t("ta.applications.motivation") %>:</strong> <%= record.getNotes() == null ? "" : record.getNotes() %><br>

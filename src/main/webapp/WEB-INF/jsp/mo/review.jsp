@@ -21,21 +21,21 @@
         <article class="panel">
             <div class="panel-header">
                 <h4><%= i18n.t("mo.review.heading") %></h4>
-                <p class="muted" style="margin: 4px 0 0; font-size: 13px;"><%= TarsService.MO_COURSE_LABEL %></p>
-                <p><%= i18n.t("mo.review.description") %></p>
+                <p class="muted" style="margin: 4px 0 0; font-size: 13px;"><%= i18n.t("course.mo.label") %></p>
+                <p><%= i18n.t("mo.review.page-description") %></p>
             </div>
             <p class="muted review-list-caption">
-                Showing <%= allApplications == null ? 0 : allApplications.size() %> applicants.
+                <%= i18n.t("mo.review.showing-applicants", allApplications == null ? 0 : allApplications.size()) %>
             </p>
             <div class="table-shell">
                 <table>
                     <thead>
                     <tr>
                         <th><%= i18n.t("mo.review.applicant") %></th>
-                        <th>Position</th>
+                        <th><%= i18n.t("mo.dashboard.position") %></th>
                         <th><%= i18n.t("mo.review.priority") %></th>
-                        <th>Skill Fit</th>
-                        <th>CV</th>
+                        <th><%= i18n.t("mo.review.fit-score") %></th>
+                        <th><%= i18n.t("common.cv") %></th>
                     </tr>
                     </thead>
                     <tbody>
@@ -49,14 +49,14 @@
                     %>
                     <tr style="<%= isSelected ? "background: rgba(0,180,216,0.08);" : "" %>">
                         <td><a class="table-link" href="<%= request.getContextPath() %>/mo/review?appId=<%= record.getId() %>"><%= applicant == null ? record.getTaId() : applicant.getFullName() %></a></td>
-                        <td><%= TarsService.MO_COURSE_TITLE %> TA</td>
-                        <td><%= record.getPriority() %></td>
+                        <td><%= i18n.t("course.mo.title") %> TA</td>
+                        <td><%= i18n.td(record.getPriority()) %></td>
                         <td><strong><%= fitScore %>%</strong></td>
                         <td>
                             <% if (hasApplicantCv) { %>
-                            <a class="table-link" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= record.getTaId() %>">View CV</a>
+                            <a class="table-link" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= record.getTaId() %>"><%= i18n.t("common.view-cv") %></a>
                             <% } else { %>
-                            <span class="muted">No CV</span>
+                            <span class="muted"><%= i18n.t("common.no-cv") %></span>
                             <% } %>
                         </td>
                     </tr>
@@ -97,16 +97,16 @@
             <h4 style="margin-bottom: 10px;"><%= selectedApplicant.getFullName() %></h4>
             <p class="muted" style="margin: 0 0 12px; font-size: 13px;"><%= selectedJob == null ? "" : selectedJob.getTitle() %></p>
             <div class="ai-evidence-box" style="margin-bottom: 12px;">
-                <strong>Applicant CV attachment</strong>
+                <strong><%= i18n.t("mo.review.applicant-cv-attachment") %></strong>
                 <% if (selectedHasCv) { %>
                 <p class="file-name"><%= selectedCvPath %></p>
-                <a class="secondary-button" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= selectedApplicant.getId() %>">Open CV</a>
+                <a class="secondary-button" target="_blank" href="<%= request.getContextPath() %>/cv/view?taId=<%= selectedApplicant.getId() %>"><%= i18n.t("common.open-cv") %></a>
                 <% } else { %>
-                <p>No CV has been uploaded for this applicant.</p>
+                <p><%= i18n.t("mo.review.no-cv-uploaded") %></p>
                 <% } %>
             </div>
             <div class="ai-score-shell" style="margin-bottom: 6px;">
-                <span class="ai-score-label">Skill Fit</span>
+                <span class="ai-score-label"><%= i18n.t("mo.review.fit-score") %></span>
                 <strong><%= profileFitScore %></strong>
             </div>
             <% if (!profileMissing.isEmpty()) { %>

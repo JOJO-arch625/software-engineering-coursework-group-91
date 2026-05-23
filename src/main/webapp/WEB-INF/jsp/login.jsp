@@ -23,7 +23,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | <%= i18n.t("page.title.suffix") %></title>
+    <title><%= i18n.t("login.page-title") %> | <%= i18n.t("page.title.suffix") %></title>
     <link rel="stylesheet" href="<%= contextPath %>/assets/styles/app.css?v=20260522b">
 </head>
 <body class="login-page">
@@ -100,7 +100,7 @@
                         <span>mo.demo / MoDemo123</span>
                     </div>
                     <div class="account-chip">
-                        <strong>Admin</strong>
+                        <strong><%= i18n.t("login.demo-role-admin") %></strong>
                         <span>admin.demo / AdminDemo123</span>
                     </div>
                 </div>
