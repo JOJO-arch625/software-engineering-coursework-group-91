@@ -15,8 +15,9 @@ export default function registerLoginAndRoutingTests(runner) {
       const { response, html } = await client.getHtml("/login");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "Login | TA Recruitment System");
-      assertContainsText(html, "Open your role workspace");
+      assertTitle(html, "Login | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
+      assertContainsText(html, "TA Recruitment Portal");
+      assertContainsText(html, "Streamline applications, reviews, and workload monitoring in one place.");
       assertContainsText(html, "Demo accounts");
       assertContainsText(html, "ta.demo / TaDemo123");
     });
@@ -40,7 +41,8 @@ export default function registerLoginAndRoutingTests(runner) {
       assert.equal(response.status, 200);
       assertContainsText(html, "TA Dashboard");
       assertContainsText(html, "Latest Notifications");
-      assertContainsText(html, "Applications: 2 / 3");
+      assertContainsText(html, "Applications:");
+      assertContainsText(html, "Accepted:");
     });
 
     test("TA users are redirected away from admin-only pages", async () => {

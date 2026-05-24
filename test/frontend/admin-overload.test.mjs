@@ -1,4 +1,4 @@
-import assert from "node:strict";
+import assert from "node:assert/strict";
 import { SessionClient } from "../helpers/sessionClient.mjs";
 import { DEMO_ACCOUNTS } from "../helpers/testConfig.mjs";
 import { assertContainsText } from "../helpers/htmlAssertions.mjs";
@@ -15,7 +15,8 @@ export function registerAdminOverloadTests(runner) {
 
     suite.test("Admin workload page shows correctly", async () => {
       const { html } = await client.getHtml("/admin/workload");
-      assertContainsText(html, "TA Workload Summary");
+      assertContainsText(html, "Workload Overview");
+      assertContainsText(html, "Total TAs tracked");
     });
 
     suite.test("Admin page shows overload indicator when applicable", async () => {

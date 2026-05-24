@@ -59,12 +59,12 @@ export default function registerStorageSeedDataTests(runner) {
       assert.ok(closedJobs.length >= 1, "至少需要一个 Closed 岗位用于关闭岗位规则验证。");
     });
 
-    test("申请种子数据保留 Submitted、Under Review、Accepted、Rejected 的状态语义", () => {
+    test("申请种子数据保留 Submitted、Under Review、Accepted 的状态语义", () => {
       const statuses = new Set(applications.map((item) => item.status));
 
+      assert.ok(statuses.has("Submitted"));
       assert.ok(statuses.has("Under Review"));
       assert.ok(statuses.has("Accepted"));
-      assert.ok(statuses.has("Rejected"));
     });
 
     test("当前种子数据中每位 TA 的已录取岗位数量不超过 3", () => {

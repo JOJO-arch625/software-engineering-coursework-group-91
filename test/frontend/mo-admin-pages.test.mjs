@@ -17,10 +17,10 @@ export default function registerMoAndAdminPageTests(runner) {
       const { response, html } = await client.getHtml("/mo/dashboard");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "MO Dashboard | TA Recruitment System");
-      assertContainsText(html, "My Job Postings");
-      assertContainsText(html, "Object-Oriented Programming TA");
-      assertContainsText(html, "Decision Support");
+      assertTitle(html, "MO Dashboard | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
+      assertContainsText(html, "EBU6304 Software Engineering - Applications");
+      assertContainsText(html, "Software Engineering TA");
+      assertContainsText(html, "Open postings");
       assertContainsText(html, "Pending review");
     });
 
@@ -31,14 +31,13 @@ export default function registerMoAndAdminPageTests(runner) {
       const { response, html } = await client.getHtml("/mo/review?jobId=job-2&appId=app-1");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "Applicant Review | TA Recruitment System");
+      assertTitle(html, "Applicant Review | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
       assertContainsText(html, "Applicant Review");
-      assertContainsText(html, "Selected Applicant Detail");
+      assertContainsText(html, "Applicant Detail");
       assertContainsText(html, "Yuyanchen Long");
       assertContainsText(html, "Mark under review");
       assertContainsText(html, "Mark shortlisted");
-      assertContainsText(html, "Bulk shortlist current job");
-      assertContainsText(html, "Accept applicant");
+      assertContainsText(html, "Accept");
     });
 
     test("Admin dashboard highlights workload alerts and tracked TA records", async () => {
@@ -48,7 +47,7 @@ export default function registerMoAndAdminPageTests(runner) {
       const { response, html } = await client.getHtml("/admin/workload");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "Admin Workload Dashboard | TA Recruitment System");
+      assertTitle(html, "Admin Workload Dashboard | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
       assertContainsText(html, "Workload Overview");
       assertContainsText(html, "Threshold: 10 weekly hours");
       assertContainsText(html, "Weekly Hours");

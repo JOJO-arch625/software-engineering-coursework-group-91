@@ -58,7 +58,7 @@
     "userId": "mo-1",
     "category": "review",
     "message": "New applicant for Software Engineering TA: Yuyanchen Long.",
-    "link": "/mo/review?appId=app-1",
+    "link": "/mo/review?appId\u003dapp-1",
     "read": true,
     "createdAt": "2026-05-20 10:00"
   },
@@ -67,7 +67,7 @@
     "userId": "mo-1",
     "category": "review",
     "message": "New applicant for Lab Support TA: Ming Li.",
-    "link": "/mo/review?appId=app-2",
+    "link": "/mo/review?appId\u003dapp-2",
     "read": true,
     "createdAt": "2026-05-21 14:30"
   },
@@ -76,7 +76,7 @@
     "userId": "mo-1",
     "category": "review",
     "message": "New applicant for Tutorial TA: Siyu Chen.",
-    "link": "/mo/review?appId=app-3",
+    "link": "/mo/review?appId\u003dapp-3",
     "read": true,
     "createdAt": "2026-05-22 09:00"
   },
@@ -88,5 +88,23 @@
     "link": "/admin/workload",
     "read": false,
     "createdAt": "2026-05-22 10:00"
+  },
+  {
+    "id": "notif-6185185708100",
+    "userId": "mo-1",
+    "category": "review",
+    "message": "New applicant for Lab Support TA: darou Li.",
+    "link": "/mo/review?jobId\u003djob-4",
+    "read": false,
+    "createdAt": "2026-05-24 11:47"
+  },
+  {
+    "id": "notif-6419898129700",
+    "userId": "mo-1",
+    "category": "review",
+    "message": "New applicant for Tutorial TA: darou Li.",
+    "link": "/mo/review?jobId\u003djob-6",
+    "read": false,
+    "createdAt": "2026-05-24 11:51"
   }
 ]

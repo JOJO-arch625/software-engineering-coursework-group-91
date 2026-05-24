@@ -70,6 +70,7 @@ public class UserAccount implements Serializable {
         this.linkedId = linkedId;
     }
 
+    //头像名称缩写
     /**
      * Extracts initials from the display name for use as an avatar.
      * For a single-word name, returns the first letter.

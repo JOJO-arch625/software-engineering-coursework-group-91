@@ -48,7 +48,7 @@
     "workload": "6 hours / week",
     "weeklyHours": 6,
     "deadline": "2026-05-25",
-    "status": "Open",
+    "status": "Closed",
     "description": "Support weekly lab sessions for Software Engineering."
   },
   {
@@ -76,5 +76,18 @@
     "deadline": "2026-05-28",
     "status": "Open",
     "description": "Lead tutorial sessions for Software Engineering."
+  },
+  {
+    "id": "job-bba0bd71",
+    "moId": "mo-1",
+    "moduleCode": "EBU6304",
+    "title": "Software Engineering TA",
+    "skills": "123",
+    "requirements": "6564",
+    "workload": "123",
+    "weeklyHours": 45,
+    "deadline": "2026-12-01",
+    "status": "Open",
+    "description": "1"
   }
 ]

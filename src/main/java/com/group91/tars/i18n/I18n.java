@@ -17,6 +17,10 @@ import java.util.ResourceBundle;
  * positional parameter substitution via {@link MessageFormat}.
  */
 public class I18n {
+    //这个是资源文件的基础名。
+    // 它对应的是：
+    // src/main/resources/i18n/messages_en.properties
+    // src/main/resources/i18n/messages_zh.properties
     private static final String BASE_NAME = "i18n.messages";
 
     /** Custom ResourceBundle.Control that reads properties files as UTF-8. */

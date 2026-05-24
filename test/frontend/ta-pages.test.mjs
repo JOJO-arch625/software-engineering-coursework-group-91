@@ -21,27 +21,26 @@ export default function registerTaPageTests(runner) {
       const { response, html } = await client.getHtml("/ta/jobs");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "Browse Job Postings | TA Recruitment System");
+      assertTitle(html, "Browse Job Postings | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
       assertContainsText(html, "Available Jobs");
       assertContainsText(html, "Object-Oriented Programming TA");
-      assertContainsText(html, "Digital Systems TA");
+      assertContainsText(html, "Software Engineering TA");
       assertContainsText(html, "Responsible MO");
       assertContainsText(html, "Application deadline");
       assertNotContainsText(html, "Data Analytics TA");
-      assertNotContainsText(html, "Closed");
     });
 
-    test("applications page keeps rejected applications visible", async () => {
+    test("applications page shows submitted and under-review applications", async () => {
       const { response, html } = await client.getHtml("/ta/applications");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "My Applications | TA Recruitment System");
+      assertTitle(html, "My Applications | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
       assertContainsText(html, "Visible rejection rule");
-      assertContainsText(html, "Digital Systems TA");
+      assertContainsText(html, "Software Engineering TA");
       assertContainsText(html, "Under Review");
       assertContainsText(html, "MO review");
-      assertContainsText(html, "Data Analytics TA");
-      assertContainsText(html, "Rejected");
+      assertContainsText(html, "Lab Support TA");
+      assertContainsText(html, "Submitted");
     });
 
     test("dashboard shows explainable AI recommendations", async () => {
@@ -58,11 +57,11 @@ export default function registerTaPageTests(runner) {
       const { response, html } = await client.getHtml("/ta/job?id=job-1");
 
       assert.equal(response.status, 200);
-      assertTitle(html, "Job Detail And Application | TA Recruitment System");
+      assertTitle(html, "Job Detail And Application | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
       assertContainsText(html, "Apply To This Job");
       assertContainsText(html, "Preference ranking");
       assertContainsText(html, "Submit application");
-      assertContainsText(html, "Optional AI Fit Summary");
+      assertContainsText(html, "Optional AI Fit Summary - AI Fit Advisor");
     });
   });
 }

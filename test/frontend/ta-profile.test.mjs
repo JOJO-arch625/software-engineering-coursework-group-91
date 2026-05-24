@@ -14,14 +14,14 @@ export function registerTaProfileTests(runner) {
 
     suite.beforeEach(async () => {
       client = new SessionClient();
-      await client.login(DEMO_ACCOUNTS.ta.username, DEMO_ACCOUNTS.password);
+      await client.login(DEMO_ACCOUNTS.ta.username, DEMO_ACCOUNTS.ta.password);
     });
 
     suite.test("TA can access profile page", async () => {
       const { html } = await client.getHtml("/ta/profile");
-      assertTitle(html, "My Profile");
-      assertContainsText(html, "Full Name");
-      assertContainsText(html, "CV");
+      assertTitle(html, "TA Profile And CV | INTERNATIONAL SCHOOL TA RECRUITMENT SYSTEM");
+      assertContainsText(html, "Full name");
+      assertContainsText(html, "CV Upload");
     });
 
     suite.test("Profile page shows skills and availability", async () => {

@@ -5,7 +5,7 @@ import registerMoAndAdminPageTests from "./frontend/mo-admin-pages.test.mjs";
 
 import { registerMoWorkflowTests } from "./frontend/mo-workflow.test.mjs";
 import { registerAdminOverloadTests } from "./frontend/admin-overload.test.mjs";
-import { registerSecurityNegativeTests } from "./frontend/security-negative-tests.mjs";
+import { registerSecurityNegativeTests } from "./frontend/security-negative-tests.test.mjs";
 
 import { registerTaProfileTests } from "./frontend/ta-profile.test.mjs";
 import { registerTaApplicationRulesTests } from "./frontend/ta-application-rules.test.mjs";

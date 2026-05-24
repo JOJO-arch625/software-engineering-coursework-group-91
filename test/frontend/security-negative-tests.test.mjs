@@ -1,4 +1,4 @@
-import assert from "node:strict";
+import assert from "node:assert/strict";
 import { SessionClient } from "../helpers/sessionClient.mjs";
 import { assertRedirectLocation } from "../helpers/sessionClient.mjs";
 import { assertContainsText } from "../helpers/htmlAssertions.mjs";
@@ -19,21 +19,35 @@ export function registerSecurityNegativeTests(runner) {
 
     suite.test("TA cannot access MO routes", async () => {
       await client.login("ta.demo", "TaDemo123");
-      const res = await client.request("/mo/create-job", { method: "GET" });
-      assertRedirectLocation(res, "/access-denied");
+      const res = await client.request("/mo/jobs/edit", { method: "GET" });
+      assertRedirectLocation(res, "/ta/dashboard");
     });
 
     suite.test("TA cannot access Admin routes", async () => {
       await client.login("ta.demo", "TaDemo123");
       const res = await client.request("/admin/workload", { method: "GET" });
-      assertRedirectLocation(res, "/access-denied");
+      assertRedirectLocation(res, "/ta/dashboard");
     });
 
     suite.test("Cannot apply to closed job", async () => {
       await client.login("ta.demo", "TaDemo123");
-      const res = await client.request("/jobs/apply/closed-job-1", { method: "POST" });
-      const html = await res.text();
-      assertContainsText(html, "closed");
+      const form = new URLSearchParams();
+      form.set("jobId", "job-3");
+      form.set("priority", "Priority 1");
+      form.set("notes", "Closed job attempt.");
+      form.set("applicantSkills", "Python");
+      form.set("applicantDescription", "Attempting to apply to a closed posting.");
+
+      const res = await client.request("/ta/job", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: form.toString()
+      });
+      assertRedirectLocation(res, "/ta/job");
+      const { html } = await client.getHtml("/ta/job?id=job-3");
+      assertContainsText(html, "This posting is closed and cannot accept new applications.");
     });
   });
 }
